@@ -1,0 +1,263 @@
+/*=============================
+	Start Pricing Table CSS
+===============================*/
+
+.package .container-package {
+    display: flex;
+}
+.package .package-list {
+    padding: 10px 15px 10px 15px !important;
+    display: flex;
+}
+
+.package .row-left {
+    padding-right: 10px;
+    width: 65%;
+}
+.package .row-left .image {
+    padding-right: 10px;
+    width: 20%;
+}
+.package .row-left .table-head {
+    padding-right: 10px;
+    width: 80%;
+}
+.package .row-left .btn-package,
+.package .row-left .btn-detail {
+    border-radius: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    float: right;
+    width: 30%;
+}
+.package .row-left .btn-package:hover,
+.package .row-left .btn-detail:hover {
+    background-color: rgb(0, 129, 241);
+    margin-right: 10px;
+    margin-top: 10px;
+}
+.package .row-left .btn-detail {
+    border: 1px solid #1044ee;
+    background-color: #f9f9f9;
+}
+.package .row-left .btn-package {
+    background-color: rgb(158, 203, 243);
+}
+.package .row-right {
+    padding-left: 10px;
+    width: 35%;
+}
+.pricing-table .single-table .price {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a76d1;
+}
+.pricing-table .single-table .title-package {
+    font-size: 21px;
+    color: #2C2D3F;
+    margin-top: 5px ;
+    margin-bottom: 10px;
+}
+
+.image-custom{
+    border-radius: 50%;
+    height: 150px;
+    width: 150px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.center-image {
+    display: flex;
+    justify-content: center;
+}
+.pricing-table {
+    padding-bottom: 20px;
+    background: #ffffff;
+    position: relative;
+}
+.padbt-100{
+    padding-bottom: 100px;
+}
+
+.pricing-table .single-table {
+    background: #f9f9f9;
+    border: 2px solid #2834da;
+    border-radius: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 30px 35px 30px 35px;
+}
+
+/* Table Head */
+.pricing-table .single-table .table-head, .pricing-table .section-title-about {
+    text-align: center;
+}
+
+.pricing-table .single-table .icon i {
+    font-size: 65px;
+    color: #1a76d1;
+}
+
+.pricing-table .single-table .title {
+    font-size: 21px;
+    color: #2C2D3F;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.pricing-table .single-table .amount {
+    font-size: 36px;
+    font-weight: 600;
+    color: #1a76d1;
+}
+.pricing-table .single-table .amount span {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 400;
+    color: #868686;
+    margin-left: 8px;
+}
+
+/* Table List */
+.pricing-table .single-table .table-list {
+    text-align: left;
+    margin-top: 30px;
+    list-style: none;
+}
+
+.pricing-table .table-list li {
+    position: relative;
+    color: #666;
+    text-transform: capitalize;
+    margin-bottom: 18px;
+    padding-right: 32px;
+}
+
+.pricing-table .table-list li:last-child {
+    margin-bottom: 0px;
+}
+
+.pricing-table .table-list li.cross i {
+    background: #aaaaaa;
+}
+
+.pricing-table .table-list i {
+    font-size: 7px;
+    text-align: center;
+    margin-right: 10px;
+    position: absolute;
+    right: 0;
+    height: 16px;
+    width: 16px;
+    line-height: 16px;
+    text-align: center;
+    color: #fff;
+    background: #1a76d1;
+    border-radius: 100%;
+    padding-left: 1px;
+}
+
+/* Table Bottom */
+.pricing-table .table-bottom {
+    margin-top: 25px;
+    background-color: rgb(158, 203, 243);
+}
+
+.pricing-table .table-bottom:hover {
+    margin-top: 25px;
+    background-color: rgb(0, 129, 241);
+}
+
+.pricing-table .btn {
+    padding: 12px 25px;
+    width: 100%;
+    color: #1044ee;
+}
+
+.pricing-table .btn:before {
+    background: #2C2D3F;
+}
+
+.pricing-table .btn:hover {
+    color: #fff;
+}
+
+.pricing-table .btn i {
+    font-size: 16px;
+    margin-right: 10px;
+}
+.single-table:hover {
+    box-shadow: 1px 14px 18px 0px rgba(1, 5, 241, 0.2);
+}
+/*=============================
+	End Pricing Table CSS
+===============================*/
+.pricing-table .slick-prev,
+.pricing-table .slick-next {
+    width: 50px;
+    height: 50px;
+    z-index: 2;
+    background-color: #0267cc;
+    border-radius: 10px;
+}
+
+.pricing-table .slick-prev:before,
+.pricing-table .slick-next:before {
+    opacity: 1;
+}
+
+.pricing-table .slick-prev:hover,
+.pricing-table .slick-next:hover {
+    opacity: .75;
+    background-color: #0267cc;
+}
+@media (min-width: 992px) {
+   .custom-slider{
+    width: 100%;
+    padding-right: 25px;
+    padding-left: 25px;
+   }
+}
+
+@media only screen and (max-width: 767px) {
+    .pricing-table .slick-prev,
+    .pricing-table .slick-next {
+        display: none !important;
+    }
+        .package .row-left {
+            width: 100%;
+        }
+    
+        .package .row-left .image {
+            padding-right: 5px;
+        }
+    
+        .package .row-left .table-head {
+            padding-right: 0px;
+        }
+    
+        .package .row-left .btn-package,
+        .package .row-left .btn-detail {
+            margin-top: 10px;
+            width: 80%;
+        }
+    
+        .package .row-right {
+            display: none;
+        }
+    
+        .pricing-table .single-table .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a76d1;
+        }
+    
+        .pricing-table .single-table .title-package {
+            font-size: 18px;
+            color: #2C2D3F;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+}

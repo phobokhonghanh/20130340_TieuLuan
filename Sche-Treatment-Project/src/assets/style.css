@@ -1,0 +1,133 @@
+html {
+  scroll-behavior: smooth;
+}
+ body {
+   font-family: Arial, sans-serif;
+ }
+.form-style{
+    display: grid !important;
+}
+.m-25{
+  margin:25px;
+}
+.m-top-5{
+    margin-top: 5%;
+}
+.m-left2{
+    margin-left: -2%;
+}
+.font-style{
+    font-size: 1rem;
+    font-weight: 100;
+}
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    z-index: -1; 
+ }
+  @media (max-width: 1000px) {
+    .background-image {
+      display: none;
+    }
+  }
+  @media screen {
+  .justify-content-center .width{
+    width: 100%;
+    }
+  }
+  .logo-image {
+    position: inherit;
+    width: 50%;
+    height: 50%;
+    object-fit: cover; 
+  }
+  .background-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .container {
+    width: 100%;
+    height: 100%;
+  }
+  .div-logo{
+    width: 50%;
+  }
+  .back{
+    width: 50px !important;
+    height: 50px !important;
+  }
+  .m-top-back{
+  margin-top: revert;
+}
+.input-otp{
+  margin: 10px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  border: 1px solid rgb(173, 169, 169);
+}
+@media (max-width: 1000px) {
+  .input-otp {
+    width: 20px;
+  height: 20px;
+  }
+}
+.input-otp:focus {
+  border: 1px solid black; /* Border đen khi ô input được focus */
+}
+.center-table {
+  margin: 0 auto; /* Để căn giữa table */
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+}
+.table-container table tbody tr td {
+  padding: 5px 30px; /* Cách trái phải 5px */
+  border: 1px solid #ccc; /* Border cho mỗi ô */
+}
+.table-container table tbody tr td:hover {
+  background-color: #f0f0f0; /* Màu nền khi hover */
+}
+
+.time-table {
+  border-collapse: collapse;
+}
+
+.time-table th,
+.time-table td {
+  padding: 10px;
+  border: 1px solid #000;
+}
+.past-time{
+  background-color: rgb(230, 230, 230);
+  opacity: 0.5;
+}
+.past-time:hover{
+  cursor: not-allowed;
+}
+.time:hover{
+  cursor: pointer;
+}
+.button{
+  border: none;
+  background-color: white;
+  opacity: 0.5;
+}
+.button:hover{
+  opacity: 1;
+}
+.displayflex{
+  justify-content: center;
+  display: flex;
+}
+.text-ali-center{
+  text-align: center;
+}

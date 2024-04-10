@@ -1,0 +1,11 @@
+/* .modal-dialog{
+    top: 30%;
+} */
+.grid-example .row{
+    text-align: center;
+    padding: 10px;
+    border-bottom: .5px solid #dfdddd70;
+}
+.p-0{
+    padding: 0px;
+}

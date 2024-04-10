@@ -1,0 +1,200 @@
+/*===========================
+	Start Hero Area CSS
+=============================*/
+/* .slick-dots{
+    position: static !important;
+} */
+
+.slider{
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+.slider .single-slider {
+    height: 600px;
+    width: 100vw;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.slider .single-slider .text {
+    margin-top: 120px;
+}
+
+.slider.index2 .single-slider .text {
+    margin-top: 150px;
+}
+
+.slider .single-slider h1 {
+    color: #2C2D3F;
+    font-size: 38px;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+    line-height: 42px;
+}
+
+.slider .single-slider h1 span {
+    color: #1a76d1;
+}
+
+.slider .single-slider p {
+    color: #2C2D3F;
+    margin-top: 27px;
+    font-weight: 400;
+}
+
+.slider .single-slider .button-div {
+    background-color:#ffffff00;
+    display: flex;
+}
+.button-div .btn {
+    margin-left: 10px;
+}
+.slider .single-slider .btn {
+    color: #ffffff;
+    background: #1a76d1;
+    font-weight: 500;
+    display: inline-block;
+    margin: 0;
+    margin-right: 10px;
+}
+.slider .single-slider .search-input {
+    border-radius: 10px;
+    border: 1px;
+    color: #000000;
+    font-weight: 500;
+    width: 40%;
+    padding: 10px;
+    margin-right: 10px;
+}
+.slider .single-slider .search-input:focus{
+    opacity: .75;
+}
+.slider .single-slider .btn:hover {
+   opacity: 0.5;
+}
+.slider .single-slider .btn.primary:before {
+    background: #1A76D1;
+}
+
+.slider .single-slider .btn.primary {
+    background: #2C2D3F;
+    color: #fff;
+}
+
+.slider .single-slider .btn:last-child {
+    margin: 0;
+}
+
+.slider .owl-carousel .owl-nav {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    margin-top: -25px;
+}
+
+.slider .owl-carousel .owl-nav div {
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    text-align: center;
+    background: #1A76D1;
+    color: #fff;
+    font-size: 26px;
+    position: absolute;
+    margin: 0;
+    -webkit-transition: all 0.4s ease;
+    -moz-transition: all 0.4s ease;
+    transition: all 0.4s ease;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.slider .owl-carousel .owl-nav div:hover {
+    background: #2C2D3F;
+    color: #fff;
+}
+
+.slider .owl-carousel .owl-controls .owl-nav .owl-prev {
+    left: 20px;
+}
+
+.slider .owl-carousel .owl-controls .owl-nav .owl-next {
+    right: 20px;
+}
+
+/* Slider Animation */
+.owl-item.active .single-slider h1 {
+    animation: fadeInUp 1s both 0.6s;
+}
+
+.owl-item.active .single-slider p {
+    animation: fadeInUp 1s both 1s;
+}
+
+.owl-item.active .single-slider .button {
+    animation: fadeInDown 1s both 1.5s;
+}
+
+/*===========================
+	End Hero Area CSS
+=============================*/
+@media only screen and (max-width: 767px) {
+.slider .single-slider {
+        height: 380px;
+    }
+
+    .schedule {
+        background: #fff;
+        margin: 0;
+        padding: 0;
+        height: auto;
+        padding: 50px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .schedule .schedule-inner {
+        transform: none;
+    }
+
+    .schedule .single-schedule {
+        margin: 15px 0;
+    }
+
+    .slider .single-slider {
+        position: relative;
+    }
+
+    .slider .single-slider:before {
+        content: "";
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        background: #fff;
+        opacity: 0.5;
+    }
+
+    .slider .single-slider h1 {
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 35px;
+    }
+
+    .slider .single-slider .text {
+        margin-top: 80px;
+    }
+
+    .slider.index2 .single-slider .text {
+        margin-top: 80px;
+    }
+
+    .slider .owl-carousel .owl-nav div {
+        height: 40px;
+        width: 40px;
+        line-height: 40px;
+        border-radius: 4px;
+    }
+}
