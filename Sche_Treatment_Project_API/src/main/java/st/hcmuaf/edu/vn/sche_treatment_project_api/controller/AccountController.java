@@ -7,7 +7,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AccountService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/api/account")
 public class AccountController {
     AccountService accountService;
 

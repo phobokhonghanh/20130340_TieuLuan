@@ -3,18 +3,11 @@ import { Dialog } from "./AdminDialog";
 import { ModalInterface } from "./Modal";
 import { CalendarModel, Clinic, Doctor } from "../Models/Model";
 import { API_ENDPOINTS } from "../apiConfig.ts";
-import {
-  Button,
-  Col,
-  Container,
-  Form,
-  Modal,
-  Row,
-  Table,
-} from "react-bootstrap";
+import { Button, Col, Form, Modal, Row, Table } from "react-bootstrap";
 import Calendar, { TileArgs } from "react-calendar";
 import { format } from "date-fns";
 import { ChooseDoctor } from "./SelectWithSearch.tsx";
+import "../assets/Admin/css/styleAdmin.css";
 
 export const CalendarManager = () => {
   const [error, setError] = useState();
@@ -145,7 +138,7 @@ export const DataTableRoom = (data: DataTableRoomProps) => {
     if (columnA > columnB) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
-
+  const [modalShow, setModalShow] = useState<{ [key: number]: boolean }>({});
   return (
     <div>
       <input
@@ -201,21 +194,20 @@ export const DataTableRoom = (data: DataTableRoomProps) => {
               <td>{row.supportStatus.supportValue}</td>
               <td style={{ textAlign: "center" }}>
                 <a
-                  data-toggle="modal"
-                  data-target={"#Calendar" + Object.values(row)[0]}
-                  className="btn default btn-xs purple btn-edit"
+                  className="btn purple"
+                  onClick={() =>
+                    setModalShow({ ...modalShow, [rowIndex]: true })
+                  }
                 >
                   <i className="fa fa-calendar"></i>
                 </a>
-                <div
-                  style={{ textAlign: "left" }}
-                  id={"Calendar" + Object.values(row)[0]}
-                  className="modal fade"
-                  tabIndex={-1}
-                  role="dialog"
-                >
-                  <ModalCalendar data={row.calendars} />
-                </div>
+                <ModalCalendar
+                  data={row.calendars}
+                  show={modalShow[rowIndex] || false}
+                  onHide={() =>
+                    setModalShow({ ...modalShow, [rowIndex]: false })
+                  }
+                />
               </td>
               <td style={{ textAlign: "center" }}>
                 <a
@@ -308,6 +300,8 @@ export const DataTableRoom = (data: DataTableRoomProps) => {
 };
 interface CalendarProps {
   data: CalendarModel[];
+  show: boolean;
+  onHide: () => void;
 }
 export const ModalCalendar = (props: CalendarProps) => {
   const [showDialog, setshowDialog] = useState(false);
@@ -325,7 +319,7 @@ export const ModalCalendar = (props: CalendarProps) => {
         const startHour = parseInt(
           timetable.supportTime.supportValue.split(":")[0]
         );
-        const doctorName = calendar.doctor.accountId.accountName;
+        const doctorName = calendar.doctor.accountName;
 
         // Kiểm tra xem timetableDate đã tồn tại trong info chưa
         if (info.has(timetableDate)) {
@@ -376,61 +370,36 @@ export const ModalCalendar = (props: CalendarProps) => {
       }
     }
   };
-  const handleDateClick = (value: any) => {
-    setShowModal(true);
-    setDate(value);
-    console.log(date + " " + showModal);
-  };
+
   const handleDateChange = (value: any) => {
+    // props.onHide();
     setShowModal(true);
     setDate(value);
-    console.log(date + " " + showModal);
   };
   return (
-    <div>
-      <div className="modal-dialog" role="document">
-        <div className="modal-content" style={{ borderRadius: "10px" }}>
-          <div
-            className="modal-header"
-            style={{
-              backgroundColor: "#007bff",
-              color: "#fff",
-              padding: "10px 15px",
-              borderTopLeftRadius: "10px",
-              borderTopRightRadius: "10px",
-            }}
-          >
-            <button
-              type="button"
-              className="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true" style={{ color: "#fff" }}>
-                &times;
-              </span>
-            </button>
-            <h4 className="">Calendar</h4>
-            {showDialog && <Dialog />}
-          </div>
-          <div className="modal-body" style={{ padding: "20px" }}>
-            <Calendar
-              value={date}
-              tileContent={infoTime}
-              onChange={handleDateChange}
-            />
-          </div>
-        </div>
-      </div>
-      <div>
+    <Modal
+      {...props}
+      aria-labelledby="contained-modal-title-vcenter"
+      style={{ opacity: "1" }}
+      className="modalShow"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title id="contained-modal-title-vcenter">Lịch khám</Modal.Title>{" "}
+      </Modal.Header>
+      <Modal.Body className="grid-example">
+        <Calendar
+          value={date}
+          tileContent={infoTime}
+          onChange={handleDateChange}
+        />
         <ModalDoctorCalendar
           title={date.toDateString()}
           doctor={null}
           show={showModal}
           onHide={() => setShowModal(false)}
         />
-      </div>
-    </div>
+      </Modal.Body>
+    </Modal>
   );
 };
 
@@ -442,44 +411,70 @@ interface Props {
   handleCloseModal?: () => void;
 }
 export const ModalDoctorCalendar = (props: Props) => {
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null); // State để lưu thông tin về bác sĩ đã chọn
+  const handleDoneClick = (ca: string) => {
+    if (selectedDoctor) {
+      console.log("Ca: " + ca + " Ngày:", new Date().toISOString()); // Lấy ngày hiện tại
+      console.log("ID bác sĩ đã chọn:", selectedDoctor.id);
+    }
+    // Thực hiện các hành động khác khi nhấn vào nút "Xong"
+  };
+  const [listDoctor, setListDoctor] = useState<Doctor[]>([]);
+  const [error, setError] = useState();
+  const [isLoading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchClinic = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(API_ENDPOINTS.GET_DOCTOR_ALL);
+        const data = (await response.json()) as Doctor[];
+        setListDoctor(data);
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClinic();
+  }, []);
   return (
     <>
       <Modal
         {...props}
         aria-labelledby="contained-modal-title-vcenter"
+        style={{ opacity: "1" }}
+        className="modalShow modalShowDoctor"
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
             {props.title}
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="grid-example">
-          <Container>
-            <Form>
-              <Row>
+        <Modal.Body className="grid-example" style={{ width: "500px" }}>
+          <Form>
+            <Row style={{ textAlign: "left" }}>
+              {isLoading && <div>Loading...</div>}
+              {error && <div>Không có data doctor</div>}
+              <Col className="col-xs-6">
                 <b>Ca sáng</b>
-                <Row>
-                  <ChooseDoctor dataSelected={props.doctor} data={[]} />
-                </Row>
-              </Row>
-              <Row>
-                <Col>
-                  <Button onClick={props.onHide}>Xong</Button>
-                </Col>
-              </Row>
-              <Row>
+                <ChooseDoctor
+                  dataSelected={props.doctor}
+                  data={listDoctor}
+                  onDoctorSelect={(doctor: Doctor) => setSelectedDoctor(doctor)}
+                />
+                <Button onClick={() => handleDoneClick("S")}>Xong</Button>
+              </Col>
+              <Col className="col-xs-6">
                 <b>Ca chiều</b>
-                <Row>
-                  <ChooseDoctor dataSelected={props.doctor} data={[]} />
-                </Row>
-              </Row>
-              <Row>
-                <Col>
-                  <Button onClick={props.onHide}>Xong</Button>
-                </Col>
-              </Row>
-            </Form>
-          </Container>
+                <ChooseDoctor
+                  dataSelected={props.doctor}
+                  data={listDoctor}
+                  onDoctorSelect={(doctor: Doctor) => setSelectedDoctor(doctor)}
+                />
+                <Button onClick={() => handleDoneClick("C")}>Xong</Button>
+              </Col>
+            </Row>
+          </Form>
         </Modal.Body>
       </Modal>
     </>

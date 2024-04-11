@@ -1,0 +1,20 @@
+.modal .modal-dialog{
+    margin-top: 150px;
+}
+.modalShow .modal-content {
+    position: fixed;
+}
+.modalShowDoctor .modal-content{
+    position: absolute;
+    margin: 50px 150px;
+}
+.btn-close::before {
+    content: '×';
+}
+.btn-close{
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 20px;
+}

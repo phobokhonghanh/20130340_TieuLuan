@@ -17,12 +17,20 @@ export interface Account {
   supportStatus: Support;
 }
 export interface Doctor {
+  id: string;
+  accountPhone: string;
+  accountPassword: string;
+  accountName: string;
+  accountGender: number;
+  createAt: string;
+  updateAt: string;
+  supportRole: Support;
+  supportStatus: Support;
   doctorDegree: string;
   doctorRank: string;
   doctorIntroduce: string;
   doctorExp: string;
   doctorImage: string;
-  accountId: Account;
 }
 export interface CalendarModel {
   id: string;

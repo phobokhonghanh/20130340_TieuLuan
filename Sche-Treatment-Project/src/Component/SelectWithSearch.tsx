@@ -195,15 +195,19 @@ export const ChooseServices: React.FC<ChooseServicesProps> = ({
 };
 interface ChooseDoctorProps {
   dataSelected: Doctor | null;
-  data: Doctor[];
+  data: Doctor[] | null;
+  onDoctorSelect: (doctor: Doctor) => void;
 }
 export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
   data,
   dataSelected,
+  onDoctorSelect,
 }) => {
-  const [showDropdown, setShowDropdown] = useState(false); // show dropdown
-  const [selectedValues, setSelectedValues] = useState<Doctor | null>(dataSelected); // selected list Service
-  const [inputValue, setInputValue] = useState(""); // user input value
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedValues, setSelectedValues] = useState<Doctor | null>(
+    dataSelected
+  );
+  const [inputValue, setInputValue] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -224,6 +228,7 @@ export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
 
   const handleSelectChange = (selectedOption: Doctor) => {
     setSelectedValues(selectedOption);
+    onDoctorSelect(selectedOption);
     setShowDropdown(false);
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,10 +236,8 @@ export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
   };
 
   const filter = inputValue
-    ? data.filter((doctor) =>
-        doctor.accountId.accountName
-          .toLowerCase()
-          .includes(inputValue.toLowerCase())
+    ? data?.filter((doctor) =>
+        doctor.accountName.toLowerCase().includes(inputValue.toLowerCase())
       )
     : data;
 
@@ -244,7 +247,7 @@ export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
         <div className="custom-select-wrapper" ref={dropdownRef}>
           <input
             type="text"
-            value={selectedValues?.accountId.accountName}
+            value={selectedValues?.accountName || ""}
             className="custom-select-input"
             placeholder={`Chọn...`}
             onFocus={() => setShowDropdown(true)}
@@ -253,12 +256,12 @@ export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
           {showDropdown && (
             <div className="custom-select-dropdown">
               <ul>
-                {filter.map((doctor) => (
+                {filter?.map((doctor) => (
                   <li
-                    key={doctor.accountId.id}
+                    key={doctor.id}
                     onClick={() => handleSelectChange(doctor)}
                   >
-                    {doctor.accountId.accountName}
+                    {doctor.accountName}
                   </li>
                 ))}
               </ul>

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 @Data
 @Table(name = "doctor")
 @NoArgsConstructor
-public class Doctor {
+public class Doctor extends Account implements Serializable {
     @Column(name = "doctor_degree", length = 20)
     private String doctorDegree;
 
@@ -31,22 +32,8 @@ public class Doctor {
     @Column(name = "doctor_image", columnDefinition = "TEXT")
     private String doctorImage;
 
-    @Id
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
-    private Account accountId;
-
     @JsonIgnore
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
     private List<Calendar> calendars;
-    public Doctor(String doctorDegree, String doctorRank, String doctorSpecialty, String doctorIntroduce, String doctorExp, String doctorImage, Account accountId) {
-        this.doctorDegree = doctorDegree;
-        this.doctorRank = doctorRank;
-        this.doctorSpecialty = doctorSpecialty;
-        this.doctorIntroduce = doctorIntroduce;
-        this.doctorExp = doctorExp;
-        this.doctorImage = doctorImage;
-        this.accountId = accountId;
-    }
+
 }
