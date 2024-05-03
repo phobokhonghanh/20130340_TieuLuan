@@ -15,10 +15,10 @@ public class Evaluate {
     @Column(name = "evaluate_content", columnDefinition = "TEXT")
     private String evaluateContent;
 
-    @Column(name = "create_at", updatable = false, nullable = false)
+    @Column(name = "create_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "update_at", nullable = false)
+    @Column(name = "update_at")
     private LocalDateTime updatedAt;
 
     @ManyToOne

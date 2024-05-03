@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../assets/css/CardInfo.css";
 
 interface CardProps {
@@ -29,9 +30,9 @@ const Card: React.FC<CardProps> = ({
           <span>{subtitle}</span>
           <h4>{title}</h4>
           {content instanceof Node ? content.textContent : content}
-          <a href={href}>
+          <Link to={href}>
             CHI TIẾT<i className="fa fa-long-arrow-right"></i>
-          </a>
+          </Link>
         </div>
       </div>
     </div>
@@ -50,10 +51,11 @@ function CardInfo() {
                 title="Cấp cứu: 19008080"
                 content={
                   <p>
-                    Thời gian vàng là thời gian cứu sống bệnh nhân. Hãy tin tưởng và gọi ngay cho chúng tôi! 
+                    Thời gian vàng là thời gian cứu sống bệnh nhân. Hãy tin
+                    tưởng và gọi ngay cho chúng tôi!
                   </p>
                 }
-                href="#"
+                href="/about-us"
                 style="first"
               />
               <Card
@@ -62,11 +64,11 @@ function CardInfo() {
                 title="Bác sĩ"
                 content={
                   <p>
-                    Chúng tôi sẽ nổ lực hết sức vì niềm vui
-                    của bạn là nhiệm vụ của chúng tôi!
+                    Chúng tôi sẽ nổ lực hết sức vì niềm vui của bạn là nhiệm vụ
+                    của chúng tôi!
                   </p>
                 }
-                href="#"
+                href="/doctors"
                 style="middle"
               />
               <Card
@@ -83,7 +85,7 @@ function CardInfo() {
                     </li>
                   </ul>
                 }
-                href="#"
+                href="/services"
                 style="last"
               />
             </div>

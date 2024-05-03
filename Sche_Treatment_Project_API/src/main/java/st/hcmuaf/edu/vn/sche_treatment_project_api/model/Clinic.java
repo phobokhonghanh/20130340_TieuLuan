@@ -1,9 +1,10 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @Table(name = "clinic")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Clinic {
     @Id
     @Column(name = "id", length = 36)
@@ -23,10 +25,10 @@ public class Clinic {
     @Column(name = "create_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "update_at", nullable = false)
+    @Column(name = "update_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "medical_area_id")
     private MedicalArea medicalArea;
@@ -38,12 +40,4 @@ public class Clinic {
     @OneToMany(mappedBy = "clinic", cascade = CascadeType.ALL)
     private List<Calendar> calendars;
 
-    public Clinic(String id, String clinicName, LocalDateTime createdAt, LocalDateTime updatedAt, MedicalArea medicalArea, Support supportStatus) {
-        this.id = id;
-        this.clinicName = clinicName;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.medicalArea = medicalArea;
-        this.supportStatus = supportStatus;
-    }
 }

@@ -71,7 +71,7 @@ function AboutUs() {
       >
         <div className="container">
           <div className="row">
-            <div className="col-lg-3 col-md-6 col-12">
+            <div className="col-lg-3 col-md-6 col-12" style={{ width: "25%" }}>
               {/* <!-- Start Single Fun --> */}
               <div className="single-fun">
                 <i className="fas fa-home"></i>
@@ -82,7 +82,7 @@ function AboutUs() {
               </div>
               {/* <!-- End Single Fun --> */}
             </div>
-            <div className="col-lg-3 col-md-6 col-12">
+            <div className="col-lg-3 col-md-6 col-12" style={{ width: "25%" }}>
               {/* <!-- Start Single Fun --> */}
               <div className="single-fun">
                 <i className="fas fa-user"></i>
@@ -93,7 +93,7 @@ function AboutUs() {
               </div>
               {/* <!-- End Single Fun --> */}
             </div>
-            <div className="col-lg-3 col-md-6 col-12">
+            <div className="col-lg-3 col-md-6 col-12" style={{ width: "25%" }}>
               {/* <!-- Start Single Fun --> */}
               <div className="single-fun">
                 <i className="fas fa-smile"></i>
@@ -104,7 +104,7 @@ function AboutUs() {
               </div>
               {/* <!-- End Single Fun --> */}
             </div>
-            <div className="col-lg-3 col-md-6 col-12">
+            <div className="col-lg-3 col-md-6 col-12" style={{ width: "25%" }}>
               {/* <!-- Start Single Fun --> */}
               <div className="single-fun">
                 <i className="fas fa-table"></i>

@@ -1,8 +1,10 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,22 +13,19 @@ import java.util.List;
 @Entity
 @Table(name = "patient")
 @NoArgsConstructor
-public class Patient {
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper=false)
+
+public class Patient extends Account implements Serializable {
 
     @Column(name = "patient_bhyt", length = 20, nullable = false)
     private String patientBHYT;
 
-    @Id
-    @MapsId
-    @OneToOne
-    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
-    private Account accountId;
-
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Appointment> appointments;
 
-    public Patient(String patientBHYT, Account accountId) {
-        this.patientBHYT = patientBHYT;
-        this.accountId = accountId;
+    public Patient(String id) {
+        super(id);
     }
 }

@@ -1,23 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Container, Row, Col } from "react-bootstrap";
+import { CalendarModel, Support } from "../Models/Model";
+import "../assets/style.css";
+import { API_ENDPOINTS } from "../apiConfig";
 
 const TableTime = () => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [timeTable, setTimeTable] = useState<Support[]>([]);
+  const [error, setError] = useState();
+  const [isLoading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchAllTime = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(API_ENDPOINTS.GET_SUPPORT_ALLTIME);
+        const data = (await response.json()) as Support[];
+        setTimeTable(data);
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllTime();
+  }, []);
+  
   const generateTimeSlots = () => {
     const currentWeekDay = currentWeek.getDay();
     const daysOfWeek = [
+      "CHỦ NHẬT",
       "THỨ HAI",
       "THỨ BA",
       "THỨ TƯ",
       "THỨ NĂM",
       "THỨ SÁU",
       "THỨ BẢY",
-      "CHỦ NHẬT",
     ];
     const startDate = new Date(currentWeek);
     startDate.setDate(
-      currentWeek.getDate() - currentWeekDay + (currentWeekDay === 0 ? -6 : 1)
+      currentWeek.getDate() - currentWeekDay + (currentWeekDay === 0 ? 6 : 0)
     );
 
     const timeSlots = [];
@@ -34,18 +56,18 @@ const TableTime = () => {
       });
       const [_, date] = dateString.split(",");
 
-      const timeRanges = Array.from({ length: 10 }, (_, i) => `${i + 7}:00`);
+      // const timeRanges = Array.from({ length: 10 }, (_, i) => `${i + 7}:00`);
 
-      const timeSlotsForDay = timeRanges.map((time, index) => {
+      const timeSlotsForDay = timeTable.map((time, index) => {
         const timeStart = new Date(currentDate);
         timeStart.setHours(index + 7);
+        
         if (timeStart < new Date()) {
           style = "past-time";
-          return <span key={index}>{time}</span>;
         } else {
           style = "time";
-          return <span key={index}>{time}</span>;
         }
+        return <button style={{}} key={time.id}>{time.supportValue}</button>;
       });
 
       timeSlots.push({
@@ -121,3 +143,6 @@ const TableTime = () => {
 };
 
 export default TableTime;
+interface Props {
+  calendars: CalendarModel[];
+}

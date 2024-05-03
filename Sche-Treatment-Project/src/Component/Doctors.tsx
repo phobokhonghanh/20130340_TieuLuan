@@ -1,101 +1,23 @@
 import "../assets/css/Package.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
 import Slider from "react-slick";
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-interface DoctorProps {
-  hinhAnh: string;
-  hocVi: string;
-  hocHam: string;
-  ten: string;
-  chuyenKhoa: string;
-  time?: React.ReactNode;
-}
+import { API_ENDPOINTS } from "../apiConfig";
+import { formatDate } from "../Module/AppointmentPage";
+import { CalendarDTO, DoctorEntity } from "../Models/Model";
 
-export const Doctor: React.FC<DoctorProps> = ({
-  hinhAnh,
-  hocVi,
-  hocHam,
-  ten,
-  chuyenKhoa,
-}) => {
-  // const [modalShow, setModalShow] = useState(false);
-  return (
-    <div className="col-md-12 col-12 custom-slider">
-      {/* <div className="single-table">
-      <div className="icon center-image">
-      </div> */}
-      <div className="single-table package-list">
-        <div className="image image-custom center-image">
-          <img className="image-custom" src={`${hinhAnh}`} alt="" />
-        </div>
-        {/* <!-- Table Head --> */}
-        <div className="table-head">
-          <h4 className="title-package">
-            {hocVi}.{hocHam} {ten}
-          </h4>
-          <div className="price">
-            <p className="amount">{chuyenKhoa}</p>
-          </div>
-          <div className="btn-detail">
-            <a className="btn">Xem chi tiết</a>
-            {/* <Modals
-              title="bác sĩ"
-              show={modalShow}
-              onHide={() => setModalShow(false)} obj={undefined} /> */}
-          </div>
-          <div className="btn-package">
-            <a className="btn" href="#">
-              Đặt lịch
-            </a>
-          </div>
-        </div>
-        {/* <!-- Table Bottom --> */}
-      </div>
-    </div>
-  );
-};
-export const DoctorInfo: React.FC<DoctorProps> = ({
-  hinhAnh,
-  hocVi,
-  hocHam,
-  ten,
-  chuyenKhoa,
-  time,
-}) => (
-  <div className="col-md-12 col-12 custom-slider">
-    <div className="single-table">
-      {/* <!-- Table Head --> */}
-      <div className="table-head">
-        <div className="icon center-image">
-          <img className="image-custom" src={`${hinhAnh}`} alt="" />
-        </div>
-        <h4 className="title">
-          {hocVi}.{hocHam} {ten}
-        </h4>
-        <div className="price">
-          <p className="amount">{chuyenKhoa}</p>
-        </div>
-        <ul className="table-list">{time}</ul>
-      </div>
-      <div className="table-bottom">
-        <a className="btn" href="#">
-          Đặt lịch
-        </a>
-      </div>
-      {/* <!-- Table Bottom --> */}
-    </div>
-  </div>
-);
 const settings = {
-  // dots: true,
   infinite: true,
-  slidesToShow: 3,
+  slidesToShow: 2,
   slidesToScroll: 1,
   loop: true,
   autoplay: true,
-  smartSpeed: 10000,
-  autoplayTimeout: 10000,
+  smartSpeed: 50000,
+  autoplayTimeout: 50000,
   singleItem: true,
   autoplayHoverPause: true,
   items: 1,
@@ -109,51 +31,202 @@ const settings = {
     },
   ],
 };
-export const DoctorSlider = () => (
-  <>
-    <section className="pricing-table section padbt-100">
-      <div className="container">
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="section-title-about">
-              <h2>Các Bác Sĩ Giỏi Nhất</h2>
-              <img src="src/assets/img/section-img.png" alt="#" />
-              <p>
-                Đội ngũ bác sĩ có chuyên môn cao, nhiều năm kinh nghiệm và tâm
-                huyết với nghề
-              </p>
+export const DoctorSlider = () => {
+  const [listDoctor, setListDoctor] = useState<DoctorEntity[]>([]);
+  const [error, setError] = useState();
+  const [isLoading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchListDoctor = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(API_ENDPOINTS.GET_DOCTOR_SLIDES);
+        const data = (await response.json()) as DoctorEntity[];
+        setListDoctor(data);
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchListDoctor();
+  }, []);
+  return (
+    <>
+      <section className="pricing-table section padbt-100">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="section-title-about">
+                <h2>Bác Sĩ Của Chúng Tôi</h2>
+                <img src="src/assets/img/section-img.png" alt="#" />
+                <p>
+                  Đội ngũ bác sĩ có chuyên môn cao, nhiều năm kinh nghiệm và tâm
+                  huyết với nghề
+                </p>
+                {isLoading && <div>Loading...</div>}
+                {error && <div>Không có data</div>}{" "}
+              </div>
             </div>
           </div>
+          <div className="row">
+            {/* <!-- Single Table --> */}
+            <Slider {...settings} className="custom-slider">
+              {listDoctor.map((doc) => (
+                <DoctorInfo doctorEntity={doc} />
+              ))}
+            </Slider>
+            {/* <!-- End Single Table--> */}
+          </div>
         </div>
-        <div className="row">
-          {/* <!-- Single Table --> */}
-          <Slider {...settings} className="custom-slider">
-            <DoctorInfo
-              hinhAnh="/src/assets/img/doctor.jpg"
-              hocVi="Ts"
-              hocHam="PGS"
-              ten="Nguyễn Đăng Khoa"
-              chuyenKhoa="Khoa Nội"
-            />
-            <DoctorInfo
-              hinhAnh="/src/assets/img/doctor.jpg"
-              hocVi="Ts"
-              hocHam="PGS"
-              ten="Phạm Kiều"
-              chuyenKhoa="Khoa Ngoại"
-            />
-            <DoctorInfo
-              hinhAnh="/src/assets/img/doctor.jpg"
-              hocVi="Ts"
-              hocHam="PGS"
-              ten="Lê Nhất"
-              chuyenKhoa="Khoa Nhi"
-            />
-          </Slider>
-          {/* <!-- End Single Table--> */}
+      </section>
+      {/* <!--/ End Pricing Table --> */}
+    </>
+  );
+};
+interface DoctorProps {
+  doctorEntity: DoctorEntity;
+}
+export const Doctor: React.FC<DoctorProps> = ({ doctorEntity }) => {
+  return (
+    <div
+      className="col-md-12 col-12 custom-slider"
+      style={{ marginBottom: "15px" }}
+    >
+      <div className="single-table package-list">
+        <div className="image image-custom center-image">
+          <img
+            className="image-custom"
+            style={{ height: "150px" }}
+            src={`${
+              doctorEntity.doctorImage
+                ? doctorEntity.doctorImage
+                : "/src/assets/img/doctor.jpg"
+            }`}
+            alt=""
+          />
+        </div>
+        <div className="table-head">
+          <h4 className=" amount title-package price">
+            {doctorEntity.doctorRank}. {doctorEntity.doctorDegree}{" "}
+            {doctorEntity.accountName}
+          </h4>
+          <div className="price">
+            <p className="title-package price">
+              {" "}
+              Chuyên khoa: {doctorEntity.doctorSpecialty}
+            </p>
+          </div>
+          <div className="btn-detail">
+            <Link
+              className="btn"
+              to={"/doctor-infor"}
+              state={{ doctorState: doctorEntity }}
+            >
+              Xem chi tiết
+            </Link>
+          </div>
+          <div className="btn-package">
+            <Link
+              className="btn"
+              to="/appointmentDoctor"
+              state={{ doctorState: doctorEntity }}
+            >
+              Đặt lịch
+            </Link>
+          </div>
         </div>
       </div>
-    </section>
-    {/* <!--/ End Pricing Table --> */}
-  </>
-);
+    </div>
+  );
+};
+
+export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
+  const [calendars, setCalendar] = useState<CalendarDTO[]>([]);
+  const [error, setError] = useState();
+  const [isLoading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchListDoctor = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          API_ENDPOINTS.GET_CALENDAR_DOCTOR(doctorEntity.id)
+        );
+        const data = (await response.json()) as CalendarDTO[];
+        setCalendar(data);
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchListDoctor();
+  }, [doctorEntity]);
+  return (
+    <div className="col-md-12 col-12 custom-slider">
+      <div className="single-table">
+        {/* <!-- Table Head --> */}
+        <div className="table-head">
+          <div className="icon center-image">
+            <img
+              className="image-custom"
+              style={{ height: "150px" }}
+              src={`${
+                doctorEntity.doctorImage
+                  ? doctorEntity.doctorImage
+                  : "/src/assets/img/doctor.jpg"
+              }`}
+              alt=""
+            />
+          </div>
+          <h4 className=" amount title-package price">
+            {doctorEntity.doctorRank}. {doctorEntity.doctorDegree}{" "}
+            {doctorEntity.accountName}
+          </h4>
+          <div className="price">
+            <p className="title-package price">
+              {" "}
+              Khoa: {doctorEntity.doctorSpecialty}
+            </p>
+          </div>
+          <div
+            className="price"
+            style={{ overflowY: "auto", height: " 150px" }}
+          >
+            {isLoading && <p>"Loading....</p>}
+            {error && <p>"Không có data"</p>}
+            {calendars ? (
+              calendars.map((calendar) => (
+                <div key={calendar.id}>
+                  <i className="far fa-calendar-check calendar"></i>
+                  <span className="calendar">
+                    {formatDate(calendar.calendarDate)}
+                  </span>
+                  <span className="calendar" style={{ margin: "15px" }}>
+                    <i className="far fa-clock calendar"></i>
+                    <span>
+                      {calendar.idGroupTime === "1"
+                        ? "07:00 - 11:30"
+                        : "12:30 - 17:00"}
+                    </span>
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="">"Không có lịch khám bệnh"</p>
+            )}
+          </div>
+        </div>
+        <div className="table-bottom">
+          <Link
+            className="btn"
+            to="/appointmentDoctor"
+            state={{ doctorState: doctorEntity }}
+          >
+            Đặt lịch
+          </Link>
+        </div>
+        {/* <!-- Table Bottom --> */}
+      </div>
+    </div>
+  );
+};

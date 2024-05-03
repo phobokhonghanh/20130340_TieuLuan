@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../assets/css/Account.css";
 
 export const Profile = () => (
@@ -17,28 +18,19 @@ export const Profile = () => (
                 </a>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link"
-                  href="pages-account-settings-notifications.html"
-                >
+                <Link className="nav-link" to="/account-doctor">
                   <i className="bx bx-bell me-1"></i> Thông tin bác sĩ
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link"
-                  href="pages-account-settings-notifications.html"
-                >
+                <Link className="nav-link" to="/history">
                   <i className="bx bx-bell me-1"></i> Lịch sử cuộc hẹn
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link"
-                  href="pages-account-settings-connections.html"
-                >
+                <Link className="nav-link" to="#">
                   <i className="bx bx-link-alt me-1"></i> Thông báo
-                </a>
+                </Link>
               </li>
             </ul>
             <div className="card mb-4">
@@ -144,9 +136,9 @@ export const ProfileDocterDetails = () => (
           <div className="col-md-12">
             <ul className="nav nav-pills flex-column flex-md-row mb-3">
               <li className="nav-item">
-                <a className="nav-link" href="">
+                <Link className="nav-link" to="/account">
                   <i className="bx bx-user me-1"></i> Tài khoản
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
                 <a className="nav-link active" href="javascript:void(0);">
@@ -154,20 +146,14 @@ export const ProfileDocterDetails = () => (
                 </a>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link"
-                  href="pages-account-settings-notifications.html"
-                >
+                <Link className="nav-link" to="/history">
                   <i className="bx bx-bell me-1"></i> Lịch sử cuộc hẹn
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link"
-                  href="pages-account-settings-connections.html"
-                >
+                <Link className="nav-link" to="#">
                   <i className="bx bx-link-alt me-1"></i> Thông báo
-                </a>
+                </Link>
               </li>
             </ul>
             <div className="card mb-4">
@@ -295,7 +281,13 @@ export const DoctorDetails = () => {
         <div className="container">
           <div className="col-lg-12">
             <div className="single-main">
-              <div style={{ marginBottom:"10px",padding: "20px", border: "1px solid #c9c7c775" }}>
+              <div
+                style={{
+                  marginBottom: "10px",
+                  padding: "20px",
+                  border: "1px solid #c9c7c775",
+                }}
+              >
                 <div className="row">
                   <div className="col-2">
                     <img
@@ -341,14 +333,20 @@ export const DoctorDetails = () => {
                 </div>
               </div>
               <div className="col-12">
-                <div style={{ marginBottom:"20px", padding: "20px", border: "1px solid #c9c7c775" }}>
+                <div
+                  style={{
+                    marginBottom: "20px",
+                    padding: "20px",
+                    border: "1px solid #c9c7c775",
+                  }}
+                >
                   <h2>Nhận xét</h2>
                   <div className="meta">
                     <div className="meta-right">
                       <h5 className="comments">
-                        <a href="#">
+                        <Link to="#">
                           <i className="fa fa-comments"></i>05 Comments
-                        </a>
+                        </Link>
                       </h5>
                     </div>
                   </div>

@@ -1,7 +1,9 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Account;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AccountDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AccountService;
 
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/account")
 public class AccountController {
+    @Autowired
     AccountService accountService;
 
     public AccountController(AccountService accountService) {
@@ -19,6 +22,7 @@ public class AccountController {
     public Account getAccountById(@PathVariable("accountId") String accountId) {
         return accountService.getAccount(accountId);
     }
+
 
     @GetMapping("/all")
     public List<Account> getAllAccount() {

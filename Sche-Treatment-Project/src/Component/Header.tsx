@@ -6,7 +6,7 @@ function Header() {
       <div className="container">
         <Navbar expand="lg" className="bg-body-tertiary">
           <Container>
-            <Navbar.Brand href="#home">
+            <Navbar.Brand href="/home">
               <div className="div-logo">
                 <img
                   src="http://myhealthdemo.benhvienkhuvucthuduc.vn/admin/assets/img/logo.png"

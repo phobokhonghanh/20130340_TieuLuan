@@ -1,4 +1,5 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Table(name = "medical_package")
-
+@AllArgsConstructor
 public class MedicalPackage {
     @Id
     @Column(name = "id", length = 36)
@@ -35,17 +36,10 @@ public class MedicalPackage {
     private Support supportStatus;
 
     @OneToMany(mappedBy = "medicalPackage", cascade = CascadeType.ALL)
-    private List<MedicalPackageService> medicalPackageServices;
+    private List<PackageService> packageServices;
 
     @OneToMany(mappedBy = "medicalPackage", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Appointment> appointments;
-    public MedicalPackage(String id, String packageName, String packagePrice, LocalDateTime createdAt, LocalDateTime updatedAt, Clinic clinic, Support supportStatus) {
-        this.id = id;
-        this.packageName = packageName;
-        this.packagePrice = packagePrice;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.clinic = clinic;
-        this.supportStatus = supportStatus;
-    }
+
 }

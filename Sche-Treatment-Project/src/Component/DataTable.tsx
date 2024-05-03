@@ -1,6 +1,6 @@
 import { useState, SetStateAction } from "react";
 import { Table } from "react-bootstrap";
-import { ModalAddAccount, ModalCalendar, ModalInterface } from "./Modal";
+import { ModalAddAccount, ModalInterface } from "./Modal";
 import Calendar, { TileArgs } from "react-calendar";
 import { Clinic } from "../Models/Model";
 type Account = {

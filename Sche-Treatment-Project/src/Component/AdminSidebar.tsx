@@ -1,9 +1,10 @@
-import "../assets/Admin/css/bootstrap.min.css";
-import "../assets/Admin/css/metisMenu.min.css";
-import "../assets/Admin/css/timeline.css";
-import "../assets/Admin/css/startmin.css";
+// import "../assets/Admin/css/bootstrap.min.css";
+// import "../assets/Admin/css/metisMenu.min.css";
+// import "../assets/Admin/css/timeline.css";
+// import "../assets/Admin/css/startmin.css";
 import "../assets/Admin/css/font-awesome.min.css";
-import "../assets/Admin/js/aos-animation/aos.css";
+// import "../assets/Admin/js/aos-animation/aos.css";
+import "../assets/Admin/css/styleAdmin.css";
 
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
@@ -19,11 +20,11 @@ export const AdminSidebar = () => {
         className="navbar-inverse"
       >
         <div className="navbar-header">
-          <Link className="navbar-brand" to="/Admin/AdminHomePage">
+          <Link className="navbar-brand" to="/admin/home">
             ADMIN
           </Link>
         </div>
-        <button
+        {/* <button
           type="button"
           className="navbar-toggle"
           data-toggle="collapse"
@@ -33,43 +34,16 @@ export const AdminSidebar = () => {
           <span className="icon-bar"></span>
           <span className="icon-bar"></span>
           <span className="icon-bar"></span>
-        </button>
+        </button> */}
         <ul className="nav navbar-nav navbar-left navbar-top-links">
           <li>
-            <Link to="/Home/Index">
+            <Link to="/home">
               <i className="fa fa-home fa-fw"></i> Website
             </Link>
           </li>
         </ul>
 
         <ul className="nav navbar-right navbar-top-links">
-          <li className="dropdown navbar-inverse">
-            <Link className="dropdown-toggle" data-toggle="dropdown" to="#">
-              <i className="fa fa-bell fa-fw"></i> <b className="caret"></b>
-            </Link>
-            <ul className="dropdown-menu dropdown-alerts">
-              <li>
-                <Link to="#">
-                  <div>
-                    <i className="fa fa-comment fa-fw"></i> Bình luận mới
-                    <span className="pull-right text-muted small">
-                      4 minutes ago
-                    </span>
-                  </div>
-                </Link>
-              </li>
-              <li>
-                <Link to="#">
-                  <div>
-                    <i className="fa fa-users fa-fw"></i> Thành viên mới
-                    <span className="pull-right text-muted small">
-                      12 minutes ago
-                    </span>
-                  </div>
-                </Link>
-              </li>
-            </ul>
-          </li>
           <li className="dropdown">
             <Link className="dropdown-toggle" data-toggle="dropdown" to="#">
               <i className="fa fa-user fa-fw"></i>ADMIN
@@ -101,65 +75,59 @@ export const AdminSidebar = () => {
                   </span>
                 </div>
               </li>
-              <li>
-                <Link to="index.html" className="active">
+              <li className="sidebar-search">
+                <Link to="/admin/home" className="active">
                   <i className="fa  fa-dashboard fa-fw"></i> Thống kê
                 </Link>
               </li>
-              <li>
+              <li className="sidebar-search">
                 <Link to="#">
                   <i className="fa fa-bar-chart-o fa-fw"></i> Danh mục
                   <span className="fa arrow"></span>
                 </Link>
                 <ul className="nav nav-second-level">
                   <li>
-                    <Link to="/Producer/Producer">
+                    <Link to="/admin/services">
                       <i className="fa fa-home fa-fw"></i>Dịch vụ khám bệnh
                     </Link>
                   </li>
                   <li>
-                    <Link to="/Product/Product_manage">
+                    <Link to="/admin/packages">
                       <i className="fa fa-pencil-square-o fa-fw"></i>Gói khám
                       bệnh
                     </Link>
                   </li>
                   <li>
-                    <Link to="/Comment/Comment_manage">
+                    <Link to="/admin/comments">
                       <i className="fa fa-comments fa-fw"></i>Quản lý bình luận
                     </Link>
                   </li>
                   <li>
-                    <Link to="/News/News_Manage">
+                    <Link to="/admin/appointments">
                       <i className="fa fa-newspaper-o fa-fw"></i> Lịch hẹn bệnh
                       nhân
                     </Link>
                   </li>
                   <li>
-                    <Link to="/News/News_Manage">
-                      <i className="fa fa-calendar fa-fw"></i> Lịch làm việc
+                    <Link to="/admin/clinic">
+                      <i className="fa fa-calendar fa-fw"></i> Phòng khám
                     </Link>
                   </li>
                 </ul>
               </li>
-              <li>
-                <Link to="/Revenue/Revenue">
+              <li className="sidebar-search">
+                <Link to="/admin/revenue">
                   <i className="fa fa-table fa-fw"></i>Doanh thu
                 </Link>
               </li>
-              <li>
-                <Link to="/Order/Order_Manage">
-                  <i className="fa  fa-shopping-cart fa-fw"></i> Quản lý đơn
-                  hàng
+              <li className="sidebar-search">
+                <Link to="/admin/bill">
+                  <i className="fa fa-shopping-cart fa-fw"></i> Quản lý hóa đơn
                 </Link>
               </li>
-              <li>
-                <Link to="/Account/Account_Manage">
+              <li className="sidebar-search">
+                <Link to="/admin/account">
                   <i className="fa  fa-user fa-fw"></i>Quản lý tài khoản
-                </Link>
-              </li>
-              <li>
-                <Link to="/Member/Member">
-                  <i className="fa fa-users fa-fw"></i>Thành viên
                 </Link>
               </li>
             </ul>
@@ -171,7 +139,7 @@ export const AdminSidebar = () => {
           ADMIN - Website Đăng Ký Khám Bệnh Trực Tuyến
         </div>
       </div>
-      <Helmet>
+      {/* <Helmet>
         <script src="/src/assets/Admin/js/jquery.min.js"></script>
         <script src="/src/assets/Admin/js/bootstrap.min.js"></script>
         <script src="/src/assets/Admin/js/metisMenu.min.js"></script>
@@ -180,10 +148,7 @@ export const AdminSidebar = () => {
         <script src="/src/assets/Admin/js/startmin.js"></script>
         <script src="/src/assets/Admin/js/aos-animation/bs-animation.js"></script>
         <script src="/src/assets/Admin/js/aos-animation/aos.js"></script>
-
-        {/* <script src="/src/assets/Admin/js/dataTables/jquery.dataTables.min.js"></script> */}
-        {/* <script src="/src/assets/Admin/js/dataTables/dataTables.bootstrap.min.js"></script> */}
-      </Helmet>
+      </Helmet> */}
 
       {/* <script src="/Content/assets/ckfinder/ckfinder.js"></script>
         <script src="/Content/assets/ckeditor/ckeditor.js"></script>

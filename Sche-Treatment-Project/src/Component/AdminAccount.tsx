@@ -49,7 +49,7 @@ export const AccountManager = () => {
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
-              <Dialog />
+              {/* <Dialog /> */}
               <div className="panel-heading d-flex">
                 <div>
                   <i className="fa  fa-user fa-fw"></i>

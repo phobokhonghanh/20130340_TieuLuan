@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import React, { useState } from "react";
 import { Option, SelectWithSearch } from "./SelectWithSearch";
+import { Link } from "react-router-dom";
 
 interface SlideProps {
   backgroundImage: string;
@@ -44,11 +45,11 @@ const Slides = () => {
   ]);
   const settings = {
     dots: true,
-    infinite: false,
+    infinite: true,
     slidesToShow: 1,
     slidesToScroll: 1,
-    loop: false,
-    autoplay: false,
+    loop: true,
+    autoplay: true,
     smartSpeed: 500,
     autoplayTimeout: 3500,
     singleItem: true,
@@ -67,12 +68,18 @@ const Slides = () => {
             subtitle="Dịch Vụ Y Tế Mà Bạn Có Thể Tin Cậy!"
             children={
               <div className="button-div">
-                <a href="#" className="btn">
+                <Link
+                  to="/appointment"
+                  state={{
+                    packageId: "44c79a43-5739-4cc2-89d9-5e48e145a0a0",
+                  }}
+                  className="btn"
+                >
                   Đặt lịch ngay
-                </a>
-                <a href="#" className="btn primary">
+                </Link>
+                <Link to="/packages" className="btn primary">
                   Xem thêm
-                </a>
+                </Link>
               </div>
             }
           />

@@ -19,6 +19,8 @@ public class MedicalService {
 
     @Column(name = "service_price", length = 255, nullable = false)
     private String servicePrice;
+    @Column(name = "service_description", columnDefinition = "TEXT")
+    private String serviceDescription;
 
     @Column(name = "create_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
@@ -34,9 +36,4 @@ public class MedicalService {
     @JoinColumn(name = "support_status_id")
     private Support supportStatus;
 
-    @OneToMany(mappedBy = "medicalService", cascade = CascadeType.ALL)
-    private List<MedicalPackageService> medicalPackageServices;
-
-    @OneToMany(mappedBy = "medicalService", cascade = CascadeType.ALL)
-    private List<AppointmentService> appointmentServices;
 }

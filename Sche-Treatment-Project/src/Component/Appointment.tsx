@@ -1,55 +1,214 @@
 import "../assets/css/Account.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ModalResult } from "./Modal";
 import Pagination from "./Pagination";
-
-export const AppointmentDetail = () => {
+import { Link } from "react-router-dom";
+import {
+  AppointmentDTO,
+  Area,
+  Bill,
+  CalendarDTO,
+  ClinicDTO,
+  DoctorEntity,
+  PackageEntity,
+  Support,
+} from "../Models/Model";
+import { API_ENDPOINTS } from "../apiConfig";
+import { formatDate } from "../Module/AppointmentPage";
+interface appointmentDetailsProps {
+  role: string;
+  appointmentId: AppointmentDTO;
+}
+export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
+  role,
+  appointmentId,
+}) => {
+  const [error, setError] = useState();
+  const [isLoading, setLoading] = useState(false);
+  const [bill, setBill] = useState<Bill>();
+  const [clinic, setClinic] = useState<ClinicDTO>();
+  const [area, setArea] = useState<Area>();
+  // gọi api - lấy danh sách khu vực khám
+  // gán mặc định cho area đầu tiên
+  // gán danh sách phòng khám
+  const fetchBill = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        API_ENDPOINTS.GET_BILL_APPOINTMENT(appointmentId.id)
+      );
+      const data = (await response.json()) as Bill;
+      setBill(data);
+    } catch (e: any) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchClinic = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        API_ENDPOINTS.GET_CLINIC_CALENDAR(appointmentId.calendarId)
+      );
+      const data = (await response.json()) as ClinicDTO;
+      setClinic(data);
+    } catch (e: any) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchArea = async () => {
+    setLoading(true);
+    try {
+      if (clinic && clinic.medicalAreaId !== null) {
+        const response = await fetch(
+          API_ENDPOINTS.GET_AREA(clinic.medicalAreaId.id)
+        );
+        const data = (await response.json()) as Area;
+        setArea(data);
+      }
+    } catch (e: any) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  // fetch data khi appointmentId thay đổi
+  useEffect(() => {
+    fetchBill();
+    fetchClinic();
+    fetchArea();
+  }, [appointmentId]);
   return (
     <>
       <div className="card col-md-4" style={{ height: "max-content" }}>
         <h5 className="card-header fw-bold">Chi tiết cuộc hẹn</h5>
+        {isLoading && (
+          <div
+            style={{
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: "larger",
+            }}
+          >
+            Loading...
+          </div>
+        )}
+        {error && (
+          <div
+            style={{
+              textAlign: "center",
+              color: "rgb(116, 136, 151)",
+              fontWeight: "bold",
+              fontSize: "larger",
+            }}
+          >
+            <i>&#9888;</i> Đang gặp sự cố kỹ thuật, xin vui lòng đợi trong giây
+            lát !
+          </div>
+        )}
         <div className="card-body">
           <div className="align-items-start align-items-sm-center gap-4">
             <div className="button-wrapper w90">
               {/* <!-- Table Head --> */}
               <div className="table-head">
-                <h4 className="title-package fw-bold">Khu khám dịch vụ</h4>
-                <h4 className="title-package fw-bold">Khoa khám: Khoa Nội</h4>
-                <h4 className="title-package fw-bold">Bác sĩ: Nguyễn Văn A</h4>
+                <p className="title-package fw-bold">{area?.areaName}</p>
+                <p className="title-package fw-bold">
+                  Khoa khám: {clinic?.clinicName}
+                </p>
+                <p className="title-package fw-bold">
+                  Bác sĩ:{" "}
+                  {bill?.appointment.calendar
+                    ? bill?.appointment.calendar.doctor.accountName
+                    : ""}
+                </p>
+                <p>
+                  Gói khám:{" "}
+                  {bill?.appointment.medicalPackage
+                    ? bill?.appointment.medicalPackage.packageName
+                    : ""}{" "}
+                  (
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  }).format(
+                    parseFloat(
+                      bill?.appointment.medicalPackage
+                        ? bill?.appointment.medicalPackage.packagePrice
+                        : "0"
+                    )
+                  )}
+                  )
+                </p>
                 <ul>
-                  <li>Dịch vụ A: 500.000 vnd</li>
-                  <li>Dịch vụ B: 500.000 vnd</li>
+                  {bill?.appointment.medicalPackage &&
+                    bill?.appointment.medicalPackage.packageServices.map(
+                      (service) => <li>{service.medicalService.serviceName}</li>
+                    )}
                 </ul>
                 <div className="table-center">
-                  <p className="">Tên bệnh nhân: Nguyễn Văn B</p>
-                  <p className="">Giới tính: Nam</p>
-                  <p className="">Triệu chứng: Đau đầu, mệt người</p>
-                  <p className="">Thời gian: 7:00 ngày 20-03-2024</p>
                   <p className="">
-                    Trạng thái: <span className="fw-bold">Đợi xử lý</span>
-                    <span className="fw-bold" style={{ color: "red" }}>
-                      Đã hủy
-                    </span>
-                    <span className="fw-bold" style={{ color: "green" }}>
-                      Đã duyệt
-                    </span>
+                    Tên bệnh nhân: {bill?.appointment.appointmentFullname}
                   </p>
                   <p className="">
-                    Tổng tiền: 1.000.000
-                    <span> vnđ</span>
+                    Số điện thoại: {bill?.appointment.appointmentPhone}
                   </p>
-                  <p
-                    className="fw-bold"
-                    style={{ float: "right", color: "green" }}
-                  >
-                    Đã thanh toán
+                  <p className="">
+                    Giới tính:{" "}
+                    {bill?.appointment.appointmentGender ? "Nam" : "Nữ"}
                   </p>
-                  <p
-                    className="fw-bold"
-                    style={{ float: "right", color: "red" }}
-                  >
-                    Chưa thanh toán
+                  <p className="">
+                    BHYT:{" "}
+                    {bill?.appointment.appointmentBhyt
+                      ? bill?.appointment.appointmentBhyt
+                      : "Không có"}
                   </p>
+                  <p className="">
+                    Triệu chứng: {bill?.appointment.appointmentSymptom}
+                  </p>
+                  <p className="">
+                    Thời gian: {bill?.appointment.supportTime.supportValue} ngày{" "}
+                    {formatDate(
+                      bill?.appointment.calendar
+                        ? bill?.appointment.calendar.calendarDate
+                        : "1/1/1900"
+                    )}
+                  </p>
+                  <p className="">
+                    Trạng thái:{" "}
+                    <span className="fw-bold">
+                      {bill?.appointment.supportStatus
+                        ? bill?.appointment.supportStatus.supportValue
+                        : ""}{" "}
+                      {"/"} {bill?.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
+                    </span>
+                  </p>
+                  <p className="">
+                    {" "}
+                    Tổng tiền:{" "}
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(parseFloat(bill?.billSum ? bill?.billSum : "0"))}
+                  </p>
+                  {bill?.isPaid ? (
+                    <p
+                      className="fw-bold"
+                      style={{ float: "right", color: "green" }}
+                    >
+                      Đã thanh toán
+                    </p>
+                  ) : (
+                    role !== "ADMIN" && (
+                      <div style={{ float: "right" }}>
+                        <button className="payment-btn paypal-btn">
+                          Vui lòng thanh toán qua PayPal
+                        </button>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -59,8 +218,88 @@ export const AppointmentDetail = () => {
     </>
   );
 };
-export const Appointment = () => {
+interface AppointmentProps {
+  role: string;
+  appointmentDTO: AppointmentDTO;
+}
+export const Appointment: React.FC<AppointmentProps> = ({
+  role,
+  appointmentDTO,
+}) => {
   const [modalShow, setModalShow] = useState(false);
+  const [packageFetch, setPackage] = useState<PackageEntity>();
+  const [supportFetch, setSupport] = useState<Support>();
+  const [calendarFetch, setCalendar] = useState<CalendarDTO>();
+  const [accountFetch, setAccount] = useState<DoctorEntity>();
+  const [error, setError] = useState();
+  const [isLoading, setLoading] = useState(false);
+
+  const fetchSupport = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_SUPPORT(appointmentDTO.supportTimeId)}`
+      );
+      const data = await response.json();
+      setSupport(data);
+    } catch (e: any) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchGetCalendar = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_CALENDAR(appointmentDTO.calendarId)}`
+      );
+      const data = await response.json();
+      setCalendar(data);
+    } catch (e: any) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchGetPackage = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_PACKAGE(appointmentDTO.packageId)}`
+      );
+      const data = await response.json();
+      setPackage(data);
+    } catch (e: any) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchGetDoctor = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_DOCTOR_CALENDAR_ID(appointmentDTO.calendarId)}`
+      );
+      const data = await response.json();
+      setAccount(data);
+    } catch (e: any) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (appointmentDTO) {
+      fetchGetDoctor();
+      fetchGetPackage();
+      fetchGetCalendar();
+      fetchSupport();
+    } else {
+      // navigator("/404");
+    }
+  }, [appointmentDTO]);
   return (
     <>
       <div className="card-body">
@@ -76,21 +315,34 @@ export const Appointment = () => {
           <div className="button-wrapper col-md-7">
             {/* <!-- Table Head --> */}
             <div className="table-head">
-              <h4 className="title-package">Tên gói khám</h4>
+              <h4 className="title-package">
+                {packageFetch ? packageFetch.packageName : "Tên gói khám"}
+              </h4>
               <div className="table-center">
                 <p>
-                  Bác sĩ: <span> Nguyễn Văn A</span>
+                  Bác sĩ:{" "}
+                  <span>
+                    {accountFetch ? accountFetch.accountName : "Nguyễn Văn A"}
+                  </span>
                 </p>
-                <p className="">Thời gian: 7:00 ngày 20-03-2024</p>
+                <p className="">
+                  Thời gian: {supportFetch?.supportValue} ngày{" "}
+                  {formatDate(
+                    calendarFetch ? calendarFetch?.calendarDate : "1/1/1900"
+                  )}
+                </p>
               </div>
             </div>
             <div className="btn-detail">
-              <ModalResult
-                title=""
-                show={modalShow}
-                onHide={() => setModalShow(false)}
-                obj={undefined}
-              />
+              {modalShow && (
+                <ModalResult
+                  show={modalShow}
+                  onHide={() => setModalShow(false)}
+                  role={role}
+                  appointmentId={appointmentDTO.id}
+                  doctorId={accountFetch ? accountFetch.id : ""}
+                />
+              )}
             </div>
 
             {/* <!-- Table Bottom --> */}
@@ -114,6 +366,46 @@ export const Appointment = () => {
   );
 };
 export const HistoryAppointment = () => {
+  const [listAppointment, setListAppointment] = useState<AppointmentDTO[]>([]);
+  const [selectAppointment, setSelectAppointment] = useState<AppointmentDTO>();
+  const account = "ea283c62-f825-11ee-87e1-847beb19aaf6";
+  // const role = "ADMIN";
+  const role = "PATIENT";
+
+  // const [account, setAccount] = useState<Account>();
+  const [currentPage, setCurrentPage] = useState<number>(1); // State để lưu trang hiện tại
+  const [totalPages, setTotalPages] = useState<number>(1); // State để lưu tổng số trang
+
+  const [error, setError] = useState();
+  const [isLoading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (account) {
+      const fetchAppointment = async (page: number) => {
+        setLoading(true);
+        try {
+          const response = await fetch(
+            `${API_ENDPOINTS.GET_APPOINTMENT_USER(account)}?page=${page}`
+          );
+          const data = await response.json();
+
+          setListAppointment(data.content);
+          if (data.content) {
+            setSelectAppointment(data.content[0]);
+          }
+          setCurrentPage(data.number + 1);
+          setTotalPages(data.totalPages);
+        } catch (e: any) {
+          setError(e);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchAppointment(currentPage);
+    } else {
+      // navigator("/404");
+    }
+  }, [currentPage]);
   return (
     <>
       <div className="content-wrapper">
@@ -125,46 +417,68 @@ export const HistoryAppointment = () => {
           <div className="row">
             <ul className="nav nav-pills flex-column flex-md-row mb-3">
               <li className="nav-item">
-                <a className="nav-link" href="">
+                <Link className="nav-link" to="/account">
                   <i className="bx bx-user me-1"></i> Tài khoản
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="javascript:void(0);">
+                <Link className="nav-link" to="/account-doctor">
                   <i className="bx bx-bell me-1"></i> Thông tin bác sĩ
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link active"
-                  href="pages-account-settings-notifications.html"
-                >
+                <Link className="nav-link active" to="javascript:void(0);">
                   <i className="bx bx-bell me-1"></i> Lịch sử cuộc hẹn
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a
-                  className="nav-link"
-                  href="pages-account-settings-connections.html"
-                >
+                <Link className="nav-link" to="#">
                   <i className="bx bx-link-alt me-1"></i> Thông báo
-                </a>
+                </Link>
               </li>
             </ul>
             <div className="col-md-8 w90">
               <div className="card mb-4 col-md-8 w100">
                 <h5 className="card-header">Lịch sử cuộc hẹn</h5>
-                <Appointment />
-                <Appointment />
-                <Appointment />
-                <Appointment />
-                <Appointment />
+                {isLoading && <div>Loading...</div>}
+                {error && (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      color: "rgb(116, 136, 151)",
+                      fontWeight: "bold",
+                      fontSize: "larger",
+                    }}
+                  >
+                    <i>&#9888;</i> Đang gặp sự cố kỹ thuật, xin vui lòng đợi
+                    trong giây lát !
+                  </div>
+                )}
+                {listAppointment &&
+                  listAppointment.map((appointment) => (
+                    <div
+                      key={appointment.id}
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setSelectAppointment(appointment)}
+                    >
+                      <Appointment role={role} appointmentDTO={appointment} />
+                    </div>
+                  ))}
               </div>
             </div>
-            <AppointmentDetail />
+            {selectAppointment && (
+              <AppointmentDetail
+                role={role}
+                appointmentId={selectAppointment}
+              />
+            )}
           </div>
           <div style={{ marginBottom: "30px" }}>
-            <Pagination totalItems={120} itemsPerPage={10} />
+            <Pagination
+              totalPage={totalPages}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />{" "}
           </div>
         </div>
       </div>

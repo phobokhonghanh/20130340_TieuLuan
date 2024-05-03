@@ -68,7 +68,6 @@ export const SelectWithSearch: React.FC<Props> = ({
     <Col xs={style}>
       <Form.Group controlId={`form${label}`}>
         {label ? <Form.Label>{label}</Form.Label> : ""}
-        {/* <Form.Label>{label}</Form.Label> */}
         <div className="custom-select-wrapper" ref={dropdownRef}>
           <input
             type="text"
@@ -242,7 +241,7 @@ export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
     : data;
 
   return (
-    <Col xs={4}>
+    <Col >
       <Form.Group controlId="form">
         <div className="custom-select-wrapper" ref={dropdownRef}>
           <input

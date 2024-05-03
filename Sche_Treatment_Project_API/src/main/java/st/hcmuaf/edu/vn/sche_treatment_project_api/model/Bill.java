@@ -1,6 +1,8 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
 import lombok.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.time.LocalDateTime;
 @Entity
 @Data
@@ -9,6 +11,8 @@ import java.time.LocalDateTime;
     public class Bill {
 
         @Id
+        @GeneratedValue(generator = "uuid2")
+        @GenericGenerator(name = "uuid2", strategy = "uuid2")
         @Column(name = "id", length = 36)
         private String id;
 
@@ -24,7 +28,7 @@ import java.time.LocalDateTime;
         @Column(name = "create_at", updatable = false, nullable = false)
         private LocalDateTime createdAt;
 
-        @Column(name = "update_at", nullable = false)
+        @Column(name = "update_at")
         private LocalDateTime updatedAt;
 
         @ManyToOne

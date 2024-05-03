@@ -1,5 +1,6 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "support")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Support {
     @Id
     @Column(name = "id", length = 36)
@@ -21,17 +23,14 @@ public class Support {
     @Column(name = "support_info", columnDefinition = "TEXT")
     private String supportInfo;
 
-    @Column(name = "create_at", updatable = false, nullable = false)
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "id_group_time")
+    private GroupTime idGroupTime;
+
+    @Column(name = "create_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "update_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    public Support(String id, String supportValue, String supportInfo, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.supportValue = supportValue;
-        this.supportInfo = supportInfo;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
 }

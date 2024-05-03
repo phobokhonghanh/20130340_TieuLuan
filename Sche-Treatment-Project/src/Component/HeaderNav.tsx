@@ -1,7 +1,9 @@
 import { Navbar, Nav, Container, Row, Col } from "react-bootstrap";
 import "../assets/css/HeaderNav.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_ENDPOINTS } from "../apiConfig";
+import { PackageEntity } from "../Models/Model";
 // function HeaderNav({
 //   onNavbarToggle,
 // }: {
@@ -12,6 +14,24 @@ function HeaderNav() {
   const handleNavbarToggle = () => {
     setSliderMobile(!sliderMobile);
   };
+  const [packageEntity, setPackage] = useState<PackageEntity>();
+  const [error, setError] = useState();
+  const [isLoading, setLoading] = useState(false);
+  useEffect(() => {
+    const fetchPackage = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(API_ENDPOINTS.GET_PACKAGE_DEFAULT);
+        const data = await response.json();
+        setPackage(data);
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPackage();
+  }, []);
   return (
     <>
       {/* Header Area */}
@@ -24,7 +44,7 @@ function HeaderNav() {
           <Container className="containerNav">
             <div className="inner">
               <Row>
-                <Col lg={3}>
+                <Col lg={3} style={{ width: "25%" }}>
                   {/* Start Logo */}
                   <div className="logo">
                     <Link to="/">
@@ -70,17 +90,23 @@ function HeaderNav() {
                 </Col>
                 <Col lg={2} xs={2}>
                   <div className="get-quote">
-                    <a href="appointment.html" className="btn">
+                    <Link
+                      to="/appointment"
+                      state={{
+                        packageState: packageEntity,
+                      }}
+                      className="btn"
+                    >
                       Đặt lịch khám bệnh
-                    </a>
+                    </Link>
                   </div>
                 </Col>
                 <Col lg={1} xs={2}>
                   <div className="icon">
-                    <a href="#" className="icon-container">
+                    <Link to="/account" className="icon-container">
                       <i className="fa fa-user icon-cus" aria-hidden="true"></i>
                       <span className="label">Tài khoản</span>
-                    </a>
+                    </Link>
                     <a href="#" className="icon-container">
                       <i className="fa fa-bell icon-cus" aria-hidden="true"></i>
                       <span className="label">Thông báo</span>

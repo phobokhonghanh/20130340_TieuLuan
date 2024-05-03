@@ -2,17 +2,21 @@ package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Data
 @Table(name = "doctor")
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper=false)
+
 public class Doctor extends Account implements Serializable {
     @Column(name = "doctor_degree", length = 20)
     private String doctorDegree;
@@ -36,4 +40,7 @@ public class Doctor extends Account implements Serializable {
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
     private List<Calendar> calendars;
 
+    public Doctor(String id) {
+        super(id);
+    }
 }

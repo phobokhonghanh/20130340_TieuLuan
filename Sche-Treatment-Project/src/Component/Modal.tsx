@@ -1,11 +1,16 @@
 import "../assets/css/Modals.css";
 import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Dialog } from "./AdminDialog";
 import { ChooseDoctor, ChooseServices } from "./SelectWithSearch";
-import Calendar, { TileArgs } from "react-calendar";
-import { CalendarModel, Timetables } from "../Models/Model";
-import { format } from "date-fns";
+import { EvaluateDTO, ResultDTO } from "../Models/Model";
+import {
+  API_ENDPOINTS,
+  createAppointmentResult,
+  createEvaluate,
+} from "../apiConfig";
+import { ErrorNotifi, Notifi } from "./Notification";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   title: string;
@@ -111,7 +116,12 @@ export const ModalInterface = (props: InterfaceProps) => {
         </div>
         <div className="modal-body" style={{ padding: "20px" }}>
           <form onSubmit={handleSubmit}>
-            <input type="hidden" name="action" value="add" />
+            <input
+              className="custom-select-input"
+              type="hidden"
+              name="action"
+              value="add"
+            />
             <div style={{ marginBottom: "20px" }}>
               <label
                 htmlFor="name"
@@ -120,6 +130,7 @@ export const ModalInterface = (props: InterfaceProps) => {
                 Tên <span style={{ color: "red" }}>*</span>
               </label>
               <input
+                className="custom-select-input"
                 type="text"
                 name="name"
                 style={{
@@ -162,6 +173,7 @@ export const ModalInterface = (props: InterfaceProps) => {
                     Giá tiền <span style={{ color: "red" }}>*</span>
                   </label>
                   <input
+                    className="custom-select-input"
                     type="text"
                     name="price"
                     style={{
@@ -309,7 +321,12 @@ export const ModalAddAccount = (props: InterfaceProps) => {
         </div>
         <div className="modal-body" style={{ padding: "20px" }}>
           <form onSubmit={handleSubmit}>
-            <input type="hidden" name="action" value="add" />
+            <input
+              className="custom-select-input"
+              type="hidden"
+              name="action"
+              value="add"
+            />
             <div style={{ marginBottom: "20px" }}>
               <label
                 htmlFor="phone"
@@ -318,6 +335,7 @@ export const ModalAddAccount = (props: InterfaceProps) => {
                 Số điện thoại <span style={{ color: "red" }}>*</span>
               </label>
               <input
+                className="custom-select-input"
                 type="text"
                 name="phone"
                 style={{
@@ -340,6 +358,7 @@ export const ModalAddAccount = (props: InterfaceProps) => {
                 </label>
 
                 <input
+                  className="custom-select-input"
                   type="password"
                   name="password"
                   style={{
@@ -359,6 +378,7 @@ export const ModalAddAccount = (props: InterfaceProps) => {
                 Họ tên <span style={{ color: "red" }}>*</span>
               </label>
               <input
+                className="custom-select-input"
                 type="text"
                 name="name"
                 style={{
@@ -454,77 +474,318 @@ export const ModalAddAccount = (props: InterfaceProps) => {
     </div>
   );
 };
-export const ModalResult = (props: Props) => {
+interface ResultProps {
+  role: string;
+  appointmentId: string;
+  doctorId: string;
+  show: boolean;
+  onHide: () => void;
+}
+export const ModalResult: React.FC<ResultProps> = ({
+  role,
+  appointmentId,
+  doctorId,
+  show,
+  onHide,
+}) => {
   const [modalShow, setModalShow] = useState(false);
-  return (
-    <>
-      <Modal {...props} aria-labelledby="contained-modal-title-vcenter">
-        <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">Kết quả</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="grid-example">
-          <Container>
-            <div>
-              <Row>
-                <b>Khoa Nội</b> <span>Bác sĩ Dương</span>
-                <Col>
-                  <Button>Đánh giá</Button>
-                </Col>
-              </Row>
-              <Row>Triệu chứng lâm sàng:</Row>
-              <Row>Chẩn đoán:</Row>
-              <Row>Ghi chú:</Row>
-            </div>
-            <Row>
-              <b>Khoa Nội</b> <span>Bác sĩ Dương</span>
-              <Col>
-                <Button onClick={() => setModalShow(true)}>Đánh giá</Button>
-              </Col>
-            </Row>
-            <Row>Triệu chứng lâm sàng:</Row>
-            <Row>Chẩn đoán:</Row>
-            <Row>Ghi chú:</Row>
-          </Container>
-        </Modal.Body>
-      </Modal>
-      <ModalComment
-        title=""
-        obj={props.obj}
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        handleCloseModal={() => setModalShow(false)}
-      />
-    </>
+  const [error, setError] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [showMess, setShowMess] = useState(false);
+  const [message, setMessage] = useState("");
+  const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
+    "danger"
   );
-};
 
-export const ModalComment = (props: Props) => {
+  const [result, setResult] = useState<ResultDTO>();
+  const [resultSymptom, setResultSymptom] = useState(
+    result ? result.resultSymptom : ""
+  );
+  const [resultDiagnostic, setResultDiagnostic] = useState(
+    result ? result.resultDiagnostic : ""
+  );
+  const [resultNote, setResultNote] = useState(result ? result.resultNote : "");
+
+  useEffect(() => {
+    // Kiểm tra xem result có giá trị không trước khi cập nhật các state phụ thuộc
+    if (result) {
+      setResultSymptom(result.resultSymptom);
+      setResultDiagnostic(result.resultDiagnostic);
+      setResultNote(result.resultNote);
+    }
+  }, [result]);
+
+  const fetchResult = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_RESULT_APPOINTMENT(appointmentId)}`
+      );
+      if (response.status === 204) {
+        return;
+      }
+      const data = await response.json();
+      setResult(data);
+    } catch (e: any) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchResult();
+  }, [appointmentId]);
+
+  const handleInputChange = (event: { target: { name: any; value: any } }) => {
+    const { name, value } = event.target;
+    switch (name) {
+      case "resultSymptom":
+        setResultSymptom(value);
+        break;
+
+      case "resultDiagnostic":
+        setResultDiagnostic(value);
+        break;
+
+      case "resultNote":
+        setResultNote(value);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMess(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [showMess]);
+
+  const handleResultSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    const resultSubmit: ResultDTO = {
+      id: result ? result.id : uuidv4(),
+      resultSymptom: resultSymptom,
+      resultDiagnostic: resultDiagnostic,
+      resultNote: resultNote,
+      appointmentId: appointmentId,
+    };
+    if (resultSubmit) {
+      createAppointmentResult(resultSubmit).then((response: any) => {
+        if (response.status === 201) {
+          onHide();
+        } else {
+          setMessage("Gửi kết quả không thành công!");
+          setLevelMessage("danger");
+          setShowMess(true);
+        }
+      });
+    }
+  };
   return (
     <>
       <Modal
-        {...props}
+        show={show}
+        onHide={onHide}
+        aria-labelledby="contained-modal-title-vcenter"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">Kết quả</Modal.Title>
+          {isLoading && <div> Loading...</div>}
+          {showMess && (
+            <Notifi
+              message={message}
+              variant={levelMessage}
+              onClose={() => setShowMess(false)}
+            />
+          )}
+          <ErrorNotifi error={error} />
+        </Modal.Header>
+        <Modal.Body className="grid-example">
+          <Container>
+            <Form onSubmit={handleResultSubmit}>
+              <Row style={{ textAlign: "left" }}>
+                Triệu chứng:{" "}
+                {role === "ADMIN" ? (
+                  <input
+                    className="custom-select-input"
+                    type="text"
+                    required
+                    onChange={handleInputChange}
+                    value={resultSymptom}
+                    name="resultSymptom"
+                  />
+                ) : (
+                  resultSymptom
+                )}
+              </Row>
+              <Row style={{ textAlign: "left" }}>
+                Chẩn đoán:{" "}
+                {role === "ADMIN" ? (
+                  <input
+                    className="custom-select-input"
+                    type="text"
+                    onChange={handleInputChange}
+                    value={resultDiagnostic}
+                    name="resultDiagnostic"
+                  />
+                ) : (
+                  resultDiagnostic
+                )}
+              </Row>
+              <Row style={{ textAlign: "left" }}>
+                Ghi chú:{" "}
+                {role === "ADMIN" ? (
+                  <input
+                    className="custom-select-input"
+                    type="text"
+                    onChange={handleInputChange}
+                    value={resultNote}
+                    name="resultNote"
+                  />
+                ) : (
+                  resultNote
+                )}
+              </Row>
+              <Row>
+                {role === "ADMIN" ? (
+                  <Col>
+                    <Button type="submit">Gửi kết quả</Button>
+                  </Col>
+                ) : (
+                  <Col>
+                    <Button onClick={() => setModalShow(true)}>Đánh giá</Button>
+                  </Col>
+                )}
+              </Row>
+            </Form>
+          </Container>
+        </Modal.Body>
+      </Modal>
+      {modalShow && (
+        <ModalComment
+          doctorId={doctorId}
+          appointmentId={appointmentId}
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+        />
+      )}
+    </>
+  );
+};
+interface CommentProps {
+  doctorId: string;
+  appointmentId: string;
+  show: boolean;
+  onHide: () => void;
+}
+export const ModalComment: React.FC<CommentProps> = ({
+  doctorId,
+  appointmentId,
+  show,
+  onHide,
+}) => {
+  const [evaluate, setEvaluate] = useState<EvaluateDTO>();
+  const [evaluateContent, setEvaluateContent] = useState("");
+  const [error, setError] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [showMess, setShowMess] = useState(false);
+  const [message, setMessage] = useState("");
+  const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
+    "danger"
+  );
+
+  useEffect(() => {
+    // Kiểm tra xem result có giá trị không trước khi cập nhật các state phụ thuộc
+    if (evaluate) {
+      setEvaluateContent(evaluate.evaluateContent);
+    }
+  }, [evaluate]);
+  const fetchEvaluate = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_EVALUATE_APPOINTMENT(appointmentId)}`
+      );
+      if (response.status === 204) {
+        return;
+      }
+      const data = await response.json();
+      setEvaluate(data);
+    } catch (e: any) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvaluate();
+  }, [appointmentId]);
+
+  const handleChange = (e: { target: { value: any } }) => {
+    setEvaluateContent(e.target.value);
+  };
+  const handleEvaluateSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    const evaluateDTO: EvaluateDTO = {
+      id: evaluate ? evaluate.id : uuidv4(),
+      evaluateContent: evaluateContent,
+      doctorId: doctorId,
+      appointmentId: appointmentId,
+    };
+    if (evaluateDTO) {
+      createEvaluate(evaluateDTO).then((response: any) => {
+        if (response.status === 201) {
+          onHide();
+        } else {
+          setMessage("Không thể đánh giá!");
+          setLevelMessage("danger");
+          setShowMess(true);
+        }
+      });
+    }
+  };
+  return (
+    <>
+      <Modal
+        show={show}
+        onHide={onHide}
         aria-labelledby="contained-modal-title-vcenter"
         style={{ padding: "0px " }}
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">Đánh giá</Modal.Title>
         </Modal.Header>
+        {isLoading && <div> Loading...</div>}
+        {showMess && (
+          <Notifi
+            message={message}
+            variant={levelMessage}
+            onClose={() => setShowMess(false)}
+          />
+        )}
+        <ErrorNotifi error={error} />
         <Modal.Body className="grid-example">
           <Container>
-            <Form>
-              <Row>
-                <b>Khoa Nội</b> <span>Bác sĩ Dương</span>
-              </Row>
+            <Form onSubmit={handleEvaluateSubmit}>
               <Row>
                 <textarea
                   placeholder="Đánh giá bác sĩ"
                   cols={30}
                   rows={5}
-                ></textarea>
+                  value={evaluateContent}
+                  onChange={handleChange}
+                  required
+                />
               </Row>
               <Row>
                 <Col>
-                  <Button onClick={props.handleCloseModal}>Hoàn tất</Button>
+                  <Button type="submit">Hoàn tất</Button>
                 </Col>
               </Row>
             </Form>

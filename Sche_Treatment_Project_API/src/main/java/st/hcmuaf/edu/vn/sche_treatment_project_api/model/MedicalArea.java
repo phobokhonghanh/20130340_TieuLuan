@@ -1,4 +1,5 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class MedicalArea {
     @JoinColumn(name = "support_status_id", referencedColumnName = "id", nullable = false)
     protected Support supportStatus;
 
-    @OneToMany(mappedBy = "medicalArea", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "medicalArea", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Clinic> clinics;
     public MedicalArea(String id, String areaName, LocalDateTime createAt, LocalDateTime updateAt, Support supportStatus) {
         this.id = id;

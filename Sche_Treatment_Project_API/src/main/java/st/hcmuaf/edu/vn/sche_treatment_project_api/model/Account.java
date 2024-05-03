@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -25,7 +26,7 @@ public class Account {
     private String accountName;
 
     @Column(name = "account_gender", nullable = false)
-    private Boolean accountGender;
+    private boolean accountGender;
 
     @Column(name = "create_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createAt;
@@ -41,15 +42,7 @@ public class Account {
     @JoinColumn(name = "support_status_id", referencedColumnName = "id", nullable = false)
     private Support supportStatus;
 
-    public Account(String id, String accountPhone, String accountPassword, String accountName, Boolean accountGender, LocalDateTime createAt, LocalDateTime updateAt, Support supportRole, Support supportStatus) {
+    public Account(String id) {
         this.id = id;
-        this.accountPhone = accountPhone;
-        this.accountPassword = accountPassword;
-        this.accountName = accountName;
-        this.accountGender = accountGender;
-        this.createAt = createAt;
-        this.updateAt = updateAt;
-        this.supportRole = supportRole;
-        this.supportStatus = supportStatus;
     }
 }
