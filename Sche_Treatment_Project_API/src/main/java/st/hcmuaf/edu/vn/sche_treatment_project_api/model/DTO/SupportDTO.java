@@ -14,6 +14,10 @@ public class SupportDTO {
     private String supportValue;
     private String supportInfo;
     private String idGroupTime;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public SupportDTO(String id) {
+        this.id = id;
+    }
 }

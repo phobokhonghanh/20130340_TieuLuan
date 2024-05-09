@@ -33,7 +33,7 @@ public class ClinicController {
     }
 
     @GetMapping("/all")
-    public List<Clinic> getAllClinic() {
+    public List<ClinicDTO> getAllClinic() {
         return clinicService.getAll();
     }
 
@@ -57,7 +57,6 @@ public class ClinicController {
             return new ResponseEntity<>(saveClinicDTO, HttpStatus.CREATED);
         }
         return new ResponseEntity<>(null,HttpStatus.OK);
-
     }
 
     @PutMapping

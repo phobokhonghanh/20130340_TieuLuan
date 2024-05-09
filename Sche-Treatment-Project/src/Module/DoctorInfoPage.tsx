@@ -7,14 +7,18 @@ import Slides from "../Component/Slides";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/style.css";
+import { useLocation } from "react-router-dom";
+import { DoctorEntity } from "../Models/Model";
 export function DoctorInfor() {
+  const { state } = useLocation();
+  const doctorState: DoctorEntity = state.doctorState;
   return (
     <>
       <Preloader />
       <HeaderNav />
       <Slides />
       <CardInfo />
-      <DoctorDetails />
+      <DoctorDetails doctor={doctorState}/>
       <Footer />
     </>
   );

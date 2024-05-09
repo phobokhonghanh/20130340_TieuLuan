@@ -22,10 +22,10 @@ public class MedicalService {
     @Column(name = "service_description", columnDefinition = "TEXT")
     private String serviceDescription;
 
-    @Column(name = "create_at", updatable = false, nullable = false)
+    @Column(name = "create_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "update_at", nullable = false)
+    @Column(name = "update_at")
     private LocalDateTime updatedAt;
 
     @ManyToOne

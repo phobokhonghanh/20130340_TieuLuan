@@ -13,17 +13,28 @@ import {
   PackageEntity,
   Support,
 } from "../Models/Model";
-import { API_ENDPOINTS } from "../apiConfig";
+import { API_ENDPOINTS, updateStatus } from "../apiConfig";
 import { formatDate } from "../Module/AppointmentPage";
+import { Button } from "react-bootstrap";
+import { ErrorNotifi, Notifi } from "./Notification";
 interface appointmentDetailsProps {
+  refesh: boolean;
   role: string;
   appointmentId: AppointmentDTO;
+  setRefesh: (rf: boolean) => void;
 }
 export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
+  refesh,
   role,
   appointmentId,
+  setRefesh,
 }) => {
-  const [error, setError] = useState();
+  const [error, setError] = useState<boolean>(false);
+  const [showMess, setShowMess] = useState(false);
+  const [message, setMessage] = useState("");
+  const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
+    "danger"
+  );
   const [isLoading, setLoading] = useState(false);
   const [bill, setBill] = useState<Bill>();
   const [clinic, setClinic] = useState<ClinicDTO>();
@@ -40,7 +51,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
       const data = (await response.json()) as Bill;
       setBill(data);
     } catch (e: any) {
-      setError(e);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -54,7 +65,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
       const data = (await response.json()) as ClinicDTO;
       setClinic(data);
     } catch (e: any) {
-      setError(e);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -70,7 +81,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
         setArea(data);
       }
     } catch (e: any) {
-      setError(e);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -80,7 +91,22 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
     fetchBill();
     fetchClinic();
     fetchArea();
-  }, [appointmentId]);
+    setRefesh(false);
+  }, [appointmentId, refesh]);
+  const handleCancel = (appointmentid: string) => {
+    if (appointmentid) {
+      updateStatus(appointmentid).then((response: any) => {
+        if (response.status === 200) {
+          setRefesh(true);
+        } else {
+          setError(true);
+          setMessage("Cập nhật trạng thái không thành công!");
+          setLevelMessage("danger");
+          setShowMess(true);
+        }
+      });
+    }
+  };
   return (
     <>
       <div className="card col-md-4" style={{ height: "max-content" }}>
@@ -96,18 +122,13 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
             Loading...
           </div>
         )}
-        {error && (
-          <div
-            style={{
-              textAlign: "center",
-              color: "rgb(116, 136, 151)",
-              fontWeight: "bold",
-              fontSize: "larger",
-            }}
-          >
-            <i>&#9888;</i> Đang gặp sự cố kỹ thuật, xin vui lòng đợi trong giây
-            lát !
-          </div>
+        <ErrorNotifi error={error} />
+        {showMess && (
+          <Notifi
+            message={message}
+            variant={levelMessage}
+            onClose={() => setShowMess(false)}
+          />
         )}
         <div className="card-body">
           <div className="align-items-start align-items-sm-center gap-4">
@@ -177,12 +198,31 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
                     )}
                   </p>
                   <p className="">
-                    Trạng thái:{" "}
+                    Trạng thái lịch hẹn:{" "}
                     <span className="fw-bold">
-                      {bill?.appointment.supportStatus
-                        ? bill?.appointment.supportStatus.supportValue
-                        : ""}{" "}
-                      {"/"} {bill?.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
+                      <span style={{ color: "green" }}>
+                        {bill?.appointment.supportStatus.id === "S1" ? (
+                          <Button
+                            onClick={() => handleCancel(appointmentId?.id)}
+                          >
+                            Hủy lịch hẹn
+                          </Button>
+                        ) : bill?.appointment.supportStatus ? (
+                          bill?.appointment.supportStatus.supportValue
+                        ) : (
+                          ""
+                        )}
+                      </span>
+                    </span>
+                  </p>
+                  <p className="">
+                    Trạng thái hóa đơn:{" "}
+                    <span className="fw-bold">
+                      {bill?.isPaid ? (
+                        "Đã thanh toán"
+                      ) : (
+                        <span style={{ color: "red" }}>Chưa thanh toán</span>
+                      )}
                     </span>
                   </p>
                   <p className="">
@@ -219,14 +259,17 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   );
 };
 interface AppointmentProps {
+  refeshDetails: (modalRefreshDetails: boolean) => void;
   role: string;
   appointmentDTO: AppointmentDTO;
 }
 export const Appointment: React.FC<AppointmentProps> = ({
+  refeshDetails,
   role,
   appointmentDTO,
 }) => {
   const [modalShow, setModalShow] = useState(false);
+  // const [modalRefreshDetails, setModalRefreshDetails] = useState(false);
   const [packageFetch, setPackage] = useState<PackageEntity>();
   const [supportFetch, setSupport] = useState<Support>();
   const [calendarFetch, setCalendar] = useState<CalendarDTO>();
@@ -337,6 +380,7 @@ export const Appointment: React.FC<AppointmentProps> = ({
               {modalShow && (
                 <ModalResult
                   show={modalShow}
+                  refeshDetails={() => refeshDetails(true)}
                   onHide={() => setModalShow(false)}
                   role={role}
                   appointmentId={appointmentDTO.id}
@@ -348,13 +392,15 @@ export const Appointment: React.FC<AppointmentProps> = ({
             {/* <!-- Table Bottom --> */}
           </div>
           <div className="mt-2">
-            <button
-              type="button"
-              className="btn btn-primary me-2"
-              onClick={() => setModalShow(true)}
-            >
-              Kết quả
-            </button>
+            {appointmentDTO.supportStatusId !== "S4" && (
+              <button
+                type="button"
+                className="btn btn-primary me-2"
+                onClick={() => setModalShow(true)}
+              >
+                Kết quả
+              </button>
+            )}
             <button type="button" className="btn btn-outline-secondary">
               Chi tiết
             </button>
@@ -378,6 +424,7 @@ export const HistoryAppointment = () => {
 
   const [error, setError] = useState();
   const [isLoading, setLoading] = useState(false);
+  const [refeshDetails, setRefeshDetails] = useState(false);
 
   useEffect(() => {
     if (account) {
@@ -402,10 +449,13 @@ export const HistoryAppointment = () => {
         }
       };
       fetchAppointment(currentPage);
+      if (refeshDetails) {
+        setRefeshDetails(false);
+      }
     } else {
       // navigator("/404");
     }
-  }, [currentPage]);
+  }, [currentPage, refeshDetails]);
   return (
     <>
       <div className="content-wrapper">
@@ -461,13 +511,19 @@ export const HistoryAppointment = () => {
                       style={{ cursor: "pointer" }}
                       onClick={() => setSelectAppointment(appointment)}
                     >
-                      <Appointment role={role} appointmentDTO={appointment} />
+                      <Appointment
+                        refeshDetails={(rf) => setRefeshDetails(rf)}
+                        role={role}
+                        appointmentDTO={appointment}
+                      />
                     </div>
                   ))}
               </div>
             </div>
             {selectAppointment && (
               <AppointmentDetail
+                refesh={refeshDetails}
+                setRefesh={(rf) => setRefeshDetails(rf)}
                 role={role}
                 appointmentId={selectAppointment}
               />

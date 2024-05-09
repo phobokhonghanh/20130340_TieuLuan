@@ -1,41 +1,22 @@
-import { useState, SetStateAction } from "react";
+import React, { useState, SetStateAction } from "react";
 import { Table } from "react-bootstrap";
 import { ModalAddAccount, ModalInterface } from "./Modal";
 import Calendar, { TileArgs } from "react-calendar";
-import { Clinic } from "../Models/Model";
+import { Clinic, PackageEntity } from "../Models/Model";
 type Account = {
   phone: string;
   name: string;
   gender: string;
   role: string;
 };
-type Service = {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  status: string;
-};
-interface Package {
-  id: string;
-  name: string;
-  price: string;
-  status: string;
-  listServices: Service[];
-}
+
 type DataTableAccountProps = {
   data: Account[];
-};
-type DataTableServiceProps = {
-  data: Service[];
-};
-type DataTablePackageProps = {
-  data: Package[];
 };
 
 type DataTableProps = {
   title: string;
-  data: Account[] | Service[] | Package[] | Clinic[];
+  data: Account[] | Clinic[];
   isPackage?: boolean;
 };
 const mapGender = (genderValue: string) => {
@@ -63,9 +44,6 @@ const mapRole = (roleValue: string) => {
   }
 };
 
-function listServices(value: Service[]) {
-  return value.map((service) => <li>{service.name}</li>);
-}
 export function renderCell(key: string, value: string | object): JSX.Element {
   switch (key) {
     case "gender":
@@ -75,11 +53,8 @@ export function renderCell(key: string, value: string | object): JSX.Element {
     case "status":
       return <>{mapStatus(String(value))}</>;
     default:
-      if (Array.isArray(value)) {
-        return <>{listServices(value)}</>;
-      } else {
-        return <>{String(value)}</>; // Handle non-array value
-      }
+      return <>{String(value)}</>; // Handle non-array value
+
   }
 }
 export const DataTable: React.FC<DataTableProps> = ({
@@ -282,231 +257,6 @@ export const DataTableAccount = (data: DataTableAccountProps) => {
           </tr>
         </thead>
         <DataTable title={"tài khoản"} data={sortedRows} />
-      </Table>
-      <div>
-        <button
-          onClick={() => handleChangePage(currentPage - 1)}
-          disabled={currentPage === 0}
-        >
-          Previous
-        </button>
-        <span>{`Page ${currentPage + 1} of ${totalPages}`}</span>
-        <button
-          onClick={() => handleChangePage(currentPage + 1)}
-          disabled={currentPage === totalPages - 1}
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-};
-export const DataTableService = (data: DataTableServiceProps) => {
-  const [filterText, setFilterText] = useState("");
-  const [filteredRows, setFilteredRows] = useState<Service[]>(data.data);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [sortColumn, setSortColumn] = useState("");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const itemsPerPage = 10;
-
-  const handleFilterChange = (e: { target: { value: string } }) => {
-    const value = e.target.value;
-    setFilterText(value);
-    const filteredData = data.data.filter((row: Service) =>
-      Object.values(row).some((cell) =>
-        String(cell).toLowerCase().includes(value.toLowerCase())
-      )
-    );
-    setFilteredRows(filteredData);
-    setCurrentPage(0);
-  };
-
-  const handleSort = (column: string) => {
-    if (column === sortColumn) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortDirection("asc");
-    }
-  };
-
-  const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
-  const currentRows = filteredRows.slice(startIndex, endIndex);
-
-  const sortedRows = [...currentRows].sort((a, b) => {
-    const columnA = a[sortColumn as keyof Service];
-    const columnB = b[sortColumn as keyof Service];
-    if (columnA < columnB) return sortDirection === "asc" ? -1 : 1;
-    if (columnA > columnB) return sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  const handleChangePage = (pageIndex: SetStateAction<number>) => {
-    setCurrentPage(pageIndex);
-  };
-
-  return (
-    <div>
-      <input
-        type="text"
-        placeholder="Tìm kiếm ..."
-        value={filterText}
-        onChange={handleFilterChange}
-      />
-      <Table striped bordered hover>
-        <thead>
-          <tr className="text-small">
-            <th># </th>
-            <th>ID</th>
-            <th>Tên dịch vụ</th>
-            <th
-              onClick={() => handleSort("price")}
-              style={{ cursor: "pointer" }}
-            >
-              {sortColumn === "price" ? (
-                <span>
-                  {sortDirection === "asc" ? "Giá tiền ▲" : "Giá tiền ▼"}
-                </span>
-              ) : (
-                "Giá tiền ▼"
-              )}
-            </th>
-            <th
-              onClick={() => handleSort("status")}
-              style={{ cursor: "pointer" }}
-            >
-              {sortColumn === "status" ? (
-                <span>
-                  {sortDirection === "asc" ? "Trạng thái ▲" : "Trạng thái ▼"}
-                </span>
-              ) : (
-                "Trạng thái ▼"
-              )}
-            </th>
-            <th className="remove" style={{ textAlign: "center" }}>
-              Sửa
-            </th>
-            <th className="remove" style={{ textAlign: "center" }}>
-              Xóa
-            </th>
-          </tr>
-        </thead>
-        <DataTable title={"dịch vụ"} data={sortedRows} />
-      </Table>
-      <div>
-        <button
-          onClick={() => handleChangePage(currentPage - 1)}
-          disabled={currentPage === 0}
-        >
-          Previous
-        </button>
-        <span>{`Page ${currentPage + 1} of ${totalPages}`}</span>
-        <button
-          onClick={() => handleChangePage(currentPage + 1)}
-          disabled={currentPage === totalPages - 1}
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-};
-export const DataTablePackage = (data: DataTablePackageProps) => {
-  const [filterText, setFilterText] = useState("");
-  const [filteredRows, setFilteredRows] = useState<Package[]>(data.data);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [sortColumn, setSortColumn] = useState("");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const itemsPerPage = 10;
-
-  const handleFilterChange = (e: { target: { value: string } }) => {
-    const value = e.target.value;
-    setFilterText(value);
-    const filteredData = data.data.filter((row: Package) =>
-      Object.values(row).some((cell) =>
-        String(cell).toLowerCase().includes(value.toLowerCase())
-      )
-    );
-    setFilteredRows(filteredData);
-    setCurrentPage(0);
-  };
-
-  const handleSort = (column: string) => {
-    if (column === sortColumn) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortDirection("asc");
-    }
-  };
-
-  const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
-  const currentRows = filteredRows.slice(startIndex, endIndex);
-
-  const sortedRows = [...currentRows].sort((a, b) => {
-    const columnA = a[sortColumn as keyof Package];
-    const columnB = b[sortColumn as keyof Package];
-    if (columnA < columnB) return sortDirection === "asc" ? -1 : 1;
-    if (columnA > columnB) return sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  const handleChangePage = (pageIndex: SetStateAction<number>) => {
-    setCurrentPage(pageIndex);
-  };
-
-  return (
-    <div>
-      <input
-        type="text"
-        placeholder="Tìm kiếm ..."
-        value={filterText}
-        onChange={handleFilterChange}
-      />
-      <Table striped bordered hover>
-        <thead>
-          <tr className="text-small">
-            <th># </th>
-            <th>ID</th>
-            <th>Tên gói dịch vụ</th>
-            <th
-              onClick={() => handleSort("price")}
-              style={{ cursor: "pointer" }}
-            >
-              {sortColumn === "price" ? (
-                <span>
-                  {sortDirection === "asc" ? "Giá tiền ▲" : "Giá tiền ▼"}
-                </span>
-              ) : (
-                "Giá tiền ▼"
-              )}
-            </th>
-            <th
-              onClick={() => handleSort("status")}
-              style={{ cursor: "pointer" }}
-            >
-              {sortColumn === "status" ? (
-                <span>
-                  {sortDirection === "asc" ? "Trạng thái ▲" : "Trạng thái ▼"}
-                </span>
-              ) : (
-                "Trạng thái ▼"
-              )}
-            </th>
-            <th>Danh sách dịch vụ</th>
-            <th className="remove" style={{ textAlign: "center" }}>
-              Sửa
-            </th>
-            <th className="remove" style={{ textAlign: "center" }}>
-              Xóa
-            </th>
-          </tr>
-        </thead>
-        <DataTable title={"gói dịch vụ"} data={sortedRows} isPackage={true} />
       </Table>
       <div>
         <button

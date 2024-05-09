@@ -14,8 +14,23 @@ export interface PackageEntity {
   createdAt: string;
   updatedAt: string;
   clinicId: Clinic;
-  supportStatus: Support;
+  supportStatusId: Support;
   packageServices: PackageService[];
+}
+export interface PackageDTO {
+  id: string;
+  packageName: string;
+  packagePrice: string;
+  clinicId: Clinic | undefined;
+  supportStatusId: string;
+  packageServices: PackageServiceDTO[];
+}
+
+export interface PackageServiceDTO {
+  id: string;
+  medicalService: string;
+  packageId: string;
+  // supportStatusId: string;
 }
 export interface PackageService {
   id: string;
@@ -23,7 +38,14 @@ export interface PackageService {
   packageId: string;
   supportStatusId: Support;
 }
-
+export interface ServiceDTO {
+  id: string;
+  serviceName: string;
+  servicePrice: string;
+  serviceDescription: string;
+  supportStatusId: string;
+  clinic: string;
+}
 export interface ServiceEntity {
   id: string;
   serviceName: string;
@@ -32,7 +54,7 @@ export interface ServiceEntity {
   supportStatusId: Support;
   createdAt: string;
   updatedAt: string;
-  clinicId: Clinic;
+  clinic: Clinic;
 }
 
 export interface Account {
@@ -161,6 +183,8 @@ export interface EvaluateDTO {
   evaluateContent: string;
   doctorId: string;
   appointmentId: string;
+  createAt: string;
+  updateAt: string;
 }
 export interface ResultDTO {
   id: string;

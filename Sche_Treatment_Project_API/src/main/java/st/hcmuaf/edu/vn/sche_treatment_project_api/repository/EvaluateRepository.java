@@ -9,6 +9,6 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Evaluate;
 public interface EvaluateRepository extends JpaRepository <Evaluate, String > {
     Evaluate getEvaluateByAppointmentId(String appointmentId);
 
-    Page<Evaluate> findAllByDoctorIdOrderByCreatedAtDesc(String doctorId, Pageable pageable);
+    Page<Evaluate> findAllByDoctorIdOrderByCreateAtDesc(String doctorId, Pageable pageable);
 
 }

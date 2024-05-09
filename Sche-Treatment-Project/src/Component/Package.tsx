@@ -100,7 +100,7 @@ export const Package: React.FC<PackageProps> = ({ packageEntity }) => {
             {packageEntity.packageName}
           </h4>
           <div className="price" style={{ float: "left", padding: "15px" }}>
-            <p className="title-package price">
+            <p style={{ color: "black" }}>
               Giá:{" "}
               {new Intl.NumberFormat("vi-VN", {
                 style: "currency",
@@ -131,11 +131,11 @@ export const PackageInfo: React.FC<PackageProps> = ({ packageEntity }) => (
     <div className="single-table">
       {/* <!-- Table Head --> */}
       <div className="table-head">
-        <h4 className=" amount title-package price">
+        <h4 className="amount title-package price">
           {packageEntity.packageName}
         </h4>
         <div className="price">
-          <p className="title-package price">
+          <p style={{ color: "black" }}>
             {new Intl.NumberFormat("vi-VN", {
               style: "currency",
               currency: "VND",
@@ -201,7 +201,9 @@ export function PackageSelected({
   packageSelected,
   onPackageSelected,
 }: PackageSelectedProps) {
-  const [selectedPackage, setSelectedPackage] = useState(packageSelected.packageName);
+  const [selectedPackage, setSelectedPackage] = useState(
+    packageSelected.packageName
+  );
   const [showDropdown, setShowDropdown] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);

@@ -20,10 +20,10 @@ import {
 import Header from "../Component/Header";
 import { Notifi } from "../Component/Notification";
 import { convertTime } from "../Component/AdminCalendar";
-import { ClinicAppoinment } from "../Component/Department";
 
 import { API_ENDPOINTS, createAppointment } from "../apiConfig";
 import { formatDate } from "./AppointmentPage";
+import { ClinicSelected } from "../Component/Department";
 
 const AppointmentDoctor = () => {
   const { state } = useLocation();
@@ -71,25 +71,6 @@ const AppointmentDoctor = () => {
     };
     fetchPackage();
   }, []);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShow(false);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [show]);
-
-  useEffect(() => {
-    const messageFromStorage = localStorage.getItem("message");
-    if (messageFromStorage !== null) {
-      const message = JSON.parse(messageFromStorage);
-      setMessage(message.message);
-      setLevelMessage(message.level);
-      setShow(message.show);
-    }
-    localStorage.removeItem("message");
-  }, []);
-
   useEffect(() => {
     const fetchArea = async () => {
       setLoading(true);
@@ -141,15 +122,14 @@ const AppointmentDoctor = () => {
     if (appointment) {
       createAppointment(appointment).then((response: any) => {
         if (response.status === 201) {
-          localStorage.setItem(
-            "message",
-            JSON.stringify({
-              message: "Đặt lịch thành công",
-              level: "success",
-              show: true,
-            })
-          );
-          window.location.reload();
+          setMessage("Đặt lịch thành công!");
+          setLevelMessage("success");
+          setShow(true);
+          const timer = setTimeout(() => {
+            setShow(false);
+            window.location.href = "/history";
+          }, 3000);
+          return () => clearTimeout(timer);
         } else {
           setMessage("Đã có người đặt lịch!");
           setLevelMessage("danger");
@@ -227,33 +207,39 @@ const AppointmentDoctor = () => {
             >
               {Array.from(caInfo.entries()).map(([key, value]) => (
                 <div key={key}>
-                  <b>{key}:</b>{" "}
-                  <span style={{ fontWeight: "600", color: "green" }}>
-                    {value.map((calendar) => (
-                      <div
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.backgroundColor = "lightGray")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.backgroundColor = "")
-                        }
-                        style={{
-                          cursor: isDateExpired(calendar)
-                            ? "not-allowed"
-                            : "pointer",
-                          borderRadius: "1px",
-                        }}
-                        key={calendar.id}
-                        onClick={() =>
-                          isDateExpired(calendar)
-                            ? null
-                            : handleDivClick(calendar)
-                        }
-                      >
-                        {calendar.doctor.accountName}
-                      </div>
-                    ))}{" "}
-                  </span>
+                  {value.map(
+                    (calendar) =>
+                      calendar.doctor.id === doctorState.id && (
+                        <>
+                          <b>{key}:</b>{" "}
+                          <span style={{ fontWeight: "600", color: "green" }}>
+                            <div
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.backgroundColor =
+                                  "lightGray")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.backgroundColor = "")
+                              }
+                              style={{
+                                cursor: isDateExpired(calendar)
+                                  ? "not-allowed"
+                                  : "pointer",
+                                borderRadius: "1px",
+                              }}
+                              key={calendar.id}
+                              onClick={() =>
+                                isDateExpired(calendar)
+                                  ? null
+                                  : handleDivClick(calendar)
+                              }
+                            >
+                              {calendar.doctor.accountName}
+                            </div>
+                          </span>
+                        </>
+                      )
+                  )}{" "}
                 </div>
               ))}
             </div>
@@ -366,10 +352,9 @@ const AppointmentDoctor = () => {
                   <Form.Label>
                     <b>Khoa khám</b>
                   </Form.Label>
-                  <ClinicAppoinment
-                    dataListClinic={
-                      areaSelected ? getClinicDoctor(areaSelected) : []
-                    }
+                  <ClinicSelected
+                    clinicSelect={clinic}
+                    data={areaSelected ? getClinicDoctor(areaSelected) : []}
                     onClinicSelected={(selectedClinic) =>
                       setClinic(selectedClinic)
                     }
@@ -466,10 +451,7 @@ const AppointmentDoctor = () => {
                       </span>
                     </Col>
                   </Form.Label>
-                  <Calendar
-                    tileContent={infoTime}
-                    // onChange={handleDateChange}
-                  />
+                  <Calendar tileContent={infoTime} />
                   <TimeTable
                     calendar={calendarModel}
                     title={

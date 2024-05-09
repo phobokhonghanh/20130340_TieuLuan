@@ -57,6 +57,9 @@
     color: #2C2D3F;
     margin-top: 5px ;
     margin-bottom: 10px;
+    height: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .pricing-table .single-table .calendar {
     margin: 3px;

@@ -1,29 +1,49 @@
-import { Dialog } from "./AdminDialog";
-import { DataTableService } from "./DataTable";
-import { ModalInterface } from "./Modal";
-type Service = {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  status: string;
-};
-const generateMockData = (length: number): Service[] => {
-  const mockData: Service[] = [];
-  for (let i = 1; i <= length; i++) {
-    mockData.push({
-      id: `ServiceID${i}`,
-      name: `Service Number ${i}`,
-      description: `Mô tả dịch vụ`,
-      price: `1000$`,
-      status: i % 2 === 0 ? "0" : "1",
-    } as Service);
-  }
-  return mockData;
-};
-const data: Service[] = generateMockData(17);
+import { useEffect, useState } from "react";
+import { Col, Table } from "react-bootstrap";
+
+import Pagination from "./Pagination";
+import { formatPrice } from "../Utils";
+import { ModalService } from "./Service";
+import { ErrorNotifi } from "./Notification";
+import { API_ENDPOINTS } from "../apiConfig";
+import { ServiceEntity } from "../Models/Model";
 
 export const ServiceManager = () => {
+  const [isLoading, setLoading] = useState(false);
+  const [filterText, setFilterText] = useState(""); // input search
+  const [error, setError] = useState<boolean>(false);
+  const [response, setResponse] = useState<number>(0); // get/set value response create
+  const [totalPages, setTotalPages] = useState<number>(1); // State để lưu tổng số trang
+  const [currentPage, setCurrentPage] = useState<number>(1); // State để lưu trang hiện tại
+  const [showModalService, setShowModalService] = useState(false); // get / set show modal (add and update)
+  const [dataService, setDataService] = useState<ServiceEntity[]>([]); // list services all
+
+  // get value user input (search name)
+  const handleFilterChange = (e: { target: { value: string } }) => {
+    const value = e.target.value;
+    setFilterText(value);
+  };
+  // call api
+  useEffect(() => {
+    const fetchListPackage = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${API_ENDPOINTS.GET_SERVICE_ALL}?page=${currentPage}&keyword=${filterText}`
+        );
+        const data = await response.json();
+        setDataService(data.content);
+        setCurrentPage(data.number + 1);
+        setTotalPages(data.totalPages);
+      } catch (e: any) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    setResponse(0);
+    fetchListPackage();
+  }, [response, currentPage, filterText]);
   return (
     <div id="page-wrapper">
       <div className="container-fluid">
@@ -33,56 +53,146 @@ export const ServiceManager = () => {
               <ul className="page-breadcrumb">
                 <li>
                   <i className="fa fa-home"></i>
-                  <a href="/Admin/Index_Admin">Home</a>
+                  <a href="/admin">Home</a>
                   <i className="fa fa-angle-right"></i>
                 </li>
                 <li>
-                  <a href="/Account/Account_Manage">
-                    Quản lý dịch vụ khám bệnh
-                  </a>
+                  <a href="/admin/services">Quản lý dịch vụ khám bệnh</a>
                 </li>
               </ul>
             </div>
           </div>
         </div>
+        <ErrorNotifi error={error} />
         <div className="row">
           <div className="col-lg-12">
             <div className="panel panel-default">
-              <Dialog />
               <div className="panel-heading d-flex">
                 <div>
                   <i className="fa  fa-user fa-fw"></i>
                   Dịch vụ khám bệnh
                 </div>
-                <a
-                  className="add"
-                  data-toggle="modal"
-                  data-target="#myModal"
-                  href="#"
-                >
-                  <div id="add" className="">
+                <a className="add" onClick={() => setShowModalService(true)}>
+                  <div id="add">
                     <i className="fa fa-plus"></i>
                     <span>Thêm mới</span>
                   </div>
                 </a>
               </div>
-              <div
-                id="myModal"
-                className="modal fade"
-                tabIndex={-1}
-                role="dialog"
-              >
-                <ModalInterface title="Thêm dịch vụ" isCreate={true} />
-              </div>
+              <Col xs={3}>
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm tên dịch vụ..."
+                  value={filterText}
+                  onChange={handleFilterChange}
+                  className="custom-select-input"
+                  style={{ margin: "15px" }}
+                />
+              </Col>
+              <ModalService
+                title="Thêm dịch vụ"
+                add={true}
+                service={undefined}
+                show={showModalService}
+                onHide={() => setShowModalService(false)}
+                responseStatus={(status: number) => setResponse(status)}
+              />
               <div className="panel-body">
                 <div className="table-responsive">
-                  <DataTableService data={data as any} />
+                  {" "}
+                  <DataTableService
+                    responseStatus={(status) => setResponse(status)}
+                    data={dataService}
+                  />
+                </div>
+                <div style={{ marginBottom: "30px" }}>
+                  <Pagination
+                    totalPage={totalPages}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                  />{" "}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+interface DataTableServiceProps {
+  responseStatus: (status: number) => void;
+  data: ServiceEntity[];
+}
+
+export const DataTableService: React.FC<DataTableServiceProps> = ({
+  responseStatus,
+  data,
+}) => {
+  const [showModalService, setShowModalService] = useState<{
+    [key: number]: boolean;
+  }>({}); // modal show update clinic
+
+  return (
+    <div>
+      <Table striped bordered hover>
+        <thead>
+          <tr className="text-small">
+            <th># </th>
+            <th>ID</th>
+            <th>Tên dịch vụ</th>
+            <th>Giá tiền</th>
+            <th>Trạng thái</th>
+            <th>Phòng khám</th>
+            <th className="remove" style={{ textAlign: "center" }}>
+              Sửa
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, rowIndex) => (
+            <tr key={row.id}>
+              <td>{++rowIndex}</td>
+              <td style={{ width: "200px" }}>{row.id}</td>
+              <td>{row.serviceName}</td>
+              <td>{formatPrice(row.servicePrice)}</td>
+              <td>{row.supportStatusId.supportValue}</td>
+              <td>
+                {row.clinic.clinicName}
+                <div>({row.clinic.medicalAreaId.areaName})</div>
+              </td>
+              <td style={{ textAlign: "center" }} key={row.id}>
+                <a
+                  className="btn default btn-xs purple btn-edit"
+                  onClick={() =>
+                    setShowModalService({
+                      ...showModalService,
+                      [rowIndex]: true,
+                    })
+                  }
+                >
+                  <i className="fa fa-edit"></i>
+                </a>
+                {showModalService && (
+                  <ModalService
+                    title="Sửa dịch vụ"
+                    add={false}
+                    service={row}
+                    show={showModalService[rowIndex] || false}
+                    onHide={() =>
+                      setShowModalService({
+                        ...showModalService,
+                        [rowIndex]: false,
+                      })
+                    }
+                    responseStatus={(status) => responseStatus(status)}
+                  />
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   );
 };

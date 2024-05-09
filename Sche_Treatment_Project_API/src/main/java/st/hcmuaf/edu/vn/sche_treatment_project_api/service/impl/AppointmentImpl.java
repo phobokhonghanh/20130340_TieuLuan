@@ -122,4 +122,9 @@ public class AppointmentImpl implements AppointmentService {
         return new PageImpl<>(appointmentDTOs, pageable, total);
     }
 
+    @Override
+    public void updateStatus(String appointmentId, String supportStatusId) {
+        appointmentRepository.updateAppointmentBySupportStatus(appointmentId,supportStatusId);
+    }
+
 }

@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
 import "../assets/css/Account.css";
+import { DoctorEntity, EvaluateDTO } from "../Models/Model";
+import React, { useEffect, useState } from "react";
+import { API_ENDPOINTS } from "../apiConfig";
+import { ErrorNotifi } from "./Notification";
+import { convertDate, convertDateTime } from "../Utils";
+import Pagination from "./Pagination";
 
 export const Profile = () => (
   <>
@@ -274,10 +280,46 @@ export const ProfileDocterDetails = () => (
     </div>
   </>
 );
-export const DoctorDetails = () => {
+interface DoctorInfProps {
+  doctor: DoctorEntity;
+}
+export const DoctorDetails: React.FC<DoctorInfProps> = ({ doctor }) => {
+  const [error, setError] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [evaluates, setEvaluate] = useState<EvaluateDTO[]>([]);
+  const [totalElement, setTotalElement] = useState(0);
+  const [currentPage, setCurrentPage] = useState<number>(1); // State để lưu trang hiện tại
+  const [totalPages, setTotalPages] = useState<number>(1); // State để lưu tổng số trang
+
+  const fetchEvaluate = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_EVALUATE_DOCTOR(doctor.id)}`
+      );
+      if (response.status === 204) {
+        return;
+      }
+      const data = await response.json();
+      setEvaluate(data.content);
+      setTotalElement(data.totalElements);
+      setCurrentPage(data.number + 1);
+      setTotalPages(data.totalPages);
+    } catch (e: any) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvaluate();
+  }, []);
   return (
     <>
+      {isLoading && <div> Loading...</div>}
       <section className="">
+        <ErrorNotifi error={error} />
         <div className="container">
           <div className="col-lg-12">
             <div className="single-main">
@@ -286,6 +328,7 @@ export const DoctorDetails = () => {
                   marginBottom: "10px",
                   padding: "20px",
                   border: "1px solid #c9c7c775",
+                  fontSize: "21px",
                 }}
               >
                 <div className="row">
@@ -299,37 +342,34 @@ export const DoctorDetails = () => {
                         backgroundPosition: "center",
                         backgroundRepeat: "no-repeat",
                       }}
-                      src="/src/assets/img/doctor.jpg"
+                      src={`${
+                        doctor.doctorImage
+                          ? doctor.doctorImage
+                          : "/src/assets/img/doctor.jpg"
+                      }`}
                       alt="#"
                     />
                   </div>
                   <div className="col-9">
-                    <h3 className="news-title">PGS TS Trịnh Thăng Bình</h3>
-                    <span>Giới tính: Nam</span>
+                    <h3 className="news-title">
+                      {doctor.doctorDegree}
+                      {". "}
+                      {doctor.doctorRank} {doctor.accountName}
+                    </h3>
+                    <span>
+                      Giới tính: {doctor.accountGender ? "Nam" : "Nữ"}
+                    </span>
                     <div>
-                      <span>Khu khám: Dịch vụ</span>
+                      <span>Chuyên khoa: {doctor.doctorSpecialty}</span>
                     </div>
                     <div>
-                      <span>Chuyên khoa: Nội</span>
-                    </div>
-                    <div>
-                      <span>Kinh nghiệm: 4 năm</span>
+                      <span>Kinh nghiệm: {doctor.doctorExp}</span>
                     </div>
                   </div>
                 </div>
                 <div style={{ marginTop: "20px" }}>
                   <label htmlFor="">Giới thiệu:</label>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Suspendisse facilisis ultricies tortor, nec sollicitudin
-                    lorem sagittis vitae. Curabitur rhoncus commodo rutrum.
-                    Pellentesque habitant morbi tristique senectus et netus et
-                    malesuada fames ac turpis egestas. Aliquam nec lacus
-                    pulvinar, laoreet dolor quis, pellentesque ante. Cras nulla
-                    orci, pharetra at dictum consequat, pretium pretium nulla.
-                    Suspendisse porttitor nunc a sodales tempor. Mauris sed
-                    felis maximus, interdum metus vel, tincidunt diam.
-                  </p>
+                  <p>{doctor.doctorIntroduce}</p>
                 </div>
               </div>
               <div className="col-12">
@@ -345,84 +385,68 @@ export const DoctorDetails = () => {
                     <div className="meta-right">
                       <h5 className="comments">
                         <Link to="#">
-                          <i className="fa fa-comments"></i>05 Comments
+                          <i className="fa fa-comments"></i>
+                          {totalElement
+                            ? totalElement < 10
+                              ? " 0" + totalElement
+                              : totalElement
+                            : " 0"}{" "}
+                          Nhận xét
                         </Link>
                       </h5>
                     </div>
                   </div>
                   <div className="comments-body">
-                    <div style={{ padding: "20px" }}>
-                      <div className="row">
-                        <div className="col-2">
-                          <img
-                            style={{
-                              borderRadius: "50%",
-                              height: "150px",
-                              width: "150px",
-                              backgroundSize: "cover",
-                              backgroundPosition: "center",
-                              backgroundRepeat: "no-repeat",
-                            }}
-                            src="/src/assets/img/doctor.jpg"
-                            alt="#"
-                          />
-                        </div>
-                        <div className="col-9">
-                          <h4>Afsana Mimi</h4>
-                          <div className="comment-meta">
-                            <span className="meta">
-                              <i className="fa fa-calendar"></i>March 05, 2019
-                            </span>
-                            <span className="meta">
-                              <i className="fa fa-clock-o"></i>03:38 AM
-                            </span>
+                    {evaluates &&
+                      evaluates.map((evaluate) => (
+                        <div style={{ padding: "20px" }}>
+                          <div className="row">
+                            <div className="col-1">
+                              <img
+                                style={{
+                                  borderRadius: "50%",
+                                  height: "50px",
+                                  width: "50px",
+                                  backgroundSize: "cover",
+                                  backgroundPosition: "center",
+                                  backgroundRepeat: "no-repeat",
+                                }}
+                                src="/src/assets/img/user.png"
+                                alt="#"
+                              />
+                            </div>
+                            <div className="col-9" style={{ fontSize: "21px" }}>
+                              <span style={{ fontSize: "21px" }}>
+                                Người khám bệnh
+                              </span>
+                              <div
+                                className="comment-meta"
+                                style={{ fontSize: "15px" }}
+                              >
+                                <span className="meta">
+                                  <i className="fa fa-calendar"></i>{" "}
+                                  {convertDate(evaluate.createAt)}
+                                </span>
+                                <span className="meta">
+                                  {" "}
+                                  <i className="fa fa-clock-o"></i>{" "}
+                                  {convertDateTime(evaluate.createAt)}
+                                </span>
+                              </div>
+                              <p style={{ marginTop: "15px" }}>
+                                {evaluate.evaluateContent}
+                              </p>
+                            </div>
                           </div>
-                          <p>
-                            Lorem Ipsum available, but the majority have
-                            suffered alteration in some form, by injected
-                            humour, or randomised words Mirum est notare quam
-                            littera gothica, quam nunc putamus parum claram,
-                            anteposuerit litterarum formas
-                          </p>
+                          <hr />
                         </div>
-                      </div>
-                      <hr />
-                    </div>
-                    <div style={{ padding: "20px" }}>
-                      <div className="row">
-                        <div className="col-2">
-                          <img
-                            style={{
-                              borderRadius: "50%",
-                              height: "150px",
-                              width: "150px",
-                              backgroundSize: "cover",
-                              backgroundPosition: "center",
-                              backgroundRepeat: "no-repeat",
-                            }}
-                            src="/src/assets/img/doctor.jpg"
-                            alt="#"
-                          />
-                        </div>
-                        <div className="col-9">
-                          <h4>Afsana Mimi</h4>
-                          <div className="comment-meta">
-                            <span className="meta">
-                              <i className="fa fa-calendar"></i>March 05, 2019
-                            </span>
-                            <span className="meta">
-                              <i className="fa fa-clock-o"></i>03:38 AM
-                            </span>
-                          </div>
-                          <p>
-                            Lorem Ipsum available, but the majority have
-                            suffered alteration in some form, by injected
-                            humour, or randomised words Mirum est notare quam
-                            littera gothica, quam nunc putamus parum claram,
-                            anteposuerit litterarum formas
-                          </p>
-                        </div>
-                      </div>
+                      ))}
+                    <div className="row-bottom">
+                      <Pagination
+                        totalPage={totalPages}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                      />
                     </div>
                   </div>
                 </div>

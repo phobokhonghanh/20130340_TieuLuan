@@ -1,8 +1,6 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.service;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AppointmentResultDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.EvaluateDTO;
 
 public interface EvaluateService {

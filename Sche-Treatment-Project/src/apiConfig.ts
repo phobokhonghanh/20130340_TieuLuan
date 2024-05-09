@@ -4,7 +4,10 @@ import {
   Clinic,
   ClinicDTO,
   EvaluateDTO,
+  PackageDTO,
   ResultDTO,
+  ServiceDTO,
+  ServiceEntity,
 } from "./Models/Model";
 import axios from "axios";
 
@@ -44,8 +47,14 @@ export const API_ENDPOINTS = {
   //http://localhost:8080/api/service/calendar
   GET_SERVICE_CALENDAR: `${API_BASE_URL}/service/calendar`,
 
+  //http://localhost:8080/api/service/all
+  GET_SERVICE_ALL: `${API_BASE_URL}/service/all`,
+
   //http://localhost:8080/api/package/default
   GET_PACKAGE_DEFAULT: `${API_BASE_URL}/package/default`,
+
+  //http://localhost:8080/api/package/all
+  GET_PACKAGE_ALL: `${API_BASE_URL}/package/all`,
 
   //http://localhost:8080/api/service/area/{medicalAreaId}
   GET_SERVICE_AREA: (medicalAreaId: string) =>
@@ -108,9 +117,26 @@ export const API_ENDPOINTS = {
   GET_EVALUATE_APPOINTMENT: (appointmentId: string) =>
     `${API_BASE_URL}/evaluate/appointment/${appointmentId}`,
 
+  //http://localhost:8080/api/evaluate/doctor/${doctorId}
+  GET_EVALUATE_DOCTOR: (doctorId: string) =>
+    `${API_BASE_URL}/evaluate/doctor/${doctorId}`,
+
+  //http://localhost:8080/api/service/all/select
+  GET_SERVICES_NOT_SELECTED: `${API_BASE_URL}/service/all/select`,
+
+  //http://localhost:8080/api/appointment/status/{appointmentId}
+  PATCH_APPOINTMENT: (appointmentId: string) =>
+    `${API_BASE_URL}/appointment/status/${appointmentId}`,
+
   //POST
   //http://localhost:8080/api/calendar
   POST_CALENDAR: `${API_BASE_URL}/calendar`,
+
+  //http://localhost:8080/api/package
+  POST_PACKAGE: `${API_BASE_URL}/package`,
+
+  //http://localhost:8080/api/service
+  POST_SERVICE: `${API_BASE_URL}/service`,
 
   //http://localhost:8080/api/appointment
   POST_APPOINTMENT: `${API_BASE_URL}/appointment`,
@@ -123,7 +149,15 @@ export const API_ENDPOINTS = {
 
   //http://localhost:8080/api/evaluate
   POST_EVALUATE: `${API_BASE_URL}/evaluate`,
+
+  //http://localhost:8080/api/packageService/${packageServicesId}
+  DELETE_PACKAGE_SERVICE: (packageServicesId: string) =>
+    `${API_BASE_URL}/package/packageService/${packageServicesId}`,
 };
+export const createPackage = (packageDTO: PackageDTO) =>
+  axios.post(API_ENDPOINTS.POST_PACKAGE, packageDTO);
+export const createService = (serviceDTO: ServiceDTO) =>
+  axios.post(API_ENDPOINTS.POST_SERVICE, serviceDTO);
 export const createCalendar = (calendar: CalendarDTO) =>
   axios.post(API_ENDPOINTS.POST_CALENDAR, calendar);
 export const createAppointment = (appointment: AppointmentDTO) =>
@@ -134,3 +168,18 @@ export const createAppointmentResult = (result: ResultDTO) =>
   axios.post(API_ENDPOINTS.POST_RESULT, result);
 export const createEvaluate = (evaluate: EvaluateDTO) =>
   axios.post(API_ENDPOINTS.POST_EVALUATE, evaluate);
+export const getServicesNotSelected = async (list: ServiceEntity[]) => {
+  try {
+    const response = await axios.post(
+      API_ENDPOINTS.GET_SERVICES_NOT_SELECTED,
+      list
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+export const updateStatus = (appointmentId: string) =>
+  axios.patch(API_ENDPOINTS.PATCH_APPOINTMENT(appointmentId));
+export const deletePackageService = (packageServicesId: string) =>
+  axios.delete(API_ENDPOINTS.DELETE_PACKAGE_SERVICE(packageServicesId));

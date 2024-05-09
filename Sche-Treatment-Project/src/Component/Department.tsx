@@ -3,16 +3,18 @@ import { Col, Form, Row } from "react-bootstrap";
 import { CalendarModel, Clinic } from "../Models/Model";
 
 interface DepartmentProps {
+  clinicSelect: Clinic;
   dataListClinic: Clinic[];
   onClinicSelected: (selectedClinic: Clinic) => void;
   onDoctorSelected: (selectedDoctor: CalendarModel) => void;
 }
 const Department: React.FC<DepartmentProps> = ({
+  clinicSelect,
   dataListClinic,
   onClinicSelected,
   onDoctorSelected,
 }) => {
-  const [clinic, setClinic] = useState<Clinic>();
+  const [clinic, setClinic] = useState<Clinic>(clinicSelect);
 
   const handleClinicSelected = (selectedClinic: Clinic) => {
     onClinicSelected(selectedClinic);
@@ -26,6 +28,7 @@ const Department: React.FC<DepartmentProps> = ({
       <ClinicSelected
         data={dataListClinic}
         onClinicSelected={handleClinicSelected}
+        clinicSelect={clinic}
       />
       <DoctorSelected
         data={clinic ? clinic.calendars : []}
@@ -35,37 +38,19 @@ const Department: React.FC<DepartmentProps> = ({
   );
 };
 export default Department;
-interface ClinicProps {
-  dataListClinic: Clinic[];
-  onClinicSelected: (selectedClinic: Clinic) => void;
-}
-export const ClinicAppoinment: React.FC<ClinicProps> = ({
-  dataListClinic,
-  onClinicSelected,
-}) => {
-  const handleClinicSelected = (selectedClinic: Clinic) => {
-    onClinicSelected(selectedClinic);
-  };
 
-  return (
-    <Row>
-      <ClinicSelected
-        data={dataListClinic}
-        onClinicSelected={handleClinicSelected}
-      />
-    </Row>
-  );
-};
 interface ClinicSelectedProps {
+  clinicSelect: Clinic | undefined;
   data: Clinic[];
   onClinicSelected: (selectedClinic: Clinic) => void;
 }
 
 export function ClinicSelected({
+  clinicSelect,
   data,
   onClinicSelected,
 }: ClinicSelectedProps) {
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState<Clinic | undefined>(clinicSelect);
   const [showDropdown, setShowDropdown] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -87,14 +72,14 @@ export function ClinicSelected({
   }, []);
 
   const handleSelectChange = (value: Clinic) => {
-    setSelected(value.clinicName);
+    setSelected(value);
     onClinicSelected(value);
     setShowDropdown(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-    setSelected("");
+    setSelected(undefined);
   };
 
   const filteredOptions = inputValue
@@ -108,7 +93,7 @@ export function ClinicSelected({
         <div className="custom-select-wrapper" ref={dropdownRef}>
           <input
             type="text"
-            value={selected || inputValue}
+            value={selected?.clinicName || inputValue}
             className="custom-select-input"
             placeholder={`Tìm kiếm khoa khám...`}
             onFocus={() => setShowDropdown(true)}
@@ -123,7 +108,10 @@ export function ClinicSelected({
                     key={option.id}
                     onClick={() => handleSelectChange(option)}
                   >
-                    {option.clinicName}
+                    {option.clinicName}{" "}
+                    {option.medicalAreaId
+                      ? "(" + option.medicalAreaId.areaName + ")"
+                      : ""}
                   </li>
                 ))}
               </ul>

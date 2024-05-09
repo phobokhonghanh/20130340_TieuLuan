@@ -14,5 +14,5 @@ public interface AppointmentService {
     Page<AppointmentDTO> getListAppointmentUser(String accountId,Integer pageNo);
     Page<AppointmentDTO> getListAppointmentDoctor(String accountId,String keyword,Integer pageNo);
     Page<AppointmentDTO> getAll(String keyword,Integer pageNo);
-
+    void updateStatus(String appointmentId, String supportStatusId);
 }

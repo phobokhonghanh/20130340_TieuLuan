@@ -16,10 +16,10 @@ public class Evaluate {
     private String evaluateContent;
 
     @Column(name = "create_at")
-    private LocalDateTime createdAt;
+    private LocalDateTime createAt;
 
     @Column(name = "update_at")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "doctor_id")
@@ -29,11 +29,11 @@ public class Evaluate {
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
 
-    public Evaluate(String id, String evaluateContent, LocalDateTime createdAt, LocalDateTime updatedAt, Doctor doctor, Appointment appointment) {
+    public Evaluate(String id, String evaluateContent, LocalDateTime createAt, LocalDateTime updateAt, Doctor doctor, Appointment appointment) {
         this.id = id;
         this.evaluateContent = evaluateContent;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createAt = createAt;
+        this.updateAt = updateAt;
         this.doctor = doctor;
         this.appointment = appointment;
     }

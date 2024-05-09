@@ -61,24 +61,24 @@ const AppointmentPackageForm = () => {
     "danger"
   );
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShow(false);
-    }, 5000);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setShow(false);
+  //   }, 5000);
 
-    return () => clearTimeout(timer);
-  }, [show]);
+  //   return () => clearTimeout(timer);
+  // }, [show]);
 
-  useEffect(() => {
-    const messageFromStorage = localStorage.getItem("message");
-    if (messageFromStorage !== null) {
-      const message = JSON.parse(messageFromStorage);
-      setMessage(message.message);
-      setLevelMessage(message.level);
-      setShow(message.show);
-    }
-    localStorage.removeItem("message");
-  }, []);
+  // useEffect(() => {
+  //   const messageFromStorage = localStorage.getItem("message");
+  //   if (messageFromStorage !== null) {
+  //     const message = JSON.parse(messageFromStorage);
+  //     setMessage(message.message);
+  //     setLevelMessage(message.level);
+  //     setShow(message.show);
+  //   }
+  //   localStorage.removeItem("message");
+  // }, []);
 
   useEffect(() => {
     const fetchPackage = async () => {
@@ -150,15 +150,14 @@ const AppointmentPackageForm = () => {
     if (appointment) {
       createAppointment(appointment).then((response: any) => {
         if (response.status === 201) {
-          localStorage.setItem(
-            "message",
-            JSON.stringify({
-              message: "Đặt lịch thành công",
-              level: "success",
-              show: true,
-            })
-          );
-          window.location.reload();
+          setMessage("Đặt lịch thành công!");
+          setLevelMessage("success");
+          setShow(true);
+          const timer = setTimeout(() => {
+            setShow(false);
+            window.location.href = "/history";
+          }, 3000);
+          return () => clearTimeout(timer);
         } else {
           setMessage("Đã có người đặt lịch!");
           setLevelMessage("danger");
@@ -393,9 +392,8 @@ const AppointmentPackageForm = () => {
                     Hướng dẫn:{" "}
                   </span>
                   <span style={{ fontStyle: "italic", fontSize: "0.95em" }}>
-                    Trong phần "Khoa Khám", hãy chọn "Phòng tiếp nhận gói khám
-                    bệnh". Điều này giúp chúng tôi chỉ định cho bạn phòng khám
-                    thích hợp khi bạn đến cơ sở y tế.
+                    Trong phần "Gói khám", bạn có thể tìm và chọn gói khám khác
+                    nếu bạn muốn.
                   </span>
                 </Col>
               </Row>

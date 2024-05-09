@@ -12,4 +12,5 @@ public interface AppointmentResultService {
     AppointmentResultDTO getAppointmentResultByAppointment(String appointmentId);
     AppointmentResultDTO create(AppointmentResultDTO appointmentResultDTO );
 
+
 }

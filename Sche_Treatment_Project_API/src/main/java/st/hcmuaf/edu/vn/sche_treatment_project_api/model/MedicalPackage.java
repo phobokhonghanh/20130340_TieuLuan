@@ -21,10 +21,10 @@ public class MedicalPackage {
     @Column(name = "package_price", length = 255, nullable = false)
     private String packagePrice;
 
-    @Column(name = "create_at", updatable = false, nullable = false)
+    @Column(name = "create_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "update_at", nullable = false)
+    @Column(name = "update_at")
     private LocalDateTime updatedAt;
 
     @ManyToOne

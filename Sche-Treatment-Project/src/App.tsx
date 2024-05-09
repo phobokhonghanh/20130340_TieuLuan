@@ -59,7 +59,7 @@ function App() {
         <Route path="/admin/services" element={<AdminServicePage />} />
         <Route path="/admin/packages" element={<AdminPackagePage />} />
         <Route path="/admin/clinic" element={<AdminCalendarPage />} />
-        <Route path="/admin/appointment" element={<AdminAppointmnetPage />} />
+        <Route path="/admin/appointments" element={<AdminAppointmnetPage />} />
       </Routes>
 
       {/* <RouterProvider router={router} /> */}

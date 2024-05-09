@@ -1,5 +1,6 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,10 @@ public interface MedicalPackageRepository extends JpaRepository<MedicalPackage, 
 
     @Query(value = "SELECT * FROM medical_package where id = (SELECT support_value FROM support where support_info = 'PACKAGE_DEFAULT')", nativeQuery = true)
     MedicalPackage getPackageDefault();
+
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM medical_package WHERE clinic_id = :clinicId and package_name LIKE :packageName)", nativeQuery = true)
+    Integer existsByPackageName(@Param("clinicId") String clinicId, @Param("packageName") String packageName);
+
+    Page<MedicalPackage> findAllByPackageNameIsContaining(String searchTerm, Pageable pageable);
+
 }

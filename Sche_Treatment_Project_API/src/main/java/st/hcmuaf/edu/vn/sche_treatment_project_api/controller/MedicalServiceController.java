@@ -6,7 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.ClinicDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.DoctorDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.MedicalPackageDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.MedicalServiceDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalPackage;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalService;
@@ -26,10 +28,22 @@ public class MedicalServiceController {
     public ResponseEntity<Object> handleDataAccessException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-
     @GetMapping("/all")
-    public List<MedicalService> getAllServices() {
-        return medicalServicesService.getAll();
+    public ResponseEntity<Page<MedicalServiceDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
+        Page<MedicalServiceDTO> medicalServiceDTOs =  medicalServicesService.getAll(keyword,pageNo);
+        return ResponseEntity.ok(medicalServiceDTOs);
+    }
+    @PostMapping
+    public ResponseEntity<MedicalServiceDTO> createService(@RequestBody MedicalServiceDTO medicalServiceDTO) {
+        MedicalServiceDTO saveService = medicalServicesService.createService(medicalServiceDTO);
+        if (saveService != null) {
+            return new ResponseEntity<>(saveService, HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(null,HttpStatus.OK);
+    }
+    @PostMapping("/all/select")
+    public List<MedicalService> getAllServices(@RequestBody List<MedicalService> medicalServices) {
+        return medicalServicesService.getServicesNotSelected(medicalServices);
     }
 
     @GetMapping("/area/{medicalAreaId}")

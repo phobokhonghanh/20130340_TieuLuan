@@ -1,9 +1,9 @@
+import "../assets/Admin/css/styleAdmin.css";
 import { format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import Calendar, { TileArgs } from "react-calendar";
 import { SetStateAction, useEffect, useState } from "react";
 import { Button, Col, Form, Modal, Row, Table } from "react-bootstrap";
-
 import {
   Area,
   CalendarDTO,
@@ -12,11 +12,9 @@ import {
   ClinicDTO,
   DoctorEntity,
 } from "../Models/Model";
+import { Notifi } from "./Notification.tsx";
 import { ChooseDoctor } from "./SelectWithSearch.tsx";
 import { API_ENDPOINTS, createCalendar, createClinic } from "../apiConfig.ts";
-
-import "../assets/Admin/css/styleAdmin.css";
-import { Notifi } from "./Notification.tsx";
 
 // page main
 export const CalendarManager = () => {
@@ -293,7 +291,6 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
     </div>
   );
 };
-
 export function convertTime(
   data: CalendarModel[]
 ): Map<string, Map<string, CalendarModel[]>> {
@@ -643,7 +640,6 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
         onHide={onHide}
         aria-labelledby="contained-modal-title-vcenter"
         style={{ opacity: "1" }}
-        className=""
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">{title}</Modal.Title>

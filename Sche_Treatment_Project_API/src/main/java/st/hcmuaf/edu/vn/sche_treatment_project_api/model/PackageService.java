@@ -1,4 +1,5 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import jakarta.persistence.*;
 @Entity
@@ -16,6 +17,7 @@ public class PackageService {
     private MedicalService medicalService;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "package_id")
     private MedicalPackage medicalPackage;
 
@@ -23,10 +25,9 @@ public class PackageService {
     @JoinColumn(name = "support_status_id")
     private Support supportStatus;
 
-    public PackageService(String id, MedicalService medicalService, MedicalPackage medicalPackage, Support supportStatus) {
+    public PackageService(String id, MedicalService medicalService, MedicalPackage medicalPackage) {
         this.id = id;
         this.medicalService = medicalService;
         this.medicalPackage = medicalPackage;
-        this.supportStatus = supportStatus;
     }
 }

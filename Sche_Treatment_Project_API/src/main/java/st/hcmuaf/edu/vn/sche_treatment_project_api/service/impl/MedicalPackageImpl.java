@@ -27,8 +27,12 @@ public class MedicalPackageImpl implements MedicalPackageService {
     private EntityManager entityManager;
 
     @Override
-    public List<MedicalPackage> getAll() {
-        return medicalPackageRepository.findAll();
+    public Page<MedicalPackageDTO> getAll(String keyword,Integer pageNo) {
+        Pageable pageable = PageRequest.of(pageNo - 1, 10);
+        Page<MedicalPackage> medicalPackages =  medicalPackageRepository.findAllByPackageNameIsContaining(keyword,pageable);
+        List<MedicalPackageDTO> medicalPackageDTOs = medicalPackageMapper.convertListMedicalPackageETD(medicalPackages.stream().toList());
+        return new PageImpl<>(medicalPackageDTOs, pageable, medicalPackages.getTotalElements());
+
     }
 
     @Override
@@ -77,6 +81,18 @@ public class MedicalPackageImpl implements MedicalPackageService {
         MedicalPackage medicalPackage = medicalPackageRepository.getPackageDefault();
         MedicalPackageDTO medicalPackageDTO = medicalPackageMapper.convertMedicalPackageETD(medicalPackage);
         return medicalPackageDTO;
+    }
+
+    @Override
+    public MedicalPackageDTO createPackage(MedicalPackageDTO medicalPackageDTO) {
+        if(!medicalPackageRepository.existsById(medicalPackageDTO.getId())){
+            if (medicalPackageRepository.existsByPackageName(medicalPackageDTO.getClinicId().getId(), medicalPackageDTO.getPackageName()) == 1) {
+                return null;
+            }
+        }
+        MedicalPackage medicalPackage = medicalPackageRepository.save(medicalPackageMapper.convertMedicalPackageDTE(medicalPackageDTO));
+        MedicalPackageDTO savePackage = medicalPackageMapper.convertMedicalPackageETD(medicalPackage);
+        return savePackage;
     }
 
     @Override

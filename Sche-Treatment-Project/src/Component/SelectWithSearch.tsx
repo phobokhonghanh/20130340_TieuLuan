@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Form, Col } from "react-bootstrap";
 import "../assets/css/SelectWithSearch.css";
-import { Account, Doctor, Service } from "../Models/Model";
+import {
+  Account,
+  DoctorEntity,
+  ServiceEntity,
+} from "../Models/Model";
+import { formatPrice } from "../Utils";
 
 export interface Option {
   value: string;
@@ -99,16 +104,19 @@ export const SelectWithSearch: React.FC<Props> = ({
   );
 };
 interface ChooseServicesProps {
-  dataSelected: Service[];
-  data: Service[];
+  dataSelected: ServiceEntity[];
+  data: ServiceEntity[];
+  callbackDataSelected: (list: ServiceEntity[]) => void;
 }
 
 export const ChooseServices: React.FC<ChooseServicesProps> = ({
   data,
   dataSelected,
+  callbackDataSelected,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false); // show dropdown
-  const [selectedValues, setSelectedValues] = useState<Service[]>(dataSelected); // selected list Service
+  const [selectedValues, setSelectedValues] =
+    useState<ServiceEntity[]>(dataSelected); // selected list Service
   const [inputValue, setInputValue] = useState(""); // user input value
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -128,15 +136,17 @@ export const ChooseServices: React.FC<ChooseServicesProps> = ({
     };
   }, []);
 
-  const handleSelectChange = (selectedOption: Service) => {
+  const handleSelectChange = (selectedOption: ServiceEntity) => {
     setSelectedValues([...selectedValues, selectedOption]);
+    callbackDataSelected([...selectedValues, selectedOption]);
     setShowDropdown(false);
   };
-  const handleRemoveSelectedValue = (selectedOption: Service) => {
-    const updatedSelectedValues = selectedValues.filter(
+  const handleRemoveSelectedValue = (selectedOption: ServiceEntity) => {
+    const updatedSelectedValues: ServiceEntity[] = selectedValues.filter(
       (option) => option.id !== selectedOption.id
     );
     setSelectedValues(updatedSelectedValues);
+    callbackDataSelected(updatedSelectedValues);
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -144,19 +154,19 @@ export const ChooseServices: React.FC<ChooseServicesProps> = ({
 
   const filter = inputValue
     ? data.filter((service) =>
-        service.name.toLowerCase().includes(inputValue.toLowerCase())
+        service.serviceName.toLowerCase().includes(inputValue.toLowerCase())
       )
     : data;
 
   return (
-    <Col xs={4}>
+    <Col>
       <Form.Group controlId="form">
         <div className="custom-select-wrapper" ref={dropdownRef}>
           <input
             type="text"
             value={inputValue}
             className="custom-select-input"
-            placeholder={`Chọn...`}
+            placeholder={`Chọn dịch vụ...`}
             onFocus={() => setShowDropdown(true)}
             onChange={handleInputChange}
           />
@@ -168,24 +178,28 @@ export const ChooseServices: React.FC<ChooseServicesProps> = ({
                     key={service.id}
                     onClick={() => handleSelectChange(service)}
                   >
-                    {service.name}
+                    {service.serviceName} (
+                    {service.clinic
+                      ? service.clinic.clinicName
+                      : ""}{" "}
+                    - {formatPrice(service.servicePrice)})
                   </li>
                 ))}
               </ul>
             </div>
           )}
         </div>
-        <div>
+        <div className="container-selected-value">
           {selectedValues.map((selectedValue) => (
-            <span key={selectedValue.id} className="selected-value">
-              {selectedValue.name}{" "}
+            <div key={selectedValue.id} className="selected-value">
+              {selectedValue.serviceName}{" "}
               <button
                 onClick={() => handleRemoveSelectedValue(selectedValue)}
                 className="remove-button"
               >
                 X
               </button>
-            </span>
+            </div>
           ))}
         </div>
       </Form.Group>
@@ -193,9 +207,9 @@ export const ChooseServices: React.FC<ChooseServicesProps> = ({
   );
 };
 interface ChooseDoctorProps {
-  dataSelected: Doctor | null;
-  data: Doctor[] | null;
-  onDoctorSelect: (doctor: Doctor) => void;
+  dataSelected: DoctorEntity | null;
+  data: DoctorEntity[] | null;
+  onDoctorSelect: (doctor: DoctorEntity) => void;
 }
 export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
   data,
@@ -203,7 +217,7 @@ export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
   onDoctorSelect,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedValues, setSelectedValues] = useState<Doctor | null>(
+  const [selectedValues, setSelectedValues] = useState<DoctorEntity | null>(
     dataSelected
   );
   const [inputValue, setInputValue] = useState("");
@@ -225,7 +239,7 @@ export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
     };
   }, []);
 
-  const handleSelectChange = (selectedOption: Doctor) => {
+  const handleSelectChange = (selectedOption: DoctorEntity) => {
     setSelectedValues(selectedOption);
     onDoctorSelect(selectedOption);
     setShowDropdown(false);
@@ -241,7 +255,7 @@ export const ChooseDoctor: React.FC<ChooseDoctorProps> = ({
     : data;
 
   return (
-    <Col >
+    <Col>
       <Form.Group controlId="form">
         <div className="custom-select-wrapper" ref={dropdownRef}>
           <input

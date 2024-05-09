@@ -220,3 +220,24 @@ html {
   color: white;
 }
 
+.container-selected-value{
+  height: 200px;
+  overflow-y: scroll;
+}
+.selected-value{
+  padding: 5px;
+  margin: 5px;
+  border: 1px solid rgb(173, 169, 169);
+  border-radius: 5px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow-wrap: break-word;
+}
+.remove-button:hover{
+  border: 3px solid rgb(255, 255, 255);
+  background-color: rgb(247, 137, 118);
+}
+.remove-button {
+  background-color: antiquewhite;
+  border: none;
+}

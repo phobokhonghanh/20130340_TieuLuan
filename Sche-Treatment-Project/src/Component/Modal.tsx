@@ -188,14 +188,14 @@ export const ModalInterface = (props: InterfaceProps) => {
                 </div>
               </>
             )}
-            {props.isPackage && (
+            {/* {props.isPackage && (
               <div>
                 <ChooseServices
                   dataSelected={formData.listServices}
-                  data={generateMockDataService(7)}
+                  data={formData.listServices}
                 />
               </div>
-            )}
+            )} */}
 
             <div style={{ marginBottom: "20px" }}>
               <label
@@ -480,6 +480,7 @@ interface ResultProps {
   doctorId: string;
   show: boolean;
   onHide: () => void;
+  refeshDetails: () => void;
 }
 export const ModalResult: React.FC<ResultProps> = ({
   role,
@@ -487,6 +488,7 @@ export const ModalResult: React.FC<ResultProps> = ({
   doctorId,
   show,
   onHide,
+  refeshDetails,
 }) => {
   const [modalShow, setModalShow] = useState(false);
   const [error, setError] = useState(false);
@@ -578,6 +580,7 @@ export const ModalResult: React.FC<ResultProps> = ({
       createAppointmentResult(resultSubmit).then((response: any) => {
         if (response.status === 201) {
           onHide();
+          refeshDetails();
         } else {
           setMessage("Gửi kết quả không thành công!");
           setLevelMessage("danger");
@@ -737,6 +740,8 @@ export const ModalComment: React.FC<CommentProps> = ({
       evaluateContent: evaluateContent,
       doctorId: doctorId,
       appointmentId: appointmentId,
+      createAt: "",
+      updateAt: "",
     };
     if (evaluateDTO) {
       createEvaluate(evaluateDTO).then((response: any) => {

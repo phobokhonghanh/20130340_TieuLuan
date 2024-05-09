@@ -107,11 +107,11 @@ export const Doctor: React.FC<DoctorProps> = ({ doctorEntity }) => {
         </div>
         <div className="table-head">
           <h4 className=" amount title-package price">
-            {doctorEntity.doctorRank}. {doctorEntity.doctorDegree}{" "}
+            {doctorEntity.doctorDegree}. {doctorEntity.doctorRank}{" "}
             {doctorEntity.accountName}
           </h4>
           <div className="price">
-            <p className="title-package price">
+            <p style={{ color: "black" }}>
               {" "}
               Chuyên khoa: {doctorEntity.doctorSpecialty}
             </p>
@@ -178,12 +178,12 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
               alt=""
             />
           </div>
-          <h4 className=" amount title-package price">
-            {doctorEntity.doctorRank}. {doctorEntity.doctorDegree}{" "}
+          <h4 className="amount title-package price">
+            {doctorEntity.doctorDegree}. {doctorEntity.doctorRank}{" "}
             {doctorEntity.accountName}
           </h4>
           <div className="price">
-            <p className="title-package price">
+            <p style={{ color: "black" }}>
               {" "}
               Khoa: {doctorEntity.doctorSpecialty}
             </p>
@@ -201,14 +201,14 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
                   <span className="calendar">
                     {formatDate(calendar.calendarDate)}
                   </span>
-                  <span className="calendar" style={{ margin: "15px" }}>
+                  <div className="calendar" style={{ margin: "15px" }}>
                     <i className="far fa-clock calendar"></i>
                     <span>
                       {calendar.idGroupTime === "1"
                         ? "07:00 - 11:30"
                         : "12:30 - 17:00"}
                     </span>
-                  </span>
+                  </div>
                 </div>
               ))
             ) : (

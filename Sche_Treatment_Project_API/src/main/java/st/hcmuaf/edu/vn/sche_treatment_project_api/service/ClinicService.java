@@ -15,7 +15,7 @@ public interface ClinicService {
 
     public Clinic getClinic(String idClinic);
 
-    public List<Clinic> getAll();
+    public List<ClinicDTO> getAll();
 
     /*
      * Lấy danh sách phòng chuyên khoa của gói dịch vụ và dịch vụ

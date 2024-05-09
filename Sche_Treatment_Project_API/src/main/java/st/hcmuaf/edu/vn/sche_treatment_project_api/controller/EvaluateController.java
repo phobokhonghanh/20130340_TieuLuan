@@ -35,9 +35,6 @@ public class EvaluateController {
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<Page<EvaluateDTO>> findAllByDoctorId(@RequestParam(name = "page", defaultValue = "1") Integer pageNo, @PathVariable String doctorId) {
         Page<EvaluateDTO> evaluateDTO = evaluateService.getAllByDoctorId(doctorId, pageNo);
-//        if (evaluateDTO == null) {
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
         return new ResponseEntity<>(evaluateDTO, HttpStatus.OK);
     }
 

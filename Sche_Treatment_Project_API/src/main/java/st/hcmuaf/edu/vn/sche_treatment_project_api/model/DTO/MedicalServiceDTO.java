@@ -18,5 +18,9 @@ public class MedicalServiceDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private SupportDTO supportStatusId;
-    private ClinicDTO clinicId;
- }
+    private ClinicDTO clinic;
+
+    public MedicalServiceDTO(String id) {
+        this.id = id;
+    }
+}

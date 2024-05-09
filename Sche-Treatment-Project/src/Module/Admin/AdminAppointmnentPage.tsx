@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { AppointmentDTO, Area, Clinic } from "../../Models/Model";
 import { Col, Form, Row } from "react-bootstrap";
 import { API_ENDPOINTS } from "../../apiConfig";
-import { ClinicAppoinment } from "../../Component/Department";
 import { Appointment, AppointmentDetail } from "../../Component/Appointment";
 import Pagination from "../../Component/Pagination";
 import { Notifi } from "../../Component/Notification";
@@ -21,9 +20,11 @@ export function AdminAppointmnetPage() {
 
   const [error, setError] = useState();
   const [isLoading, setLoading] = useState(false);
-  
+
   const [currentPage, setCurrentPage] = useState<number>(1); // State để lưu trang hiện tại
   const [totalPages, setTotalPages] = useState<number>(1); // State để lưu tổng số trang
+
+  const [refesh, setRefesh] = useState(false);
 
   const account = "ea29643b-f825-11ee-87e1-847beb19aaf6";
   const role = "ADMIN";
@@ -76,11 +77,14 @@ export function AdminAppointmnetPage() {
           setLoading(false);
         }
       };
+      if (refesh) {
+        setRefesh(false);
+      }
       fetchAppointment(currentPage);
     } else {
       // navigator("/404");
     }
-  }, [currentPage, filterText]);
+  }, [currentPage, filterText, refesh]);
   const handleFilterChange = (e: { target: { value: string } }) => {
     const value = e.target.value;
     setFilterText(value);
@@ -121,13 +125,13 @@ export function AdminAppointmnetPage() {
                       <Col xs={4}>
                         <input
                           type="text"
-                          placeholder="Tìm kiếm ..."
+                          placeholder="Tìm kiếm số điện thoại..."
                           value={filterText}
                           onChange={handleFilterChange}
                           className="custom-select-input"
                         />
                       </Col>
-                      <Col xs={4}>
+                      {/* <Col xs={4}>
                         <Form.Group controlId="formClinic">
                           <select
                             className="custom-select-input"
@@ -157,7 +161,7 @@ export function AdminAppointmnetPage() {
                             }
                           />
                         </Form.Group>
-                      </Col>
+                      </Col> */}
                     </Row>
                   </div>
                   <div className="row">
@@ -191,6 +195,7 @@ export function AdminAppointmnetPage() {
                               <Appointment
                                 appointmentDTO={appointment}
                                 role={role}
+                                refeshDetails={(rf) => setRefesh(rf)}
                               />
                             </div>
                           ))}
@@ -200,6 +205,8 @@ export function AdminAppointmnetPage() {
                       <AppointmentDetail
                         appointmentId={selectAppointment}
                         role={role}
+                        refesh={refesh}
+                        setRefesh={(rf) => setRefesh(rf)}
                       />
                     )}
                   </div>

@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 public class AppointmentResultImpl implements AppointmentResultService {
     private AppointmentResultRepository appointmentResultRepository;
     private AppointmentResultMapper appointmentResultMapper;
+    private AppointmentService appointmentService;
 
     @Override
     public AppointmentResultDTO getAppointmentResultByAppointment(String appointmentId) {
@@ -37,6 +38,9 @@ public class AppointmentResultImpl implements AppointmentResultService {
     @Override
     public AppointmentResultDTO create(AppointmentResultDTO appointmentResultDTO) {
         AppointmentResult appointmentResult = appointmentResultRepository.save(appointmentResultMapper.convertAppointmentResultDTE(appointmentResultDTO));
+        if(appointmentResult !=null){
+            appointmentService.updateStatus(appointmentResultDTO.getAppointmentId(),"S3");
+        }
         return appointmentResultMapper.convertAppointmentResultETD(appointmentResult);
     }
 

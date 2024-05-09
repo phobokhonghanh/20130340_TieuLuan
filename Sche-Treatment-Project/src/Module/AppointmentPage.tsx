@@ -18,8 +18,8 @@ import {
 import Header from "../Component/Header";
 import { Notifi } from "../Component/Notification";
 import { convertTime } from "../Component/AdminCalendar";
-import { ClinicAppoinment } from "../Component/Department";
 import { API_ENDPOINTS, createAppointment } from "../apiConfig";
+import { ClinicSelected } from "../Component/Department";
 
 export function formatDate(date: string) {
   return format(new Date(date), "dd/MM/yyyy");
@@ -146,15 +146,14 @@ const AppointmentForm = () => {
       createAppointment(appointment)
         .then((response: any) => {
           if (response.status === 201) {
-            localStorage.setItem(
-              "message",
-              JSON.stringify({
-                message: "Đặt lịch thành công",
-                level: "success",
-                show: true,
-              })
-            );
-            window.location.reload();
+            setMessage("Đặt lịch thành công!");
+            setLevelMessage("success");
+            setShow(true);
+            const timer = setTimeout(() => {
+              setShow(false);
+              window.location.href = "/history";
+            }, 3000);
+            return () => clearTimeout(timer);
           } else {
             setMessage("Đã có người đặt lịch!");
             setLevelMessage("danger");
@@ -349,8 +348,9 @@ const AppointmentForm = () => {
                   <Form.Label>
                     <b>Khoa khám</b>
                   </Form.Label>
-                  <ClinicAppoinment
-                    dataListClinic={areaSelected ? areaSelected.clinics : []}
+                  <ClinicSelected
+                    clinicSelect={clinic}
+                    data={areaSelected ? areaSelected.clinics : []}
                     onClinicSelected={(selectedClinic) =>
                       setClinic(selectedClinic)
                     }

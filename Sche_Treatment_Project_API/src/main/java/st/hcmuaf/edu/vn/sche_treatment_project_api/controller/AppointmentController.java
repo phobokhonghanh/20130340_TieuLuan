@@ -34,7 +34,7 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<Bill> createCalendar(@RequestBody AppointmentDTO appointmentDTO) {
+    public ResponseEntity<Bill> createAppointment(@RequestBody AppointmentDTO appointmentDTO) {
         boolean createAppointment = appointmentService.createAppointment(appointmentDTO);
         if (createAppointment) {
             Bill createBill = billService.createBill(appointmentDTO);
@@ -44,7 +44,11 @@ public class AppointmentController {
         }
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
-
+    @PatchMapping("/status/{appointmentId}")
+    public ResponseEntity<?> updateAppointmentStatus(@PathVariable String appointmentId) {
+        appointmentService.updateStatus(appointmentId,"S4");
+        return ResponseEntity.ok().build();
+    }
     @GetMapping("/calendar/{calendarId}")
     public List<Appointment> getListAppointmentCalendarId(@PathVariable("calendarId") String calendarId) {
         return appointmentService.getListAppointmentCalendarId(calendarId);
