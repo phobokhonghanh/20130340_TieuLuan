@@ -12,25 +12,32 @@ import OTP from "./Module/OTP";
 
 import Register from "./Module/RegisterPage";
 import AboutUsPage from "./Module/AboutUsPage";
-import { Routes, Route, Router } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import ErrorPage from "./Module/ErrorPage";
 import { AdminHomePage } from "./Module/Admin/AdminHomePage";
 import { AdminAccountPage } from "./Module/Admin/AdminAccountPage";
 import { AdminServicePage } from "./Module/Admin/AdminServicePage";
 import { AdminPackagePage } from "./Module/Admin/AdminPackagePage";
 import { AdminCalendarPage } from "./Module/Admin/AdminCalendarPage";
-import AppointmentPSDForm from "./Module/AppointmentPackagePage";
 import AppointmentPackageForm from "./Module/AppointmentPackagePage";
 import AppointmentDoctor from "./Module/AppointmentDoctorPage";
 import { BillPage } from "./Module/BillPage";
 import { AdminAppointmnetPage } from "./Module/Admin/AdminAppointmnentPage";
+import { useEffect, useState } from "react";
 function App() {
+  const [account, setAccount] = useState();
+  useEffect(() => {
+    const response = localStorage.getItem("response");
+    if (response) {
+      setAccount(JSON.parse(response));
+    }
+  });
   return (
     <>
       <Routes>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/otp" element={<OTP />} />
+        <Route path="/otp/:accountId" element={<OTP />} />
       </Routes>
       <Routes>
         <Route path="/" element={<HomePage />} />

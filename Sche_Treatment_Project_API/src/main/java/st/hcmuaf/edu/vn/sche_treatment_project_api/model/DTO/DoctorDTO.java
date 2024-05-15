@@ -21,4 +21,8 @@ public class DoctorDTO extends AccountDTO {
     private String doctorImage;
     private String accountId;
     private List<EvaluateDTO> evaluates;
- }
+
+    public DoctorDTO(String accountId) {
+        this.accountId = accountId;
+    }
+}

@@ -1,13 +1,14 @@
 import {
   AppointmentDTO,
   CalendarDTO,
-  Clinic,
   ClinicDTO,
   EvaluateDTO,
   PackageDTO,
   ResultDTO,
   ServiceDTO,
   ServiceEntity,
+  Signin,
+  Signup,
 } from "./Models/Model";
 import axios from "axios";
 
@@ -127,10 +128,22 @@ export const API_ENDPOINTS = {
   //http://localhost:8080/api/appointment/status/{appointmentId}
   PATCH_APPOINTMENT: (appointmentId: string) =>
     `${API_BASE_URL}/appointment/status/${appointmentId}`,
+  //http://localhost:8080/api/account/confirm-OTP/{accountId}
+  PATCH_CONFIRM_OTP: (accountId: string, otp: string) =>
+    `${API_BASE_URL}/account/confirm-OTP/${accountId}?otp=${otp}`,
 
   //POST
   //http://localhost:8080/api/calendar
   POST_CALENDAR: `${API_BASE_URL}/calendar`,
+
+  //http://localhost:8080/api/account/register
+  POST_ACCOUNT: `${API_BASE_URL}/account/register`,
+
+  //http://localhost:8080/api/account/register/patient
+  POST_ACCOUNT_PATIENT: `${API_BASE_URL}/account/register/patient`,
+
+  //http://localhost:8080/api/account/login
+  POST_LOGIN: `${API_BASE_URL}/account/login`,
 
   //http://localhost:8080/api/package
   POST_PACKAGE: `${API_BASE_URL}/package`,
@@ -156,18 +169,34 @@ export const API_ENDPOINTS = {
 };
 export const createPackage = (packageDTO: PackageDTO) =>
   axios.post(API_ENDPOINTS.POST_PACKAGE, packageDTO);
+
 export const createService = (serviceDTO: ServiceDTO) =>
   axios.post(API_ENDPOINTS.POST_SERVICE, serviceDTO);
+
 export const createCalendar = (calendar: CalendarDTO) =>
   axios.post(API_ENDPOINTS.POST_CALENDAR, calendar);
+
 export const createAppointment = (appointment: AppointmentDTO) =>
   axios.post(API_ENDPOINTS.POST_APPOINTMENT, appointment);
+
 export const createClinic = (clinic: ClinicDTO) =>
   axios.post(API_ENDPOINTS.POST_CLINIC, clinic);
+
 export const createAppointmentResult = (result: ResultDTO) =>
   axios.post(API_ENDPOINTS.POST_RESULT, result);
+
 export const createEvaluate = (evaluate: EvaluateDTO) =>
   axios.post(API_ENDPOINTS.POST_EVALUATE, evaluate);
+
+export const register_patient = (signup: Signup) =>
+  axios.post(API_ENDPOINTS.POST_ACCOUNT_PATIENT, signup);
+
+export const register = (signup: Signup) =>
+  axios.post(API_ENDPOINTS.POST_ACCOUNT, signup);
+
+export const login = (signin: Signin) =>
+  axios.post(API_ENDPOINTS.POST_LOGIN, signin);
+
 export const getServicesNotSelected = async (list: ServiceEntity[]) => {
   try {
     const response = await axios.post(
@@ -181,5 +210,7 @@ export const getServicesNotSelected = async (list: ServiceEntity[]) => {
 };
 export const updateStatus = (appointmentId: string) =>
   axios.patch(API_ENDPOINTS.PATCH_APPOINTMENT(appointmentId));
+export const confirmOTP = (accountId: string, otp: string) =>
+  axios.patch(API_ENDPOINTS.PATCH_CONFIRM_OTP(accountId, otp));
 export const deletePackageService = (packageServicesId: string) =>
   axios.delete(API_ENDPOINTS.DELETE_PACKAGE_SERVICE(packageServicesId));

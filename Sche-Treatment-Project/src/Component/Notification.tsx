@@ -9,6 +9,8 @@ export const Notifi: React.FC<NotificationProps> = ({
   variant,
   onClose,
 }) => {
+  const notifications = message.split("\n");
+
   return (
     <>
       <Alert
@@ -17,7 +19,9 @@ export const Notifi: React.FC<NotificationProps> = ({
         dismissible
         style={{ zIndex: "1900" }}
       >
-        {message}
+        {notifications ? notifications.map((notify, index) => (
+          <p key={index}>{notify}</p>
+        )) : message}
       </Alert>
     </>
   );

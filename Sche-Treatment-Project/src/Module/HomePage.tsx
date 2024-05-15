@@ -1,5 +1,4 @@
 import HeaderNav from "../Component/HeaderNav";
-import Preloader from "../Component/Preloader";
 import Slides from "../Component/Slides";
 import CardInfo from "../Component/CardInfo";
 import AboutUs from "../Component/AboutUs";
@@ -12,7 +11,6 @@ import "../assets/style.css";
 function HomePage() {
   return (
     <>
-      <Preloader />
       <HeaderNav />
       <Slides  />
       <CardInfo />

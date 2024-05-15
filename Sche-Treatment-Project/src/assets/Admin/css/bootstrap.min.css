@@ -6233,7 +6233,9 @@ button.close {
         width: 900px
     }
 }
-
+.contain:hover .tooltip{
+    opacity: 1;
+}
 .tooltip {
     position: absolute;
     z-index: 1070;

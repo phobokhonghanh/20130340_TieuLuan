@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Patient extends Account implements Serializable {
 
-    @Column(name = "patient_bhyt", length = 20, nullable = false)
+    @Column(name = "patient_bhyt", length = 20)
     private String patientBHYT;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)

@@ -45,6 +45,5 @@ public class EvaluateController {
             return new ResponseEntity<>(saveEvaluateDTO, HttpStatus.CREATED);
         }
         return new ResponseEntity<>(null, HttpStatus.OK);
-
     }
 }

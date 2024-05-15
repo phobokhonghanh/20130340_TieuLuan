@@ -3,10 +3,29 @@ import Header from "../Component/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/style.css";
+import { useNavigate, useParams } from "react-router-dom";
+import { confirmOTP } from "../apiConfig";
+import { Notifi } from "../Component/Notification";
+import Preloader from "../Component/Preloader";
 function OTP() {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const otpInputs = useRef<HTMLInputElement[]>([]);
+  const { accountId } = useParams();
+  const [message, setMessage] = useState("");
+  const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
+    "danger"
+  );
+  const [showMess, setShowMess] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMess(false);
+    }, 5000);
 
+    return () => clearTimeout(timer);
+  }, [showMess]);
   useEffect(() => {
     if (otpInputs.current[0]) {
       otpInputs.current[0].focus();
@@ -49,34 +68,48 @@ function OTP() {
       otpInputs.current[index - 1].focus();
     }
   };
-
+  const handleSubmit = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    setIsLoading(true);
+    const data = otp.join("");
+    confirmOTP(accountId ? accountId : "", data)
+      .then((response: any) => {
+        if (response.status === 200) {
+          const timer = setTimeout(() => {
+            setIsLoading(false);
+            navigate("/login");
+          }, 2000);
+          return () => clearTimeout(timer);
+        }
+      })
+      .catch((error: any) => {
+        setIsLoading(false);
+        console.error(error);
+        setMessage("Sai OTP, Vui lòng nhập lại");
+        setLevelMessage("danger");
+        setShowMess(true);
+      });
+  };
   return (
     <>
+      {isLoading && <Preloader />}
       <Header />
+      {showMess && (
+        <Notifi
+          message={message}
+          variant={levelMessage}
+          onClose={() => setShowMess(false)}
+        />
+      )}
       <div className="container">
         <img
-          src="src/assets/img/bg.png"
+          src="/src/assets/img/bg.png"
           alt="Background"
           className="background-image"
         />
         <div className="background-container m-top-5 form-control-lg">
           <h1>Xin chào!</h1>
-          <p>Vui lòng nhập mã 6 số đã gửi cho bạn qua số điện thoại</p>
-          <div className="col-md-4">
-            <div className="input-group has-validation">
-              <div className="input-group-text">
-                <img src="src/assets/svg/vietnam.svg" alt="img" />
-              </div>
-              <input
-                type="text"
-                className="form-control"
-                id="validationCustom01"
-                value="+84"
-                disabled
-                required
-              />
-            </div>
-          </div>
+          <p>Vui lòng nhập mã OTP đã gửi cho bạn qua email</p>
           <div>
             {otp.map((value, index) => (
               <input
@@ -96,7 +129,7 @@ function OTP() {
             ))}
           </div>
           <div className="col-13">
-            <button className="btn btn-primary" type="submit">
+            <button className="btn btn-primary" onClick={handleSubmit}>
               Xác thực
             </button>
             <p>

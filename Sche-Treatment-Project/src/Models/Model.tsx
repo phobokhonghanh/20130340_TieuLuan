@@ -97,6 +97,21 @@ export interface Patient {
   supportStatus: Support;
   bhyt: string;
 }
+export interface Signup {
+  id: string;
+  accountPhone: string;
+  accountEmail: string;
+  accountPassword: string;
+  accountName: string;
+  accountGender: number;
+  supportRoleId: string;
+  supportStatusId:string;
+}
+export interface Signin {
+  phone: string;
+  password: string;
+  role: string;
+}
 export interface CalendarDTO {
   id: string;
   calendarDate: string;

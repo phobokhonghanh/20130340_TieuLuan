@@ -13,14 +13,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.AccountMapper;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AccountDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.DoctorDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.PatientDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Doctor;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Patient;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.DoctorRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.DoctorService;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -41,15 +40,20 @@ public class DoctorImpl implements DoctorService {
     }
 
     @Override
+    public void deleteDoctor(String id) {
+        doctorRepository.deleteById(id);
+    }
+
+    @Override
     public List<DoctorDTO> getListDoctorLimit() {
         List<Doctor> doctors = doctorRepository.getListDoctorLimit();
-        List<DoctorDTO> listDoctorDTO = accountMapper.convertDoctorETD(doctors);
+        List<DoctorDTO> listDoctorDTO = accountMapper.convertListDoctorETD(doctors);
         return listDoctorDTO;
     }
 
     @Override
     public Page<DoctorDTO> getListDoctorCalendarPageable(Integer pageNo) {
-        Pageable pageable = PageRequest.of(pageNo-1,5);
+        Pageable pageable = PageRequest.of(pageNo - 1, 5);
 
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
@@ -61,7 +65,7 @@ public class DoctorImpl implements DoctorService {
 
         List<Doctor> doctors = query.getResultList();
 
-        List<DoctorDTO> listDoctorDTO = accountMapper.convertDoctorETD(doctors);
+        List<DoctorDTO> listDoctorDTO = accountMapper.convertListDoctorETD(doctors);
         Query countQuery = entityManager.createNativeQuery("SELECT COUNT(*) FROM doctor JOIN account ON doctor.id = account.id WHERE doctor.id IN (SELECT account_id FROM calendar WHERE calendar_date >= CURDATE())");
         Long total = (Long) countQuery.getSingleResult();
 
@@ -73,10 +77,11 @@ public class DoctorImpl implements DoctorService {
         return accountMapper.convertDoctorETD(doctorRepository.getDoctorbyIdCalendar(idCalendar));
     }
 
-//    @Override
-//    public Doctor getDoctor(String idDoctor) {
-//        return doctorRepository.findById(idDoctor).get();
-//    }
+    @Override
+    public boolean createDoctor(DoctorDTO doctorDTO) {
+        Doctor acc = doctorRepository.save(accountMapper.convertDoctorDTE(doctorDTO));
+        return acc != null ? true : false;
+    }
 
 //    @Override
 //    public List<Doctor> getListDoctorClinic(String clinicId) {

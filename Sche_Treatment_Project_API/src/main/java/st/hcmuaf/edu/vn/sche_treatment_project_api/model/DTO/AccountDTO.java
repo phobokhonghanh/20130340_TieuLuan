@@ -11,8 +11,10 @@ import java.time.LocalDateTime;
 public class AccountDTO {
     private String id;
     private String accountPhone;
+    private String accountEmail;
     private String accountPassword;
     private String accountName;
+    private String accountOTP;
     private Byte accountGender;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;

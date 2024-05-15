@@ -10,11 +10,12 @@ import java.util.List;
 public interface DoctorService {
     public List<Doctor> getAll();
 
-    //    public List<Doctor> getListDoctorClinic(String clinicId);
+    void deleteDoctor(String id);
+
     List<DoctorDTO> getListDoctorLimit();
 
     Page<DoctorDTO> getListDoctorCalendarPageable(Integer pageNo);
     DoctorDTO getDoctorByIdCalendar(String idCalendar);
-
+    boolean createDoctor(DoctorDTO doctorDTO);
 
 }
