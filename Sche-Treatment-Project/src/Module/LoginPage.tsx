@@ -6,7 +6,7 @@ import "../assets/style.css";
 import { Link, useNavigate } from "react-router-dom";
 import { Notifi } from "../Component/Notification";
 import { login } from "../apiConfig";
-import { Signin } from "../Models/Model";
+import { LoginResponse, Signin } from "../Models/Model";
 import Preloader from "../Component/Preloader";
 function Login() {
   const navigate = useNavigate();
@@ -61,13 +61,13 @@ function Login() {
     const formData: Signin = {
       phone: phone,
       password: password,
-      role: "R4",
+      role: "R1",
     };
     login(formData)
       .then((response: any) => {
         if (response.status === 200) {
-          // console.log(response.data.roles[0]);
-          localStorage.setItem("response", JSON.stringify(response.data));
+          const responseData: LoginResponse = response.data;
+          localStorage.setItem("response", JSON.stringify(responseData));
           const timer = setTimeout(() => {
             setIsLoading(false);
             navigate("/home");

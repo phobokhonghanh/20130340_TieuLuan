@@ -47,7 +47,7 @@ function ListDoctors() {
   }, [currentPage]);
   return (
     <>
-      <Preloader />
+      {/* <Preloader /> */}
       <HeaderNav />
       <section className="slider">
         <div className="hero-slider">

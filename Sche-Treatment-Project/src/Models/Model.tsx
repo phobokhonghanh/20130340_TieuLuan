@@ -105,12 +105,21 @@ export interface Signup {
   accountName: string;
   accountGender: number;
   supportRoleId: string;
-  supportStatusId:string;
+  supportStatusId: string;
 }
 export interface Signin {
   phone: string;
   password: string;
   role: string;
+}
+export interface LoginResponse {
+  message: string | null;
+  token: string | null;
+  refreshToken: string | null;
+  tokenType: string | null;
+  id: string | null;
+  username: string | null;
+  roles: string[] | null;
 }
 export interface CalendarDTO {
   id: string;
