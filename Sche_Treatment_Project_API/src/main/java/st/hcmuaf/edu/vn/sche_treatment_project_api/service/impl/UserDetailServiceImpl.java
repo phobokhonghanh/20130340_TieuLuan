@@ -22,7 +22,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
         Account userEntity = accountRepository.findByAccountPhoneIgnoreCase(phone);
-        //tìm trong dtb xem user có email đó có tồn tại hay khong
+        //tìm trong dtb xem user có phone đó có tồn tại hay khong
         if (userEntity == null) throw new UsernameNotFoundException(phone + " không tồn tại trong database");
         //tạo grantedAuthority với roleNames tương ứng
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();

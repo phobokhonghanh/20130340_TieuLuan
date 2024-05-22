@@ -1,4 +1,4 @@
-package st.hcmuaf.edu.vn.sche_treatment_project_api.Component;
+package st.hcmuaf.edu.vn.sche_treatment_project_api.Utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

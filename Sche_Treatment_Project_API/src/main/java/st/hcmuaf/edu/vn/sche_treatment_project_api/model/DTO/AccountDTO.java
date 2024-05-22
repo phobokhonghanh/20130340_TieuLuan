@@ -15,10 +15,9 @@ public class AccountDTO {
     private String accountPassword;
     private String accountName;
     private String accountOTP;
-    private Byte accountGender;
+    private Boolean accountGender;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private String supportRoleId;
     private String supportStatusId;
-
 }

@@ -18,10 +18,12 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.CalendarDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.MedicalPackageDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.AppointmentRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.CalendarRepository;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.StatisticalResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AppointmentService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.CalendarService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -124,7 +126,36 @@ public class AppointmentImpl implements AppointmentService {
 
     @Override
     public void updateStatus(String appointmentId, String supportStatusId) {
-        appointmentRepository.updateAppointmentBySupportStatus(appointmentId,supportStatusId);
+        appointmentRepository.updateAppointmentBySupportStatus(appointmentId, supportStatusId);
+    }
+
+    @Override
+    public List<Double> sumAppointmentMonths() {
+        Query query = entityManager.createNativeQuery("SELECT EXTRACT(MONTH FROM create_at) AS month, CAST(COUNT(*) AS double) AS sum FROM appointment GROUP BY month ORDER BY month", StatisticalResponse.class);
+        List<StatisticalResponse> list = query.getResultList();
+        List<Double> listResult = new ArrayList<>();
+        for (int i = 1; i < 13; i++) {
+            listResult.add(0.0);
+        }
+        for (StatisticalResponse s : list) {
+            listResult.set(s.getMonth() - 1, s.getSum());
+        }
+        return listResult;
+    }
+
+    @Override
+    public List<Double> sumAppointmentStatusMonths(String status) {
+        Query query = entityManager.createNativeQuery("SELECT EXTRACT(MONTH FROM create_at) AS month, CAST(COUNT(*) AS double) AS sum FROM appointment WHERE support_status_id = :status GROUP BY month ORDER BY month", StatisticalResponse.class);
+        query.setParameter("status", status);
+        List<StatisticalResponse> list = query.getResultList();
+        List<Double> listResult = new ArrayList<>();
+        for (int i = 1; i < 13; i++) {
+            listResult.add(0.0);
+        }
+        for (StatisticalResponse s : list) {
+            listResult.set(s.getMonth() - 1, s.getSum());
+        }
+        return listResult;
     }
 
 }

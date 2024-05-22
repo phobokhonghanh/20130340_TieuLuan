@@ -1,23 +1,24 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Account;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalPackage;
 
 public interface AccountRepository extends JpaRepository<Account, String> {
 
     @Query(value = "select account_OTP from account where id=:id", nativeQuery = true)
     String getOTPById(@Param("id") String id);
 
-    boolean existsByAccountEmailAndSupportRoleId(String email, String role);
+    boolean existsByAccountEmailIgnoreCaseOrAccountPhone(String email, String phone);
 
-    boolean existsByAccountPhoneAndSupportRoleId(String phone, String role);
+    Account findByAccountEmailAndAccountPhoneAndSupportStatusId(String email, String phone, String status);
 
-    Account findByAccountEmailAndAccountPhoneAndSupportStatusIdAndSupportRoleId(String email, String phone, String status, String role);
-    Account findByAccountPhoneAndSupportRoleId(String phone, String role);
     Account findByAccountPhoneIgnoreCase(String phone);
 
-    Account findByAccountEmailIgnoreCaseAndSupportStatusId(String email, String status);
+    Page<Account> findAllByAccountPhoneIsContaining(String keyword, Pageable pageable);
 
 }

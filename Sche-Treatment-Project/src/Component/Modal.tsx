@@ -2,7 +2,6 @@ import "../assets/css/Modals.css";
 import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
 import { FC, useEffect, useState } from "react";
 import { Dialog } from "./AdminDialog";
-import { ChooseDoctor, ChooseServices } from "./SelectWithSearch";
 import { EvaluateDTO, ResultDTO } from "../Models/Model";
 import {
   API_ENDPOINTS,
@@ -11,6 +10,7 @@ import {
 } from "../apiConfig";
 import { ErrorNotifi, Notifi } from "./Notification";
 import { v4 as uuidv4 } from "uuid";
+import { checkRoleDoctor } from "../Authentication/Authentication";
 
 interface Props {
   title: string;
@@ -256,226 +256,7 @@ export const ModalInterface = (props: InterfaceProps) => {
     </div>
   );
 };
-
-export const ModalAddAccount = (props: InterfaceProps) => {
-  const [showDialog, setshowDialog] = useState(false);
-  const [formData, setFormData] = useState({
-    name: props.obj ? props.obj.name : "",
-    phone: props.obj ? props.obj.phone : "",
-    gender: props.obj ? props.obj.gender || "0" : "0",
-    role: props.obj ? props.obj.role || "0" : "0",
-  });
-  // Hàm xử lý khi người dùng thay đổi thông tin
-  const handleChange = (e: { target: { name: any; value: any } }) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-    setshowDialog(false);
-  };
-
-  // Hàm xử lý khi người dùng submit form
-  const handleSubmit = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setshowDialog(true);
-    // Thực hiện gửi dữ liệu đã cập nhật lên server
-    props.isCreate &&
-      setFormData({
-        name: "",
-        phone: "",
-        gender: "0",
-        role: "0",
-      });
-    // Gọi hàm cập nhật thông tin người dùng ở đây
-  };
-  return (
-    <div
-      className="modal-dialog"
-      role="document"
-      style={{ maxWidth: "500px", margin: "auto" }}
-    >
-      <div className="modal-content" style={{ borderRadius: "10px" }}>
-        <div
-          className="modal-header"
-          style={{
-            backgroundColor: "#007bff",
-            color: "#fff",
-            padding: "10px 15px",
-            borderTopLeftRadius: "10px",
-            borderTopRightRadius: "10px",
-          }}
-        >
-          <button
-            type="button"
-            className="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true" style={{ color: "#fff" }}>
-              &times;
-            </span>
-          </button>
-          <h4 className="">{props.title}</h4>
-          {showDialog && <Dialog />}
-        </div>
-        <div className="modal-body" style={{ padding: "20px" }}>
-          <form onSubmit={handleSubmit}>
-            <input
-              className="custom-select-input"
-              type="hidden"
-              name="action"
-              value="add"
-            />
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="phone"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
-                Số điện thoại <span style={{ color: "red" }}>*</span>
-              </label>
-              <input
-                className="custom-select-input"
-                type="text"
-                name="phone"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                }}
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </div>
-            {props.isCreate && (
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  htmlFor="password"
-                  style={{ display: "block", marginBottom: "5px" }}
-                >
-                  Mật khẩu <span style={{ color: "red" }}>*</span>
-                </label>
-
-                <input
-                  className="custom-select-input"
-                  type="password"
-                  name="password"
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                  }}
-                />
-              </div>
-            )}
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="name"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
-                Họ tên <span style={{ color: "red" }}>*</span>
-              </label>
-              <input
-                className="custom-select-input"
-                type="text"
-                name="name"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                }}
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="gender"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
-                Giới tính
-              </label>
-              <select
-                name="gender"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                }}
-                value={formData.gender === null ? "0" : formData.gender}
-                onChange={handleChange}
-              >
-                <option value="0">Nam</option>
-                <option value="1">Nữ</option>
-              </select>
-            </div>
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="level"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
-                Chức vụ
-              </label>
-              <select
-                name="level"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                }}
-                value={formData.role}
-                onChange={handleChange}
-              >
-                <option value="0">Admin</option>
-                <option value="1">Quản lý</option>
-                <option value="2">Bác sĩ</option>
-                <option value="3">Bệnh nhân</option>
-              </select>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <button
-                type="submit"
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-              >
-                Hoàn tất
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary ml-2"
-                data-dismiss="modal"
-                style={{
-                  marginLeft: "10px",
-                  padding: "10px 20px",
-                  backgroundColor: "#ccc",
-                  color: "#333",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-              >
-                Đóng
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
 interface ResultProps {
-  role: string;
   appointmentId: string;
   doctorId: string;
   show: boolean;
@@ -483,7 +264,6 @@ interface ResultProps {
   refeshDetails: () => void;
 }
 export const ModalResult: React.FC<ResultProps> = ({
-  role,
   appointmentId,
   doctorId,
   show,
@@ -613,7 +393,7 @@ export const ModalResult: React.FC<ResultProps> = ({
             <Form onSubmit={handleResultSubmit}>
               <Row style={{ textAlign: "left" }}>
                 Triệu chứng:{" "}
-                {role === "ADMIN" ? (
+                {checkRoleDoctor() ? (
                   <input
                     className="custom-select-input"
                     type="text"
@@ -628,7 +408,7 @@ export const ModalResult: React.FC<ResultProps> = ({
               </Row>
               <Row style={{ textAlign: "left" }}>
                 Chẩn đoán:{" "}
-                {role === "ADMIN" ? (
+                {checkRoleDoctor() ? (
                   <input
                     className="custom-select-input"
                     type="text"
@@ -642,7 +422,7 @@ export const ModalResult: React.FC<ResultProps> = ({
               </Row>
               <Row style={{ textAlign: "left" }}>
                 Ghi chú:{" "}
-                {role === "ADMIN" ? (
+                {checkRoleDoctor() ? (
                   <input
                     className="custom-select-input"
                     type="text"
@@ -655,7 +435,7 @@ export const ModalResult: React.FC<ResultProps> = ({
                 )}
               </Row>
               <Row>
-                {role === "ADMIN" ? (
+                {checkRoleDoctor() ? (
                   <Col>
                     <Button type="submit">Gửi kết quả</Button>
                   </Col>
@@ -839,5 +619,4 @@ function Modals(props: Props) {
     </Modal>
   );
 }
-
 export default Modals;

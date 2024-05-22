@@ -30,7 +30,7 @@ export const PackageManager = () => {
   const [isLoading, setLoading] = useState(false);
   const [filterText, setFilterText] = useState(""); // input search
   const [error, setError] = useState<boolean>(false);
-  const [response, setResponse] = useState<number>(0); // get/set value response create Clinic
+  const [response, setResponse] = useState<number>(0); // get/set value response
   const [totalPages, setTotalPages] = useState<number>(1); // State để lưu tổng số trang
   const [currentPage, setCurrentPage] = useState<number>(1); // State để lưu trang hiện tại
   const [packages, setPackages] = useState<PackageEntity[]>([]);
@@ -476,7 +476,6 @@ interface DataTablePackageProps {
   responseStatus: (status: number) => void;
   data: PackageEntity[];
 }
-
 export const DataTablePackage: React.FC<DataTablePackageProps> = ({
   responseStatus,
   data,
@@ -486,7 +485,7 @@ export const DataTablePackage: React.FC<DataTablePackageProps> = ({
   }>({}); // modal show update clinic
 
   return (
-    <div>
+    <>
       <Table striped bordered hover>
         <thead>
           <tr className="text-small">
@@ -553,6 +552,6 @@ export const DataTablePackage: React.FC<DataTablePackageProps> = ({
           ))}
         </tbody>
       </Table>
-    </div>
+    </>
   );
 };

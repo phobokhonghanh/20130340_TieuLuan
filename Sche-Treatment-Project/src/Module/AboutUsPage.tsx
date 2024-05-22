@@ -1,5 +1,4 @@
 import HeaderNav from "../Component/HeaderNav";
-import Preloader from "../Component/Preloader";
 import Slides from "../Component/Slides";
 import CardInfo from "../Component/CardInfo";
 import Footer from "../Component/Footer";
@@ -10,7 +9,6 @@ import "../assets/style.css";
 function AboutUsPage() {
   return (
     <>
-      <Preloader />
       <HeaderNav />
       <Slides />
       <CardInfo />

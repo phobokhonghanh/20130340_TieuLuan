@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Form, Col } from "react-bootstrap";
 import "../assets/css/SelectWithSearch.css";
 import {
-  Account,
   DoctorEntity,
   ServiceEntity,
 } from "../Models/Model";

@@ -11,6 +11,8 @@ import java.util.List;
 public interface PatientService {
     boolean createPatient(PatientDTO patientDTO);
     boolean updatePatient(PatientDTO patientDTO);
+    boolean updateBHYT(String accountId, String bhyt);
     void deletePatient(String id);
+    PatientDTO  getPatient(String id);
     List<PatientDTO> getAll();
 }

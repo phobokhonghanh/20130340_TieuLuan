@@ -56,21 +56,32 @@ export interface ServiceEntity {
   updatedAt: string;
   clinic: Clinic;
 }
-
+export interface AccountDTO {
+  id: string;
+  accountName: string;
+  accountPhone: string;
+  accountEmail: string;
+  accountGender: number;
+}
 export interface Account {
   id: string;
   accountPhone: string;
-  accountPassword: string;
+  accountEmail: string;
   accountName: string;
   accountGender: number;
-  createAt: string;
-  updateAt: string;
-  supportRole: Support;
-  supportStatus: Support;
+  supportRoleId: string;
+  supportStatusId: string;
+}
+export interface AccountResponse {
+  accountDTO: Account;
+  countSum: number;
+  countCancel: number;
+  countPay: number;
 }
 export interface DoctorEntity {
   id: string;
   accountPhone: string;
+  accountEmail: string;
   accountPassword: string;
   accountName: string;
   accountGender: number;
@@ -85,9 +96,19 @@ export interface DoctorEntity {
   doctorExp: string;
   doctorImage: string;
 }
+export interface DoctorDTO {
+  id: string;
+  doctorDegree: string;
+  doctorRank: string;
+  doctorSpecialty: string;
+  doctorIntroduce: string;
+  doctorExp: string;
+  doctorImage: string;
+}
 export interface Patient {
   id: string;
   accountPhone: string;
+  accountEmail: string;
   accountPassword: string;
   accountName: string;
   accountGender: number;
@@ -95,7 +116,7 @@ export interface Patient {
   updateAt: string;
   supportRole: Support;
   supportStatus: Support;
-  bhyt: string;
+  patientBhyt: string;
 }
 export interface Signup {
   id: string;
@@ -110,7 +131,6 @@ export interface Signup {
 export interface Signin {
   phone: string;
   password: string;
-  role: string;
 }
 export interface LoginResponse {
   message: string | null;
@@ -216,4 +236,7 @@ export interface ResultDTO {
   resultDiagnostic: string;
   resultNote: string;
   appointmentId: string;
+}
+export interface StatisticalResponse {
+  sum: number;
 }

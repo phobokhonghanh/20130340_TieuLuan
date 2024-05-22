@@ -10,6 +10,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 
 public class SupportDTO {
+    public static final String STATUS_UNLOCK = "S1";
+    public static final String STATUS_LOCK = "S2";
+    public static final String STATUS_ACCEPT = "S3";
+    public static final String STATUS_CANCEL = "S4";
+    public static final String STATUS_VERIFY = "S5";
+    public static final String STATUS_ROLE_ADMIN = "R1";
+    public static final String STATUS_ROLE_DOCTOR = "R2";
+    public static final String STATUS_ROLE_PATIENT = "R4";
     private String id;
     private String supportValue;
     private String supportInfo;

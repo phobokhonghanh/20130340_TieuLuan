@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import Header from "../Component/Header";
 import "../assets/style.css";
 import { v4 as uuidv4 } from "uuid";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Signup } from "../Models/Model";
-import { register_patient } from "../apiConfig";
+import { register } from "../apiConfig";
 import { Notifi } from "../Component/Notification";
 import { Form } from "react-bootstrap";
 import Preloader from "../Component/Preloader";
@@ -22,6 +22,7 @@ function Register() {
     "danger"
   );
   const [showMess, setShowMess] = useState(false);
+  let location = useLocation();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,6 +40,8 @@ function Register() {
     }
     if (value.length < 10) {
       setValidationPhone("Vui lòng nhập đúng số điện thoại");
+    } else {
+      setValidationPhone("");
     }
   };
   const handleEmail = (event: { currentTarget: any }) => {
@@ -84,11 +87,11 @@ function Register() {
       accountName: name,
       accountPassword: password,
       accountGender: 0,
-      supportRoleId: "R4",
+      supportRoleId: location.pathname === "/admin/register" ? "R1" : "R4",
       supportStatusId: "S5",
     };
     setIsLoading(true);
-    register_patient(formData)
+    register(formData)
       .then((response: any) => {
         if (response.status === 200) {
           setIsLoading(false);
@@ -122,7 +125,7 @@ function Register() {
       )}
       <div className="container">
         <img
-          src="src/assets/img/bg.png"
+          src="/src/assets/img/bg.png"
           alt="background"
           className="background-image"
         />
@@ -131,7 +134,7 @@ function Register() {
             <Link to="/login" className="biback">
               <img
                 className="back"
-                src="src/assets/svg/back.svg"
+                src="/src/assets/svg/back.svg"
                 alt="img"
                 aria-label="Đăng nhập"
               />
@@ -142,7 +145,7 @@ function Register() {
             <div className="col-md-4">
               <div className="input-group has-validation">
                 <div className="input-group-text">
-                  <img src="src/assets/svg/vietnam.svg" alt="img" />
+                  <img src="/src/assets/svg/vietnam.svg" alt="img" />
                 </div>
                 <input
                   style={{ marginLeft: "5px" }}

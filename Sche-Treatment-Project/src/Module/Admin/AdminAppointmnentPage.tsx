@@ -5,7 +5,12 @@ import { Col, Form, Row } from "react-bootstrap";
 import { API_ENDPOINTS } from "../../apiConfig";
 import { Appointment, AppointmentDetail } from "../../Component/Appointment";
 import Pagination from "../../Component/Pagination";
-import { Notifi } from "../../Component/Notification";
+import {
+  checkRoleAdmin,
+  getIdAccount,
+  getRole,
+} from "../../Authentication/Authentication";
+import { useNavigate } from "react-router-dom";
 
 export function AdminAppointmnetPage() {
   const [filterText, setFilterText] = useState(""); // input search
@@ -25,10 +30,10 @@ export function AdminAppointmnetPage() {
   const [totalPages, setTotalPages] = useState<number>(1); // State để lưu tổng số trang
 
   const [refesh, setRefesh] = useState(false);
+  const navigate = useNavigate();
 
-  const account = "ea29643b-f825-11ee-87e1-847beb19aaf6";
-  const role = "ADMIN";
-
+  const account = getIdAccount();
+  const role = getRole();
   const fetchArea = async () => {
     setLoading(true);
     try {
@@ -53,7 +58,9 @@ export function AdminAppointmnetPage() {
         setLoading(true);
         try {
           let response;
-          if (role !== "ADMIN") {
+          console.log(account);
+          console.log(checkRoleAdmin());
+          if (!checkRoleAdmin()) {
             response = await fetch(
               `${API_ENDPOINTS.GET_APPOINTMENT_DOCTOR(
                 account
@@ -82,9 +89,10 @@ export function AdminAppointmnetPage() {
       }
       fetchAppointment(currentPage);
     } else {
-      // navigator("/404");
+      navigate("/login");
     }
   }, [currentPage, filterText, refesh]);
+
   const handleFilterChange = (e: { target: { value: string } }) => {
     const value = e.target.value;
     setFilterText(value);
@@ -131,37 +139,6 @@ export function AdminAppointmnetPage() {
                           className="custom-select-input"
                         />
                       </Col>
-                      {/* <Col xs={4}>
-                        <Form.Group controlId="formClinic">
-                          <select
-                            className="custom-select-input"
-                            value={areaSelected ? areaSelected.id : ""}
-                            // onChange={handleAreaChange}
-                            required
-                          >
-                            {isLoading && <option>Loading...</option>}
-                            {error && <option>Không có data</option>}
-                            <option value="">-- Chọn khu khám --</option>
-                            {areas.map((area) => (
-                              <option key={area.id} value={area.id}>
-                                {area.areaName}
-                              </option>
-                            ))}
-                          </select>
-                        </Form.Group>
-                      </Col>
-                      <Col xs={4}>
-                        <Form.Group controlId="formClinic">
-                          <ClinicAppoinment
-                            dataListClinic={
-                              areaSelected ? areaSelected.clinics : []
-                            }
-                            onClinicSelected={(selectedClinic) =>
-                              setClinic(selectedClinic.id)
-                            }
-                          />
-                        </Form.Group>
-                      </Col> */}
                     </Row>
                   </div>
                   <div className="row">

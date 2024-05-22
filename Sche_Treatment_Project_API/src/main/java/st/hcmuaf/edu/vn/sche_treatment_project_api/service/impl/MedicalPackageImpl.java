@@ -32,7 +32,6 @@ public class MedicalPackageImpl implements MedicalPackageService {
         Page<MedicalPackage> medicalPackages =  medicalPackageRepository.findAllByPackageNameIsContaining(keyword,pageable);
         List<MedicalPackageDTO> medicalPackageDTOs = medicalPackageMapper.convertListMedicalPackageETD(medicalPackages.stream().toList());
         return new PageImpl<>(medicalPackageDTOs, pageable, medicalPackages.getTotalElements());
-
     }
 
     @Override

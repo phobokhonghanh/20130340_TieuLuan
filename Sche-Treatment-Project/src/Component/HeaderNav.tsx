@@ -1,14 +1,16 @@
-import { Navbar, Nav, Container, Row, Col } from "react-bootstrap";
+import { Navbar, Nav, Container, Row, Col, Button } from "react-bootstrap";
 import "../assets/css/HeaderNav.css";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from "../apiConfig";
 import { PackageEntity } from "../Models/Model";
-// function HeaderNav({
-//   onNavbarToggle,
-// }: {
-//   onNavbarToggle: (event: React.SyntheticEvent) => void;
-// }) {
+import {
+  getIdAccount,
+  getNameAccount,
+  removeToken,
+} from "../Authentication/Authentication";
+import Preloader from "./Preloader";
+
 function HeaderNav() {
   const [sliderMobile, setSliderMobile] = useState(false);
   const handleNavbarToggle = () => {
@@ -17,6 +19,12 @@ function HeaderNav() {
   const [packageEntity, setPackage] = useState<PackageEntity>();
   const [error, setError] = useState();
   const [isLoading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    removeToken();
+    navigate("/");
+  };
   useEffect(() => {
     const fetchPackage = async () => {
       setLoading(true);
@@ -88,7 +96,7 @@ function HeaderNav() {
                   </div>
                   {/* / End Main Menu */}
                 </Col>
-                <Col lg={2} xs={2}>
+                <Col lg={2} xs={2} style={{ width: "11%" }} className="center">
                   <div className="get-quote">
                     <Link
                       to="/appointment"
@@ -97,22 +105,75 @@ function HeaderNav() {
                       }}
                       className="btn"
                     >
-                      Đặt lịch khám bệnh
+                      Đặt lịch hẹn
                     </Link>
                   </div>
                 </Col>
-                <Col lg={1} xs={2}>
-                  <div className="icon">
-                    <Link to="/account" className="icon-container">
-                      <i className="fa fa-user icon-cus" aria-hidden="true"></i>
-                      <span className="label">Tài khoản</span>
-                    </Link>
-                    <a href="#" className="icon-container">
-                      <i className="fa fa-bell icon-cus" aria-hidden="true"></i>
-                      <span className="label">Thông báo</span>
-                    </a>
+                <Col lg={1} xs={2} className="center">
+                  <div className="get-quote">
+                    <div
+                      className="btn hover"
+                      style={{
+                        padding: "5px",
+                        background: "none",
+                        color: "#048dbb",
+                        border: "1px solid #048dbb",
+                        borderRadius: "25px",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        width: "150px",
+                      }}
+                    >
+                      <Link
+                        to="/account"
+                        style={{
+                          color: "#048dbb",
+                        }}
+                      >
+                        <i
+                          className="fa fa-user icon-cus"
+                          aria-hidden="true"
+                        ></i>
+                        {!getNameAccount() ? (
+                          <span
+                            style={{
+                              paddingRight: "10px",
+                            }}
+                          >
+                            Tài khoản
+                          </span>
+                        ) : (
+                          <>
+                            <span
+                              style={{
+                                paddingRight: "10px",
+                              }}
+                            >
+                              {getNameAccount()}
+                            </span>
+                          </>
+                        )}
+                      </Link>
+                    </div>
                   </div>
                 </Col>
+                {getIdAccount() && (
+                  <Col
+                    lg={1}
+                    xs={2}
+                    className="center"
+                    style={{ width: "3%", cursor: "pointer" }}
+                  >
+                    <span onClick={handleLogout}>
+                      <i
+                        className="fa fa-sign-out icon-cus"
+                        aria-hidden="true"
+                      ></i>
+                    </span>
+                  </Col>
+                )}
               </Row>
             </div>
           </Container>

@@ -17,15 +17,17 @@ import { API_ENDPOINTS, updateStatus } from "../apiConfig";
 import { formatDate } from "../Module/AppointmentPage";
 import { Button } from "react-bootstrap";
 import { ErrorNotifi, Notifi } from "./Notification";
+import {
+  checkRoleDoctor,
+  getIdAccount,
+} from "../Authentication/Authentication";
 interface appointmentDetailsProps {
   refesh: boolean;
-  role: string;
   appointmentId: AppointmentDTO;
   setRefesh: (rf: boolean) => void;
 }
 export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   refesh,
-  role,
   appointmentId,
   setRefesh,
 }) => {
@@ -241,7 +243,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
                       Đã thanh toán
                     </p>
                   ) : (
-                    role !== "ADMIN" && (
+                    !checkRoleDoctor() && (
                       <div style={{ float: "right" }}>
                         <button className="payment-btn paypal-btn">
                           Vui lòng thanh toán qua PayPal
@@ -260,16 +262,13 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
 };
 interface AppointmentProps {
   refeshDetails: (modalRefreshDetails: boolean) => void;
-  role: string;
   appointmentDTO: AppointmentDTO;
 }
 export const Appointment: React.FC<AppointmentProps> = ({
   refeshDetails,
-  role,
   appointmentDTO,
 }) => {
   const [modalShow, setModalShow] = useState(false);
-  // const [modalRefreshDetails, setModalRefreshDetails] = useState(false);
   const [packageFetch, setPackage] = useState<PackageEntity>();
   const [supportFetch, setSupport] = useState<Support>();
   const [calendarFetch, setCalendar] = useState<CalendarDTO>();
@@ -382,7 +381,6 @@ export const Appointment: React.FC<AppointmentProps> = ({
                   show={modalShow}
                   refeshDetails={() => refeshDetails(true)}
                   onHide={() => setModalShow(false)}
-                  role={role}
                   appointmentId={appointmentDTO.id}
                   doctorId={accountFetch ? accountFetch.id : ""}
                 />
@@ -392,15 +390,14 @@ export const Appointment: React.FC<AppointmentProps> = ({
             {/* <!-- Table Bottom --> */}
           </div>
           <div className="mt-2">
-            {appointmentDTO.supportStatusId !== "S4" && (
-              <button
-                type="button"
-                className="btn btn-primary me-2"
-                onClick={() => setModalShow(true)}
-              >
-                Kết quả
-              </button>
-            )}
+            <button
+              type="button"
+              className="btn btn-primary me-2"
+              onClick={() => setModalShow(true)}
+              disabled={appointmentDTO.supportStatusId === "S4"}
+            >
+              Kết quả
+            </button>
             <button type="button" className="btn btn-outline-secondary">
               Chi tiết
             </button>
@@ -414,9 +411,7 @@ export const Appointment: React.FC<AppointmentProps> = ({
 export const HistoryAppointment = () => {
   const [listAppointment, setListAppointment] = useState<AppointmentDTO[]>([]);
   const [selectAppointment, setSelectAppointment] = useState<AppointmentDTO>();
-  const account = "ea283c62-f825-11ee-87e1-847beb19aaf6";
-  // const role = "ADMIN";
-  const role = "PATIENT";
+  const account = getIdAccount();
 
   // const [account, setAccount] = useState<Account>();
   const [currentPage, setCurrentPage] = useState<number>(1); // State để lưu trang hiện tại
@@ -477,14 +472,9 @@ export const HistoryAppointment = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link active" to="javascript:void(0);">
+                <a className="nav-link active">
                   <i className="bx bx-bell me-1"></i> Lịch sử cuộc hẹn
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="#">
-                  <i className="bx bx-link-alt me-1"></i> Thông báo
-                </Link>
+                </a>
               </li>
             </ul>
             <div className="col-md-8 w90">
@@ -513,7 +503,6 @@ export const HistoryAppointment = () => {
                     >
                       <Appointment
                         refeshDetails={(rf) => setRefeshDetails(rf)}
-                        role={role}
                         appointmentDTO={appointment}
                       />
                     </div>
@@ -524,7 +513,6 @@ export const HistoryAppointment = () => {
               <AppointmentDetail
                 refesh={refeshDetails}
                 setRefesh={(rf) => setRefeshDetails(rf)}
-                role={role}
                 appointmentId={selectAppointment}
               />
             )}

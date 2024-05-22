@@ -21,6 +21,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.DoctorRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.DoctorService;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -38,19 +39,28 @@ public class DoctorImpl implements DoctorService {
     public List<Doctor> getAll() {
         return doctorRepository.findAll();
     }
-
     @Override
-    public void deleteDoctor(String id) {
-        doctorRepository.deleteById(id);
+    public boolean updateDoctor(DoctorDTO doctorDTO) {
+        Optional<Doctor> doctorOptional = doctorRepository.findById(doctorDTO.getId());
+        if (doctorOptional.isPresent()) {
+            Doctor doctor = doctorOptional.get();
+            doctor.setDoctorExp(doctorDTO.getDoctorExp());
+            doctor.setDoctorDegree(doctorDTO.getDoctorDegree());
+            doctor.setDoctorImage(doctorDTO.getDoctorImage());
+            doctor.setDoctorRank(doctorDTO.getDoctorRank());
+            doctor.setDoctorSpecialty(doctorDTO.getDoctorSpecialty());
+            doctor.setDoctorIntroduce(doctorDTO.getDoctorIntroduce());
+            doctorRepository.save(doctor);
+            return true;
+        }
+        return false;
     }
-
     @Override
     public List<DoctorDTO> getListDoctorLimit() {
         List<Doctor> doctors = doctorRepository.getListDoctorLimit();
         List<DoctorDTO> listDoctorDTO = accountMapper.convertListDoctorETD(doctors);
         return listDoctorDTO;
     }
-
     @Override
     public Page<DoctorDTO> getListDoctorCalendarPageable(Integer pageNo) {
         Pageable pageable = PageRequest.of(pageNo - 1, 5);
@@ -71,20 +81,13 @@ public class DoctorImpl implements DoctorService {
 
         return new PageImpl<>(listDoctorDTO, pageable, total);
     }
-
     @Override
     public DoctorDTO getDoctorByIdCalendar(String idCalendar) {
         return accountMapper.convertDoctorETD(doctorRepository.getDoctorbyIdCalendar(idCalendar));
     }
-
     @Override
-    public boolean createDoctor(DoctorDTO doctorDTO) {
-        Doctor acc = doctorRepository.save(accountMapper.convertDoctorDTE(doctorDTO));
-        return acc != null ? true : false;
+    public DoctorDTO getDoctor(String id) {
+        return accountMapper.convertDoctorETD(doctorRepository.findById(id).get());
     }
 
-//    @Override
-//    public List<Doctor> getListDoctorClinic(String clinicId) {
-//        return doctorRepository.getListDoctorClinic(clinicId);
-//    }
 }

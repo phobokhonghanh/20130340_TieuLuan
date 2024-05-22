@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Appointment;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Bill;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AppointmentDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.StatisticalResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AppointmentService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.BillService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bill")
+@RequestMapping("${api.v1}")
 public class BillController {
     @Autowired
     private BillService billService;
@@ -26,8 +27,16 @@ public class BillController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping("/appointment/{appointmentId}")
+    @GetMapping("/bill/appointment/{appointmentId}")
     public ResponseEntity<Bill> getListAppointmentUser(@PathVariable String appointmentId) {
         return ResponseEntity.ok(billService.getBillByAppointmentId(appointmentId));
+    }
+    @GetMapping("/admin/bill/sum/months")
+    public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "is_pay", defaultValue = "true") boolean is_pay) {
+        return ResponseEntity.ok(billService.sumBillMonths(is_pay));
+    }
+    @GetMapping("/admin/bill/sum/week")
+    public ResponseEntity<Double> getSumBillWeek() {
+        return ResponseEntity.ok(billService.sumBillWeek());
     }
 }

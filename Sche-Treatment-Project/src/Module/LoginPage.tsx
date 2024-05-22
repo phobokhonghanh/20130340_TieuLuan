@@ -61,7 +61,6 @@ function Login() {
     const formData: Signin = {
       phone: phone,
       password: password,
-      role: "R1",
     };
     login(formData)
       .then((response: any) => {
@@ -70,7 +69,11 @@ function Login() {
           localStorage.setItem("response", JSON.stringify(responseData));
           const timer = setTimeout(() => {
             setIsLoading(false);
-            navigate("/home");
+            if (responseData.roles && responseData.roles[0] === "ROLE_ADMIN") {
+              navigate("/admin/home");
+            } else {
+              navigate("/");
+            }
           }, 1000);
           return () => clearTimeout(timer);
         }

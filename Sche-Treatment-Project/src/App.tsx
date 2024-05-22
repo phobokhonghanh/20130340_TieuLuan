@@ -65,6 +65,7 @@ function App() {
         </Route>
         {/* phải đăng nhập và role là admin */}
         <Route element={<AdminRoutes />}>
+          <Route path="/admin/register" element={<Register />} />
           <Route path="/admin/home" element={<AdminHomePage />} />
           <Route path="/admin" element={<AdminHomePage />} />
           <Route path="/admin/account" element={<AdminAccountPage />} />

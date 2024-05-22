@@ -1,7 +1,9 @@
 import {
+  AccountDTO,
   AppointmentDTO,
   CalendarDTO,
   ClinicDTO,
+  DoctorDTO,
   EvaluateDTO,
   PackageDTO,
   ResultDTO,
@@ -12,15 +14,31 @@ import {
 } from "./Models/Model";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api"; // Thay đổi thành URL cơ sở của API của bạn
+const API_BASE_URL = "http://localhost:8080/api";
 
 export const API_ENDPOINTS = {
   // GET
+
+  //http://localhost:8080/api/admin/appointment/sum/months
+  GET_APPOINTMENT_SUM_MONTHS: `${API_BASE_URL}/admin/appointment/sum/months`,
+
+  //http://localhost:8080/api/admin/appointment/sum/status/months
+  GET_APPOINTMENT_SUM_STAUS_MONTHS: `${API_BASE_URL}/admin/appointment/sum/status/months`,
+
+  //http://localhost:8080/api/admin/bill/sum/months
+  GET_BILL_SUM_MONTHS: `${API_BASE_URL}/admin/bill/sum/months`,
+
+  //http://localhost:8080/api/admin/bill/sum/week
+  GET_BILL_SUM_WEEK: `${API_BASE_URL}/admin/bill/sum/week`,
+
   //http://localhost:8080/api/clinic/all
   GET_CLINIC_ALL: `${API_BASE_URL}/clinic/all`,
 
   //http://localhost:8080/api/doctor/all
   GET_DOCTOR_ALL: `${API_BASE_URL}/doctor/all`,
+
+  //http://localhost:8080/api/admin/account/all
+  GET_ACCOUNT_ALL: `${API_BASE_URL}/admin/account/all`,
 
   //http://localhost:8080/api/doctor/slides
   GET_DOCTOR_SLIDES: `${API_BASE_URL}/doctor/slides`,
@@ -75,11 +93,18 @@ export const API_ENDPOINTS = {
   GET_APPOINTMENT_CALENDAR: (calendarId: string) =>
     `${API_BASE_URL}/appointment/calendar/${calendarId}`,
 
-  //http://localhost:8080/api/appointment/user/{{accountId}}
+  //http://localhost:8080/api/appointment/user/${accountId}
   GET_APPOINTMENT_USER: (accountId: string) =>
     `${API_BASE_URL}/appointment/user/${accountId}`,
 
-  //http://localhost:8080/api/appointment/doctor/{{accountId}}
+  //http://localhost:8080/api/patient/${accountId}
+  GET_PATIENT: (accountId: string) => `${API_BASE_URL}/patient/${accountId}`,
+  //http://localhost:8080/api/account/${accountId}
+  GET_ACCOUNT: (accountId: string) => `${API_BASE_URL}/account/${accountId}`,
+  //http://localhost:8080/api/doctor/${accountId}
+  GET_DOCTOR: (accountId: string) => `${API_BASE_URL}/doctor/${accountId}`,
+
+  //http://localhost:8080/api/appointment/doctor/${accountId}
   GET_APPOINTMENT_DOCTOR: (accountId: string) =>
     `${API_BASE_URL}/appointment/doctor/${accountId}`,
 
@@ -128,9 +153,30 @@ export const API_ENDPOINTS = {
   //http://localhost:8080/api/appointment/status/{appointmentId}
   PATCH_APPOINTMENT: (appointmentId: string) =>
     `${API_BASE_URL}/appointment/status/${appointmentId}`,
+
   //http://localhost:8080/api/account/confirm-OTP/{accountId}
   PATCH_CONFIRM_OTP: (accountId: string, otp: string) =>
     `${API_BASE_URL}/account/confirm-OTP/${accountId}?otp=${otp}`,
+
+  //http://localhost:8080/api/patient/update/{accountId}
+  PATCH_PATIENT_BHYT: (accountId: string, bhyt: string) =>
+    `${API_BASE_URL}/patient/update/${accountId}?bhyt=${bhyt}`,
+
+  //http://localhost:8080/api/admin/account/update/role-doctor/{accountId}
+  PATCH_ROLE_FROM_PATIENT_TO_DOCTOR: (accountId: string) =>
+    `${API_BASE_URL}/admin/account/update/role-doctor/${accountId}`,
+
+  //http://localhost:8080/api/admin/account/update/role-patient/{accountId}
+  PATCH_ROLE_FROM_ADMIN_AND_DOCTOR_TO_PATIENT: (accountId: string) =>
+    `${API_BASE_URL}/admin/account/update/role-patient/${accountId}`,
+
+  //http://localhost:8080/api/admin/account/lock/{accountId}
+  PATCH_LOCK_ACCOUNT: (accountId: string) =>
+    `${API_BASE_URL}/admin/account/lock/${accountId}`,
+
+  //http://localhost:8080/api/admin/account/unlock/{accountId}
+  PATCH_UNLOCK_ACCOUNT: (accountId: string) =>
+    `${API_BASE_URL}/admin/account/unlock/${accountId}`,
 
   //POST
   //http://localhost:8080/api/calendar
@@ -139,8 +185,11 @@ export const API_ENDPOINTS = {
   //http://localhost:8080/api/account/register
   POST_ACCOUNT: `${API_BASE_URL}/account/register`,
 
-  //http://localhost:8080/api/account/register/patient
-  POST_ACCOUNT_PATIENT: `${API_BASE_URL}/account/register/patient`,
+  //http://localhost:8080/api/account
+  POST_ACCOUNT_UPDATE: `${API_BASE_URL}/account`,
+
+  //http://localhost:8080/api/doctor/update
+  PUT_DOCTOR_UPDATE: `${API_BASE_URL}/doctor/update`,
 
   //http://localhost:8080/api/account/login
   POST_LOGIN: `${API_BASE_URL}/account/login`,
@@ -188,14 +237,20 @@ export const createAppointmentResult = (result: ResultDTO) =>
 export const createEvaluate = (evaluate: EvaluateDTO) =>
   axios.post(API_ENDPOINTS.POST_EVALUATE, evaluate);
 
-export const register_patient = (signup: Signup) =>
-  axios.post(API_ENDPOINTS.POST_ACCOUNT_PATIENT, signup);
-
 export const register = (signup: Signup) =>
   axios.post(API_ENDPOINTS.POST_ACCOUNT, signup);
 
 export const login = (signin: Signin) =>
   axios.post(API_ENDPOINTS.POST_LOGIN, signin);
+
+export const updateAccount = (account: AccountDTO) =>
+  axios.post(API_ENDPOINTS.POST_ACCOUNT_UPDATE, account);
+
+export const updateDoctor = (doctor: DoctorDTO) =>
+  axios.put(API_ENDPOINTS.PUT_DOCTOR_UPDATE, doctor);
+
+export const updateBHYT_Patient = (accountId: string, bhyt: string) =>
+  axios.patch(API_ENDPOINTS.PATCH_PATIENT_BHYT(accountId, bhyt));
 
 export const getServicesNotSelected = async (list: ServiceEntity[]) => {
   try {
@@ -208,9 +263,25 @@ export const getServicesNotSelected = async (list: ServiceEntity[]) => {
     throw error;
   }
 };
+
 export const updateStatus = (appointmentId: string) =>
   axios.patch(API_ENDPOINTS.PATCH_APPOINTMENT(appointmentId));
+
 export const confirmOTP = (accountId: string, otp: string) =>
   axios.patch(API_ENDPOINTS.PATCH_CONFIRM_OTP(accountId, otp));
+
 export const deletePackageService = (packageServicesId: string) =>
   axios.delete(API_ENDPOINTS.DELETE_PACKAGE_SERVICE(packageServicesId));
+
+export const upRole = (accountId: string) =>
+  axios.patch(API_ENDPOINTS.PATCH_ROLE_FROM_PATIENT_TO_DOCTOR(accountId));
+
+export const lowRole = (accountId: string) =>
+  axios.patch(
+    API_ENDPOINTS.PATCH_ROLE_FROM_ADMIN_AND_DOCTOR_TO_PATIENT(accountId)
+  );
+export const lockAccount = (accountId: string) =>
+  axios.patch(API_ENDPOINTS.PATCH_LOCK_ACCOUNT(accountId));
+
+export const unlockAccount = (accountId: string) =>
+  axios.patch(API_ENDPOINTS.PATCH_UNLOCK_ACCOUNT(accountId));
