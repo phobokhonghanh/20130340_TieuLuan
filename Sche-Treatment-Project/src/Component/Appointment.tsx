@@ -2,7 +2,7 @@ import "../assets/css/Account.css";
 import { useEffect, useState } from "react";
 import { ModalResult } from "./Modal";
 import Pagination from "./Pagination";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   AppointmentDTO,
   Area,
@@ -13,7 +13,7 @@ import {
   PackageEntity,
   Support,
 } from "../Models/Model";
-import { API_ENDPOINTS, updateStatus } from "../apiConfig";
+import { API_ENDPOINTS, payment_paypal, updateStatus } from "../apiConfig";
 import { formatDate } from "../Module/AppointmentPage";
 import { Button } from "react-bootstrap";
 import { ErrorNotifi, Notifi } from "./Notification";
@@ -51,6 +51,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
         API_ENDPOINTS.GET_BILL_APPOINTMENT(appointmentId.id)
       );
       const data = (await response.json()) as Bill;
+      console.log(data);
       setBill(data);
     } catch (e: any) {
       setError(true);
@@ -107,6 +108,26 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
           setShowMess(true);
         }
       });
+    }
+  };
+  const handPayment = (id: string) => {
+    if (id !== "") {
+      payment_paypal(id)
+        .then((response: any) => {
+          if (response.status === 200) {
+            window.open(response.data, "mywin", "width=800,height=800");
+          }
+        })
+        .catch((error: any) => {
+          if (error.code === 400) {
+            setMessage(error.response.data);
+            setLevelMessage("danger");
+            setShowMess(true);
+          } else {
+            setError(true);
+          }
+        })
+        .finally(() => {});
     }
   };
   return (
@@ -220,8 +241,8 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
                   <p className="">
                     Trạng thái hóa đơn:{" "}
                     <span className="fw-bold">
-                      {bill?.isPaid ? (
-                        "Đã thanh toán"
+                      {bill?.paid ? (
+                        <span style={{ color: "green" }}>Đã thanh toán</span>
                       ) : (
                         <span style={{ color: "red" }}>Chưa thanh toán</span>
                       )}
@@ -235,21 +256,15 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
                       currency: "VND",
                     }).format(parseFloat(bill?.billSum ? bill?.billSum : "0"))}
                   </p>
-                  {bill?.isPaid ? (
-                    <p
-                      className="fw-bold"
-                      style={{ float: "right", color: "green" }}
-                    >
-                      Đã thanh toán
-                    </p>
-                  ) : (
-                    !checkRoleDoctor() && (
-                      <div style={{ float: "right" }}>
-                        <button className="payment-btn paypal-btn">
-                          Vui lòng thanh toán qua PayPal
-                        </button>
-                      </div>
-                    )
+                  {!bill?.paid && !checkRoleDoctor() && (
+                    <div style={{ float: "right" }}>
+                      <button
+                        className="payment-btn paypal-btn"
+                        onClick={() => handPayment(bill ? bill.id : "")}
+                      >
+                        Vui lòng thanh toán qua PayPal
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -409,15 +424,15 @@ export const Appointment: React.FC<AppointmentProps> = ({
   );
 };
 export const HistoryAppointment = () => {
+  const navigator = useNavigate();
   const [listAppointment, setListAppointment] = useState<AppointmentDTO[]>([]);
   const [selectAppointment, setSelectAppointment] = useState<AppointmentDTO>();
   const account = getIdAccount();
 
-  // const [account, setAccount] = useState<Account>();
   const [currentPage, setCurrentPage] = useState<number>(1); // State để lưu trang hiện tại
   const [totalPages, setTotalPages] = useState<number>(1); // State để lưu tổng số trang
 
-  const [error, setError] = useState();
+  const [error, setError] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [refeshDetails, setRefeshDetails] = useState(false);
 
@@ -430,7 +445,6 @@ export const HistoryAppointment = () => {
             `${API_ENDPOINTS.GET_APPOINTMENT_USER(account)}?page=${page}`
           );
           const data = await response.json();
-
           setListAppointment(data.content);
           if (data.content) {
             setSelectAppointment(data.content[0]);
@@ -438,7 +452,7 @@ export const HistoryAppointment = () => {
           setCurrentPage(data.number + 1);
           setTotalPages(data.totalPages);
         } catch (e: any) {
-          setError(e);
+          setError(true);
         } finally {
           setLoading(false);
         }
@@ -448,11 +462,12 @@ export const HistoryAppointment = () => {
         setRefeshDetails(false);
       }
     } else {
-      // navigator("/404");
+      navigator("/login");
     }
   }, [currentPage, refeshDetails]);
   return (
     <>
+      <ErrorNotifi error={error} />
       <div className="content-wrapper">
         <div className="container-xxl flex-grow-1 container-p-y">
           <h4 className="fw-bold py-3 mb-4">
@@ -481,19 +496,6 @@ export const HistoryAppointment = () => {
               <div className="card mb-4 col-md-8 w100">
                 <h5 className="card-header">Lịch sử cuộc hẹn</h5>
                 {isLoading && <div>Loading...</div>}
-                {error && (
-                  <div
-                    style={{
-                      textAlign: "center",
-                      color: "rgb(116, 136, 151)",
-                      fontWeight: "bold",
-                      fontSize: "larger",
-                    }}
-                  >
-                    <i>&#9888;</i> Đang gặp sự cố kỹ thuật, xin vui lòng đợi
-                    trong giây lát !
-                  </div>
-                )}
                 {listAppointment &&
                   listAppointment.map((appointment) => (
                     <div

@@ -14,6 +14,8 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     String getOTPById(@Param("id") String id);
 
     boolean existsByAccountEmailIgnoreCaseOrAccountPhone(String email, String phone);
+    boolean existsByAccountEmailIgnoreCaseAndAccountPhone(String email, String phone);
+
 
     Account findByAccountEmailAndAccountPhoneAndSupportStatusId(String email, String phone, String status);
 

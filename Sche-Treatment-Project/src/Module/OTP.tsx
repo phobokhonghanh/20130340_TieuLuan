@@ -3,7 +3,7 @@ import Header from "../Component/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/style.css";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { confirmOTP } from "../apiConfig";
 import { Notifi } from "../Component/Notification";
 import Preloader from "../Component/Preloader";
@@ -14,6 +14,10 @@ function OTP() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const otpInputs = useRef<HTMLInputElement[]>([]);
   const { accountId } = useParams();
+  const location = useLocation();
+  const isResetPassword = new URLSearchParams(location.search).get(
+    "reset-password"
+  );
   const [message, setMessage] = useState("");
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
     "danger"
@@ -77,7 +81,11 @@ function OTP() {
         if (response.status === 200) {
           const timer = setTimeout(() => {
             setIsLoading(false);
-            navigate("/login");
+            if (isResetPassword == "true") {
+              navigate(`/reset-password/${accountId}`);
+            } else {
+              navigate("/login");
+            }
           }, 2000);
           return () => clearTimeout(timer);
         }

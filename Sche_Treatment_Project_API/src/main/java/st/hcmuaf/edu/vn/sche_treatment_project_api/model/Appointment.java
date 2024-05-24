@@ -58,20 +58,5 @@ public class Appointment {
     @JoinColumn(name = "support_time_id")
     private Support supportTime;
 
-//    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private List<AppointmentService> appointmentServices;
-//
-//    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private List<AppointmentResult> appointmentResults;
-//
-//    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private List<Evaluate> evaluates;
-//
-//    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    private List<Bill> bills;
 
 }

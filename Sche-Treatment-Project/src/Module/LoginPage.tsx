@@ -122,7 +122,7 @@ function Login() {
             <div className="col-md-4">
               <div className="has-validation">
                 <div className="input-group-text">
-                  <img src="src/assets/svg/vietnam.svg" alt="img" />
+                  <img src="/src/assets/svg/vietnam.svg" alt="img" />
                   <input
                     style={{ marginLeft: "5px" }}
                     type="tel"
@@ -156,6 +156,9 @@ function Login() {
               <button className="btn btn-primary" type="submit">
                 Đăng nhập
               </button>
+              <span style={{ paddingLeft: "15px", cursor: "pointer" }}>
+                <Link to="/forgot-password">Quên mật khẩu ?</Link>
+              </span>
             </div>
           </form>
         </div>

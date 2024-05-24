@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../assets/css/Account.css";
 
 import {
@@ -12,6 +12,7 @@ import {
 import React, { useEffect, useState } from "react";
 import {
   API_ENDPOINTS,
+  sendOTPRestPassword,
   updateAccount,
   updateBHYT_Patient,
   updateDoctor,
@@ -22,11 +23,13 @@ import Pagination from "./Pagination";
 import {
   checkRoleDoctor,
   getIdAccount,
+  removeToken,
 } from "../Authentication/Authentication";
 import { Button } from "react-bootstrap";
 import Preloader from "./Preloader";
 
 export const Profile = () => {
+  const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
   const [account, setAccount] = useState<Account>();
   const [patient, setPatient] = useState<Patient>();
@@ -68,7 +71,6 @@ export const Profile = () => {
         if (!checkRoleDoctor()) {
           const response2 = await fetch(API_ENDPOINTS.GET_PATIENT(idAccount));
           const data2 = (await response2.json()) as Patient;
-          console.log(data2);
           setPatient(data2);
         }
         setAccount(data);
@@ -112,6 +114,29 @@ export const Profile = () => {
   }) => {
     setGender(event.target.value);
     setCheckChange(true);
+  };
+  const handChangePassword = () => {
+    setLoading(true);
+    sendOTPRestPassword(idAccount)
+      .then((response: any) => {
+        if (response.status === 200) {
+          removeToken();
+          navigate(`/otp/${idAccount}?reset-password=true`);
+        }
+      })
+      .catch((error: any) => {
+        if (error.response && error.response.status === 400) {
+          setMessage(error.response.data);
+        } else {
+          console.log("error:", error);
+          setMessage("Vui lòng thử lại sau");
+        }
+        setLevelMessage("danger");
+      })
+      .finally(() => {
+        setShowMess(true);
+        setLoading(false);
+      });
   };
   const handSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -285,6 +310,15 @@ export const Profile = () => {
                           <option value="1">Nữ</option>
                         </select>
                       </div>
+                    </div>
+                    <div className="mb-3 col-md-6">
+                      {" "}
+                      <span
+                        style={{ cursor: "pointer", color: "blue" }}
+                        onClick={() => handChangePassword()}
+                      >
+                        Bạn muốn thay đổi mật khẩu ?
+                      </span>
                     </div>
                     <div className="mt-2">
                       <Button

@@ -217,7 +217,7 @@ export interface Bill {
   id: string;
   packagePrice: string;
   billSum: string;
-  isPaid: boolean;
+  paid: boolean;
   createdAt: string;
   updatedAt: string;
   appointment: AppointmentEntity;

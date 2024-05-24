@@ -28,4 +28,6 @@ public interface BillRepository extends JpaRepository<Bill, String> {
             "  bill_ispay = true" +
             "  AND WEEK(create_at, 1) = WEEK(CURRENT_DATE, 1)", nativeQuery = true)
     Double sumBillWeek();
+
+    Bill findByPaymentId(String idPayment);
 }

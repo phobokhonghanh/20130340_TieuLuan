@@ -28,6 +28,8 @@ import {
   DoctorRoutes,
   UserRoutes,
 } from "./Authentication/RoutesAuthentication";
+import ForgotPassword, { ResetPassword } from "./Module/ResetPasswordPage";
+import { ErrorPaymentPage, SuccessPage } from "./Component/Notification";
 function App() {
   return (
     <>
@@ -35,7 +37,11 @@ function App() {
       <Routes>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:accountId" element={<ResetPassword />} />
         <Route path="/otp/:accountId" element={<OTP />} />
+        <Route path="/payment/success" element={<SuccessPage />} />
+        <Route path="/payment/cancel" element={<ErrorPaymentPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/doctors" element={<ListDoctors />} />

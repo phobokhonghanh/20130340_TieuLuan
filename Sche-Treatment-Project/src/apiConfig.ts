@@ -162,6 +162,21 @@ export const API_ENDPOINTS = {
   PATCH_PATIENT_BHYT: (accountId: string, bhyt: string) =>
     `${API_BASE_URL}/patient/update/${accountId}?bhyt=${bhyt}`,
 
+  //http://localhost:8080/api/account/send-OTP-reset-password/{accountId}
+  PATCH_ACCOUNT_SEND_OTP_RESET_PASSWORD: (accountId: string) =>
+    `${API_BASE_URL}/account/send-OTP-reset-password/${accountId}`,
+
+  //http://localhost:8080/api/account/forgot/{email}/{phone}
+  PUT_ACCOUNT_FORGOT: (email: string, phone: string) =>
+    `${API_BASE_URL}/account/forgot/${email}/${phone}`,
+
+  //http://localhost:8080/api/payment/paypal/{id}
+  PUT_BILL_PAYMENT_PAYPAL: (id: string) =>
+    `${API_BASE_URL}/payment/paypal/${id}`,
+
+  //http://localhost:8080/api/account/reset-password
+  PUT_ACCOUNT_RESET_PASSWORD: `${API_BASE_URL}/account/reset-password`,
+
   //http://localhost:8080/api/admin/account/update/role-doctor/{accountId}
   PATCH_ROLE_FROM_PATIENT_TO_DOCTOR: (accountId: string) =>
     `${API_BASE_URL}/admin/account/update/role-doctor/${accountId}`,
@@ -242,6 +257,18 @@ export const register = (signup: Signup) =>
 
 export const login = (signin: Signin) =>
   axios.post(API_ENDPOINTS.POST_LOGIN, signin);
+
+export const sendOTPRestPassword = (accountId: string) =>
+  axios.patch(API_ENDPOINTS.PATCH_ACCOUNT_SEND_OTP_RESET_PASSWORD(accountId));
+
+export const resetPassword = (signin: Signin) =>
+  axios.put(API_ENDPOINTS.PUT_ACCOUNT_RESET_PASSWORD, signin);
+
+export const forgotPassword = (email: string, phone: string) =>
+  axios.put(API_ENDPOINTS.PUT_ACCOUNT_FORGOT(email, phone));
+
+export const payment_paypal = (id: string) =>
+  axios.put(API_ENDPOINTS.PUT_BILL_PAYMENT_PAYPAL(id));
 
 export const updateAccount = (account: AccountDTO) =>
   axios.post(API_ENDPOINTS.POST_ACCOUNT_UPDATE, account);

@@ -16,4 +16,6 @@ public interface BillService {
 
     List<Double> sumBillMonths(boolean is_pay);
     Double sumBillWeek();
+    String billPayByPaypal(String id);
+    boolean captureTransactionPaypal(String paypalOrderId, String payerId);
 }

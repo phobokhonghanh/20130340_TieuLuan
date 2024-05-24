@@ -20,6 +20,7 @@ import { Notifi } from "../Component/Notification";
 import { convertTime } from "../Component/AdminCalendar";
 import { API_ENDPOINTS, createAppointment } from "../apiConfig";
 import { ClinicSelected } from "../Component/Department";
+import { getIdAccount } from "../Authentication/Authentication";
 
 export function formatDate(date: string) {
   return format(new Date(date), "dd/MM/yyyy");
@@ -46,7 +47,7 @@ export function isDateExpired(calendar: Calendar): boolean {
 }
 const AppointmentForm = () => {
   const { state } = useLocation();
-  // const { packageState } = state;
+  const account = getIdAccount();
   const packageState: PackageEntity = state?.packageState;
 
   const [fullName, setFullName] = useState("");
@@ -135,7 +136,7 @@ const AppointmentForm = () => {
       appointmentGender: gender,
       appointmentBhyt: BHYTNumber,
       appointmentSymptom: symptomDescription,
-      accountId: "ea283c62-f825-11ee-87e1-847beb19aaf6",
+      accountId: account,
       packageId: packageState.id,
       calendarId: calendarModel.id,
       supportTimeId: time,

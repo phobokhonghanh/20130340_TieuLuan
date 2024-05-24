@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.MessageUtils;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.config.payment.paypal.PayPalHttpClient;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.BillMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Bill;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AppointmentDTO;
@@ -15,11 +17,17 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalPackage;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.BillRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.MedicalPackageRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.StatisticalResponse;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.OrderIntent;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.PaymentLandingPage;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.PaypalRequest;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.PaypalResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.BillService;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -30,6 +38,9 @@ public class BillImpl implements BillService {
     private BillMapper billMapper;
     @PersistenceContext
     private EntityManager entityManager;
+    private final PayPalHttpClient payPalHttpClient;
+
+    private static final int USD_VND_RATE = 23_000;
 
     @Override
     public Bill createBill(AppointmentDTO appointmentDTO) {
@@ -80,5 +91,67 @@ public class BillImpl implements BillService {
     @Override
     public Double sumBillWeek() {
         return billRepository.sumBillWeek();
+    }
+
+    @Override
+    public String billPayByPaypal(String id) {
+        try {
+            Optional<Bill> optional = billRepository.findById(id);
+            if (!optional.isPresent()) {
+                return null;
+            }
+            Bill bill = optional.get();
+            // (3.2.1) Tính tổng tiền theo USD
+
+            BigDecimal billSum = BigDecimal.valueOf(Double.parseDouble(bill.getBillSum()));
+            BigDecimal totalPayUSD = billSum.divide(BigDecimal.valueOf(USD_VND_RATE), 0, BigDecimal.ROUND_HALF_UP);
+
+            // (3.2.2) Tạo một yêu cầu giao dịch PayPal
+            PaypalRequest paypalRequest = new PaypalRequest();
+
+            paypalRequest.setIntent(OrderIntent.CAPTURE);
+            paypalRequest.setPurchaseUnits(List.of(
+                    new PaypalRequest.PurchaseUnit(
+                            new PaypalRequest.PurchaseUnit.Money("USD", totalPayUSD.toString())
+                    )
+            ));
+
+            paypalRequest.setApplicationContext(new PaypalRequest.PayPalAppContext()
+                    .setBrandName("Benh vien da khoa Thu Duc")
+                    .setLandingPage(PaymentLandingPage.BILLING)
+                    .setReturnUrl(MessageUtils.BACKEND_HOST + "/api/payment/paypal/success")
+                    .setCancelUrl(MessageUtils.BACKEND_HOST + "/api/payment/paypal/cancel"));
+
+            PaypalResponse paypalResponse = payPalHttpClient.createPaypalTransaction(paypalRequest);
+            bill.setPaymentId(paypalResponse.getId());
+            billRepository.save(bill);
+            // (3.2.4) Trả về đường dẫn checkout cho user
+            for (PaypalResponse.Link link : paypalResponse.getLinks()) {
+                if ("approve".equals(link.getRel())) {
+                    return link.getHref();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create PayPal transaction request!" + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public boolean captureTransactionPaypal(String paypalOrderId, String payerId) {
+        Bill bill = billRepository.findByPaymentId(paypalOrderId);
+        if (bill != null) {
+            try {
+                // (1) Capture
+                payPalHttpClient.capturePaypalTransaction(paypalOrderId, payerId);
+                bill.setPaid(true); // (2) Đã thanh toán
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return false;
+            }
+            billRepository.save(bill);
+            return true;
+        }
+        return false;
     }
 }

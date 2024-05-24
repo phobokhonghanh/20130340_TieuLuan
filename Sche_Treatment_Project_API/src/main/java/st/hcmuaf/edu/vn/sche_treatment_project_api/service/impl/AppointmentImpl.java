@@ -49,6 +49,7 @@ public class AppointmentImpl implements AppointmentService {
                 Appointment saveAppointment = appointmentRepository.save(appointment);
                 return saveAppointment != null;
             } catch (DataAccessException ex) {
+                System.out.println(ex.getMessage());
                 return false;
             }
         }

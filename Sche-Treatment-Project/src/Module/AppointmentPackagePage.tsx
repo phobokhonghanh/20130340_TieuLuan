@@ -24,10 +24,11 @@ import { convertTime } from "../Component/AdminCalendar";
 import { API_ENDPOINTS, createAppointment } from "../apiConfig";
 import { PackageSelected } from "../Component/Package";
 import { formatDate } from "./AppointmentPage";
+import { getIdAccount } from "../Authentication/Authentication";
 
 const AppointmentPackageForm = () => {
   const { state } = useLocation();
-  // const { packageId } = state;
+  const account = getIdAccount();
   const packageId = state?.packageEntity;
 
   const [fullName, setFullName] = useState("");
@@ -140,7 +141,7 @@ const AppointmentPackageForm = () => {
       appointmentGender: gender,
       appointmentBhyt: BHYTNumber,
       appointmentSymptom: symptomDescription,
-      accountId: "ea283c62-f825-11ee-87e1-847beb19aaf6",
+      accountId: account,
       packageId: packageEntitySelected.id,
       calendarId: calendarModel.id,
       supportTimeId: time,
