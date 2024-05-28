@@ -53,8 +53,11 @@ public class MedicalServiceController {
 
     @GetMapping("/calendar")
     public ResponseEntity<Page<MedicalServiceDTO>> getListServiceCalendarPageable(
-            @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
-        Page<MedicalServiceDTO> serviceDTOs = medicalServicesService.getListServiceCalendarPageable(pageNo);
+            @RequestParam(name = "page", defaultValue = "1") Integer pageNo,
+            @RequestParam(name = "sort", required = false, defaultValue = "asc") String sortBy,
+            @RequestParam(name = "filter", required = false, defaultValue = "id") String filter,
+            @RequestParam(name = "search", required = false, defaultValue = "") String keyword) {
+        Page<MedicalServiceDTO> serviceDTOs = medicalServicesService.getListServiceCalendarPageable(pageNo,sortBy,filter,keyword);
         return ResponseEntity.ok(serviceDTOs);
     }
 

@@ -41,8 +41,11 @@ public class MedicalPackageController {
 
     @GetMapping("/calendar")
     public ResponseEntity<Page<MedicalPackageDTO>> getListPackageCalendar(
-            @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
-        Page<MedicalPackageDTO> medicalPackageDTOs = medicalPackageService.getListPackageCalendar(pageNo);
+            @RequestParam(name = "page", defaultValue = "1") Integer pageNo,
+            @RequestParam(name = "sort", required = false, defaultValue = "asc") String sortBy,
+            @RequestParam(name = "filter", required = false, defaultValue = "id") String filter,
+            @RequestParam(name = "search", required = false, defaultValue = "") String keyword) {
+        Page<MedicalPackageDTO> medicalPackageDTOs = medicalPackageService.getListPackageCalendar(pageNo,sortBy,filter,keyword);
         return ResponseEntity.ok(medicalPackageDTOs);
     }
 

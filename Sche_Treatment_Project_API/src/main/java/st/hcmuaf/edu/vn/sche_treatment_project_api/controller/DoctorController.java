@@ -37,8 +37,12 @@ public class DoctorController {
     }
     @GetMapping("/calendar")
     public ResponseEntity<Page<DoctorDTO>> getListDoctorCalendarPageable(
-            @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
-        Page<DoctorDTO> doctors = doctorService.getListDoctorCalendarPageable(pageNo);
+            @RequestParam(name = "page", defaultValue = "1") Integer pageNo,
+            @RequestParam(name = "sort", required = false, defaultValue = "asc") String sortBy,
+            @RequestParam(name = "filter", required = false, defaultValue = "id") String filter,
+            @RequestParam(name = "search", required = false, defaultValue = "") String keyword
+            ) {
+        Page<DoctorDTO> doctors = doctorService.getListDoctorCalendarPageable(pageNo,sortBy,filter,keyword);
         return ResponseEntity.ok(doctors);
     }
     @PutMapping("/update")

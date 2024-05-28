@@ -69,6 +69,9 @@ export const API_ENDPOINTS = {
   //http://localhost:8080/api/service/all
   GET_SERVICE_ALL: `${API_BASE_URL}/service/all`,
 
+  //http://localhost:8080/api/admin/bill/all
+  GET_BILL_ALL: `${API_BASE_URL}/admin/bill/all`,
+
   //http://localhost:8080/api/package/default
   GET_PACKAGE_DEFAULT: `${API_BASE_URL}/package/default`,
 
@@ -174,6 +177,10 @@ export const API_ENDPOINTS = {
   PUT_BILL_PAYMENT_PAYPAL: (id: string) =>
     `${API_BASE_URL}/payment/paypal/${id}`,
 
+  //http://localhost:8080/api/doctor/payment/cash/{id}
+  PATCH_BILL_PAYMENT_CASH: (id: string) =>
+    `${API_BASE_URL}/doctor/payment/cash/${id}?is_pay=true`,
+
   //http://localhost:8080/api/account/reset-password
   PUT_ACCOUNT_RESET_PASSWORD: `${API_BASE_URL}/account/reset-password`,
 
@@ -269,6 +276,8 @@ export const forgotPassword = (email: string, phone: string) =>
 
 export const payment_paypal = (id: string) =>
   axios.put(API_ENDPOINTS.PUT_BILL_PAYMENT_PAYPAL(id));
+export const payment_paycash = (id: string) =>
+  axios.patch(API_ENDPOINTS.PATCH_BILL_PAYMENT_CASH(id));
 
 export const updateAccount = (account: AccountDTO) =>
   axios.post(API_ENDPOINTS.POST_ACCOUNT_UPDATE, account);

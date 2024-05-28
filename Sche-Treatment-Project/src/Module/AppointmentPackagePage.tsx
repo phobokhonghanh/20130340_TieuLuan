@@ -25,6 +25,7 @@ import { API_ENDPOINTS, createAppointment } from "../apiConfig";
 import { PackageSelected } from "../Component/Package";
 import { formatDate } from "./AppointmentPage";
 import { getIdAccount } from "../Authentication/Authentication";
+import Preloader from "../Component/Preloader";
 
 const AppointmentPackageForm = () => {
   const { state } = useLocation();
@@ -52,7 +53,7 @@ const AppointmentPackageForm = () => {
 
   const [symptomDescription, setSymptomDescription] = useState<string>("");
 
-  const [error, setError] = useState();
+  const [error, setError] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
@@ -62,36 +63,14 @@ const AppointmentPackageForm = () => {
     "danger"
   );
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setShow(false);
-  //   }, 5000);
-
-  //   return () => clearTimeout(timer);
-  // }, [show]);
-
-  // useEffect(() => {
-  //   const messageFromStorage = localStorage.getItem("message");
-  //   if (messageFromStorage !== null) {
-  //     const message = JSON.parse(messageFromStorage);
-  //     setMessage(message.message);
-  //     setLevelMessage(message.level);
-  //     setShow(message.show);
-  //   }
-  //   localStorage.removeItem("message");
-  // }, []);
-
   useEffect(() => {
     const fetchPackage = async () => {
-      setLoading(true);
       try {
         const response = await fetch(API_ENDPOINTS.GET_PACKAGE_CALENDAR_LIST);
         const data = (await response.json()) as PackageEntity[];
         setPackages(data);
       } catch (e: any) {
         setError(e);
-      } finally {
-        setLoading(false);
       }
     };
     fetchPackage();
@@ -99,7 +78,6 @@ const AppointmentPackageForm = () => {
 
   useEffect(() => {
     const fetchCalendar = async () => {
-      setLoading(true);
       try {
         if (clinic) {
           const response = await fetch(
@@ -109,21 +87,25 @@ const AppointmentPackageForm = () => {
           setListCanlendar(data);
         }
       } catch (e: any) {
-        setError(e);
-      } finally {
-        setLoading(false);
+        console.error(e);
+        setError(true);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     };
     fetchCalendar();
   }, [clinic]);
   const handleFormSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    setLoading(true);
     if (!calendarModel) {
       setMessage(
         "Không có lịch khám, vui lòng chọn lịch khám có hiển thị ca trực của bác sĩ !"
       );
       setLevelMessage("danger");
       setShow(true);
+      setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
       return;
     }
     if (!time) {
@@ -132,6 +114,9 @@ const AppointmentPackageForm = () => {
       );
       setLevelMessage("danger");
       setShow(true);
+      setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
       return;
     }
     const appointment: AppointmentDTO = {
@@ -149,22 +134,32 @@ const AppointmentPackageForm = () => {
     };
 
     if (appointment) {
-      createAppointment(appointment).then((response: any) => {
-        if (response.status === 201) {
-          setMessage("Đặt lịch thành công!");
-          setLevelMessage("success");
-          setShow(true);
-          const timer = setTimeout(() => {
-            setShow(false);
-            window.location.href = "/history";
-          }, 3000);
-          return () => clearTimeout(timer);
-        } else {
+      createAppointment(appointment)
+        .then((response: any) => {
+          if (response.status === 201) {
+            setMessage("Đặt lịch thành công!");
+            setLevelMessage("success");
+            setShow(true);
+            const timer = setTimeout(() => {
+              setShow(false);
+              window.location.href = "/history";
+            }, 3000);
+            return () => clearTimeout(timer);
+          }
+        })
+        .catch((error: any) => {
+          console.error(error);
           setMessage("Đã có người đặt lịch!");
           setLevelMessage("danger");
           setShow(true);
-        }
-      });
+        })
+        .finally(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          const timer = setTimeout(() => {
+            setLoading(false);
+          }, 2000);
+          return () => clearTimeout(timer);
+        });
     }
   };
 
@@ -262,6 +257,7 @@ const AppointmentPackageForm = () => {
   return (
     <>
       <Header />
+      {isLoading && <Preloader />}
       <Container>
         <Row className="justify-content-center m-25">
           <Col md={8} className="width">

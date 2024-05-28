@@ -6,6 +6,10 @@ import jakarta.persistence.Query;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.MessageUtils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.config.payment.paypal.PayPalHttpClient;
@@ -29,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 @AllArgsConstructor
 public class BillImpl implements BillService {
@@ -49,7 +52,7 @@ public class BillImpl implements BillService {
             BillDTO billDTO = new BillDTO();
             billDTO.setPackagePrice(medicalPackage.getPackagePrice());
             billDTO.setBillSum(billDTO.getPackagePrice());
-            billDTO.setBillIspay(false);
+            billDTO.setPaid(false);
             billDTO.setCreatedAt(LocalDateTime.now());
             billDTO.setAppointmentId(appointmentDTO.getId());
             Bill bill = billMapper.convertBillDTE(billDTO);
@@ -62,8 +65,13 @@ public class BillImpl implements BillService {
     }
 
     @Override
-    public Page<BillDTO> getBill(Integer pageNo) {
-        return null;
+    public Page<BillDTO>  getAll(Integer pageNo, String keyword) {
+        Pageable pageable = PageRequest.of(pageNo - 1, 10);
+        Specification<Bill> spec = Specification
+                .where(BillSpecs.idLike(keyword));
+        Page pageBill = billRepository.findAll(spec, pageable);
+        List<BillDTO> billDTOList = billMapper.convertListBillETD(pageBill.getContent());
+        return new PageImpl<>(billDTOList, pageable, pageBill.getTotalElements());
     }
 
     @Override
@@ -153,5 +161,10 @@ public class BillImpl implements BillService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void updateBillByPaid(String id, boolean is_pay) {
+         billRepository.updateIsPaid(id,is_pay);
     }
 }

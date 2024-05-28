@@ -12,9 +12,10 @@ public class BillDTO {
     private String id;
     private String packagePrice;
     private String billSum;
-    private boolean billIspay;
+    private boolean isPaid;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String appointmentId;
+    private String paymentId;
 
    }

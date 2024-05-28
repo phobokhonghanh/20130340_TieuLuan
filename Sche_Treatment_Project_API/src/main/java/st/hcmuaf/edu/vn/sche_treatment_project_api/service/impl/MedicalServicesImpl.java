@@ -20,6 +20,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.MedicalServicesRep
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.MedicalServicesService;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,23 +47,63 @@ public class MedicalServicesImpl implements MedicalServicesService {
     }
 
     @Override
-    public Page<MedicalServiceDTO> getListServiceCalendarPageable(Integer pageNo) {
+    public Page<MedicalServiceDTO> getListServiceCalendarPageable(Integer pageNo, String sortBy, String filter, String search) {
+        // Validate the filter to ensure it's a valid column
+        Set<String> validFilters = Set.of("id", "service_name", "service_price"); // replace with actual column names
+
+        // Determine the sort direction
+        String sortDirection = sortBy.equalsIgnoreCase("asc") ? "ASC" : "DESC";
+
+        String orderByClause = "";
+        if (validFilters.contains(filter)) {
+            orderByClause  = " ORDER BY " + filter + " " + sortDirection;
+        }
+
         Pageable pageable = PageRequest.of(pageNo - 1, 5);
 
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         int offset = pageSize * pageNumber;
 
-        Query query = entityManager.createNativeQuery("SELECT * FROM medical_service WHERE clinic_id IN (SELECT clinic_id FROM calendar WHERE calendar_date >= CURDATE()) LIMIT :limit OFFSET :offset", MedicalService.class);
+        // Create search condition
+        String searchCondition = "";
+        if (search != null && !search.trim().isEmpty()) {
+            searchCondition = " AND (service_name LIKE :search)";
+        }
+
+        // Create the native query string with the ORDER BY clause and search condition
+        String queryString = "SELECT * FROM medical_service " +
+                "WHERE clinic_id IN (SELECT clinic_id FROM calendar) " +
+                "AND support_status_id = 'S1'" +
+                searchCondition +
+                orderByClause + " LIMIT :limit OFFSET :offset";
+
+        // Create and set up the query
+        Query query = entityManager.createNativeQuery(queryString, MedicalService.class);
         query.setParameter("limit", pageSize);
         query.setParameter("offset", offset);
+        if (!searchCondition.isEmpty()) {
+            query.setParameter("search", "%" + search + "%");
+        }
 
+        // Execute the query and get the results
         List<MedicalService> services = query.getResultList();
 
+        // Convert the list of MedicalService entities to MedicalServiceDTO
         List<MedicalServiceDTO> serviceDTOs = medicalServiceMapper.convertListMedicalServiceETD(services);
-        Query countQuery = entityManager.createNativeQuery("SELECT COUNT(*) FROM medical_service WHERE clinic_id IN (SELECT clinic_id FROM calendar WHERE calendar_date >= CURDATE())");
-        Long total = (Long) countQuery.getSingleResult();
 
+        // Create a query to count the total number of matching records with the search condition
+        String countQueryString = "SELECT COUNT(*) FROM medical_service " +
+                "WHERE clinic_id IN (SELECT clinic_id FROM calendar) " +
+                "AND support_status_id = 'S1'" +
+                searchCondition;
+        Query countQuery = entityManager.createNativeQuery(countQueryString);
+        if (!searchCondition.isEmpty()) {
+            countQuery.setParameter("search", "%" + search + "%");
+        }
+        Long total = ((Number) countQuery.getSingleResult()).longValue();
+
+        // Return a page of MedicalServiceDTO objects
         return new PageImpl<>(serviceDTOs, pageable, total);
     }
 

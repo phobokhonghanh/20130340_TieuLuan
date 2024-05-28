@@ -5,11 +5,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from "../apiConfig";
 import { PackageEntity } from "../Models/Model";
 import {
+  checkRoleAdmin,
   getIdAccount,
   getNameAccount,
   removeToken,
 } from "../Authentication/Authentication";
-import Preloader from "./Preloader";
 
 function HeaderNav() {
   const [sliderMobile, setSliderMobile] = useState(false);
@@ -17,25 +17,20 @@ function HeaderNav() {
     setSliderMobile(!sliderMobile);
   };
   const [packageEntity, setPackage] = useState<PackageEntity>();
-  const [error, setError] = useState();
-  const [isLoading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    removeToken();
+    removeToken("benhviendakhoathuduc");
     navigate("/");
   };
   useEffect(() => {
     const fetchPackage = async () => {
-      setLoading(true);
       try {
         const response = await fetch(API_ENDPOINTS.GET_PACKAGE_DEFAULT);
         const data = await response.json();
         setPackage(data);
       } catch (e: any) {
-        setError(e);
-      } finally {
-        setLoading(false);
+        console.error(e);
       }
     };
     fetchPackage();
@@ -166,12 +161,24 @@ function HeaderNav() {
                     className="center"
                     style={{ width: "3%", cursor: "pointer" }}
                   >
-                    <span onClick={handleLogout}>
-                      <i
-                        className="fa fa-sign-out icon-cus"
-                        aria-hidden="true"
-                      ></i>
-                    </span>
+                    {checkRoleAdmin() ? (
+                      <Link to={"/admin/home"}>
+                        <i
+                          className="fa fa-reply-all icon-cus"
+                          aria-hidden="true"
+                        >
+                          {" "}
+                          ADMIN
+                        </i>
+                      </Link>
+                    ) : (
+                      <span onClick={handleLogout}>
+                        <i
+                          className="fa fa-sign-out icon-cus"
+                          aria-hidden="true"
+                        ></i>
+                      </span>
+                    )}
                   </Col>
                 )}
               </Row>

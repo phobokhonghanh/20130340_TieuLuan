@@ -1,8 +1,14 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.repository;
 
 import jakarta.persistence.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Bill;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.StatisticalResponse;
 
@@ -30,4 +36,12 @@ public interface BillRepository extends JpaRepository<Bill, String> {
     Double sumBillWeek();
 
     Bill findByPaymentId(String idPayment);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE Bill SET bill_ispay = :isPaid WHERE id = :id", nativeQuery = true)
+    void updateIsPaid(@Param("id") String id, @Param("isPaid") boolean isPaid);
+
+    Page<Bill> findAll(Specification<Bill> spec, Pageable pageable);
+
 }

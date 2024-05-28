@@ -190,7 +190,6 @@ export const PackageInfo: React.FC<PackageProps> = ({ packageEntity }) => (
     </div>
   </div>
 );
-
 interface PackageSelectedProps {
   data: PackageEntity[];
   packageSelected: PackageEntity;

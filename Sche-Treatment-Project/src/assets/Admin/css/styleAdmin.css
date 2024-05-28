@@ -274,10 +274,6 @@ a{
     margin-right: auto;
     margin-left: auto
 }
-.navbar-inverse {
-    float: none;
-    /* loại bỏ float */
-}
 
 .navbar-default.sidebar {
     width: 250px;

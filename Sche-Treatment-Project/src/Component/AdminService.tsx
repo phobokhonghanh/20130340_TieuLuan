@@ -7,7 +7,9 @@ import { ModalService } from "./Service";
 import { ErrorNotifi } from "./Notification";
 import { API_ENDPOINTS } from "../apiConfig";
 import { ServiceEntity } from "../Models/Model";
+import Preloader from "./Preloader";
 
+// quản lý dịch vụ
 export const ServiceManager = () => {
   const [isLoading, setLoading] = useState(false);
   const [filterText, setFilterText] = useState(""); // input search
@@ -45,86 +47,89 @@ export const ServiceManager = () => {
     fetchListPackage();
   }, [response, currentPage, filterText]);
   return (
-    <div id="page-wrapper">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="page-bar page-header">
-              <ul className="page-breadcrumb">
-                <li>
-                  <i className="fa fa-home"></i>
-                  <a href="/admin">Home</a>
-                  <i className="fa fa-angle-right"></i>
-                </li>
-                <li>
-                  <a href="/admin/services">Quản lý dịch vụ khám bệnh</a>
-                </li>
-              </ul>
+    <>
+      {isLoading && <Preloader />}
+      <ErrorNotifi error={error} />
+      <div id="page-wrapper">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="page-bar page-header">
+                <ul className="page-breadcrumb">
+                  <li>
+                    <i className="fa fa-home"></i>
+                    <a href="/admin">Home</a>
+                    <i className="fa fa-angle-right"></i>
+                  </li>
+                  <li>
+                    <a href="/admin/services">Quản lý dịch vụ khám bệnh</a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-        <ErrorNotifi error={error} />
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="panel panel-default">
-              <div className="panel-heading d-flex">
-                <div>
-                  <i className="fa  fa-user fa-fw"></i>
-                  Dịch vụ khám bệnh
-                </div>
-                <a className="add" onClick={() => setShowModalService(true)}>
-                  <div id="add">
-                    <i className="fa fa-plus"></i>
-                    <span>Thêm mới</span>
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="panel panel-default">
+                <div className="panel-heading d-flex">
+                  <div>
+                    <i className="fa  fa-user fa-fw"></i>
+                    Dịch vụ khám bệnh
                   </div>
-                </a>
-              </div>
-              <Col xs={3}>
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm tên dịch vụ..."
-                  value={filterText}
-                  onChange={handleFilterChange}
-                  className="custom-select-input"
-                  style={{ margin: "15px" }}
-                />
-              </Col>
-              <ModalService
-                title="Thêm dịch vụ"
-                add={true}
-                service={undefined}
-                show={showModalService}
-                onHide={() => setShowModalService(false)}
-                responseStatus={(status: number) => setResponse(status)}
-              />
-              <div className="panel-body">
-                <div className="table-responsive">
-                  {" "}
-                  <DataTableService
-                    responseStatus={(status) => setResponse(status)}
-                    data={dataService}
-                  />
+                  <a className="add" onClick={() => setShowModalService(true)}>
+                    <div id="add">
+                      <i className="fa fa-plus"></i>
+                      <span>Thêm mới</span>
+                    </div>
+                  </a>
                 </div>
-                <div style={{ marginBottom: "30px" }}>
-                  <Pagination
-                    totalPage={totalPages}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                  />{" "}
+                <Col xs={3}>
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm tên dịch vụ..."
+                    value={filterText}
+                    onChange={handleFilterChange}
+                    className="custom-select-input"
+                    style={{ margin: "15px" }}
+                  />
+                </Col>
+                <ModalService
+                  title="Thêm dịch vụ"
+                  add={true}
+                  service={undefined}
+                  show={showModalService}
+                  onHide={() => setShowModalService(false)}
+                  responseStatus={(status: number) => setResponse(status)}
+                />
+                <div className="panel-body">
+                  <div className="table-responsive">
+                    {" "}
+                    <DataTableService
+                      responseStatus={(status) => setResponse(status)}
+                      data={dataService}
+                    />
+                  </div>
+                  <div style={{ marginBottom: "30px" }}>
+                    <Pagination
+                      totalPage={totalPages}
+                      currentPage={currentPage}
+                      setCurrentPage={setCurrentPage}
+                    />{" "}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 interface DataTableServiceProps {
   responseStatus: (status: number) => void;
   data: ServiceEntity[];
 }
-
+// danh sách dịch vụ
 export const DataTableService: React.FC<DataTableServiceProps> = ({
   responseStatus,
   data,

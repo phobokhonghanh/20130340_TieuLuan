@@ -16,11 +16,12 @@ import {
   Support,
 } from "../Models/Model";
 import Header from "../Component/Header";
-import { Notifi } from "../Component/Notification";
+import { ErrorNotifi, Notifi } from "../Component/Notification";
 import { convertTime } from "../Component/AdminCalendar";
 import { API_ENDPOINTS, createAppointment } from "../apiConfig";
 import { ClinicSelected } from "../Component/Department";
 import { getIdAccount } from "../Authentication/Authentication";
+import Preloader from "../Component/Preloader";
 
 export function formatDate(date: string) {
   return format(new Date(date), "dd/MM/yyyy");
@@ -66,7 +67,7 @@ const AppointmentForm = () => {
 
   const [symptomDescription, setSymptomDescription] = useState<string>("");
 
-  const [error, setError] = useState();
+  const [error, setError] = useState(false);
   const [isLoading, setLoading] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
@@ -77,35 +78,15 @@ const AppointmentForm = () => {
   );
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShow(false);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [show]);
-
-  useEffect(() => {
-    const messageFromStorage = localStorage.getItem("message");
-    if (messageFromStorage !== null) {
-      const message = JSON.parse(messageFromStorage);
-      setMessage(message.message);
-      setLevelMessage(message.level);
-      setShow(message.show);
-    }
-    localStorage.removeItem("message");
-  }, []);
-
-  useEffect(() => {
     const fetchArea = async () => {
-      setLoading(true);
       try {
         const response = await fetch(API_ENDPOINTS.GET_AREA_ALL);
         const data = (await response.json()) as Area[];
         setArea(data);
       } catch (e: any) {
-        setError(e);
+        console.error(e.message);
+        setError(true);
       } finally {
-        setLoading(false);
       }
     };
     fetchArea();
@@ -113,12 +94,15 @@ const AppointmentForm = () => {
 
   const handleFormSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    setLoading(true);
     if (!calendarModel) {
       setMessage(
         "Không có lịch khám, vui lòng chọn lịch khám có hiển thị ca trực của bác sĩ !"
       );
       setLevelMessage("danger");
       setShow(true);
+      setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     if (!time) {
@@ -127,6 +111,8 @@ const AppointmentForm = () => {
       );
       setLevelMessage("danger");
       setShow(true);
+      setLoading(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     const appointment: AppointmentDTO = {
@@ -150,15 +136,7 @@ const AppointmentForm = () => {
             setMessage("Đặt lịch thành công!");
             setLevelMessage("success");
             setShow(true);
-            const timer = setTimeout(() => {
-              setShow(false);
-              window.location.href = "/history";
-            }, 3000);
-            return () => clearTimeout(timer);
-          } else {
-            setMessage("Đã có người đặt lịch!");
-            setLevelMessage("danger");
-            setShow(true);
+            window.location.href = "/history";
           }
         })
         .catch((error: any) => {
@@ -167,6 +145,13 @@ const AppointmentForm = () => {
           setMessage("Đã có người đặt lịch!");
           setLevelMessage("danger");
           setShow(true);
+        })
+        .finally(() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          const timer = setTimeout(() => {
+            setLoading(false);
+          }, 1000);
+          return () => clearTimeout(timer);
         });
     }
   };
@@ -249,6 +234,7 @@ const AppointmentForm = () => {
   return (
     <>
       <Header />
+      {isLoading && <Preloader />}
       <Container>
         <Row className="justify-content-center m-25">
           <Col md={8} className="width">
@@ -411,13 +397,6 @@ const AppointmentForm = () => {
                   )}
                 </Form.Group>
               )}
-              {/* <Department
-                dataListClinic={areaSelected ? areaSelected.clinics : []}
-                onClinicSelected={(selectedClinic) => setClinic(selectedClinic)}
-                onDoctorSelected={(selectedCalendar) =>
-                  setCalendar(selectedCalendar)
-                }
-              /> */}
               <Row>
                 <Form.Group controlId="exampleForm.ControlTextarea1">
                   <Form.Label>
@@ -504,7 +483,7 @@ export const TimeTable: React.FC<Props> = ({
 }) => {
   const [time, setSelectedTime] = useState<Support[]>([]);
   const [selectedValues, setSelectedValues] = useState<string>("");
-  const [error, setError] = useState();
+  const [error, setError] = useState(false);
   const handleChange: React.ChangeEventHandler<HTMLSelectElement> = async (
     e
   ) => {
@@ -525,7 +504,9 @@ export const TimeTable: React.FC<Props> = ({
         const data = await response.json();
         setSelectedTime(data);
       } catch (e: any) {
-        setError(e);
+        console.error(e);
+        setError(true);
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     };
     if (calendar) {
@@ -535,6 +516,7 @@ export const TimeTable: React.FC<Props> = ({
 
   return (
     <>
+      <ErrorNotifi error={error} />
       <Modal
         show={show}
         onHide={onHide}

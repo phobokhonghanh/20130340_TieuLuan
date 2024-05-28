@@ -66,7 +66,7 @@ function Login() {
       .then((response: any) => {
         if (response.status === 200) {
           const responseData: LoginResponse = response.data;
-          localStorage.setItem("response", JSON.stringify(responseData));
+          localStorage.setItem("benhviendakhoathuduc", JSON.stringify(responseData));
           const timer = setTimeout(() => {
             setIsLoading(false);
             if (responseData.roles && responseData.roles[0] === "ROLE_ADMIN") {

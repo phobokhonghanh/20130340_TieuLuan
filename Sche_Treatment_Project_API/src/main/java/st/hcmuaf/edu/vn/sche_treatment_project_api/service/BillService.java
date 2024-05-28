@@ -10,12 +10,18 @@ import java.util.List;
 
 public interface BillService {
     Bill createBill(AppointmentDTO appointmentDTO);
-    Page<BillDTO> getBill(Integer pageNo);
+
+    Page<BillDTO> getAll(Integer pageNo, String keyword);
 
     Bill getBillByAppointmentId(String appointmentId);
 
     List<Double> sumBillMonths(boolean is_pay);
+
     Double sumBillWeek();
+
     String billPayByPaypal(String id);
+
     boolean captureTransactionPaypal(String paypalOrderId, String payerId);
+
+    void updateBillByPaid(String id, boolean is_pay);
 }

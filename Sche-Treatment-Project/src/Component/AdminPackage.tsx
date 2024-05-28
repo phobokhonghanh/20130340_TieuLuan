@@ -25,7 +25,9 @@ import {
   getServicesRemoved,
   getServicesSelected,
 } from "../Utils";
+import Preloader from "./Preloader";
 
+//Quản lý gói khám
 export const PackageManager = () => {
   const [isLoading, setLoading] = useState(false);
   const [filterText, setFilterText] = useState(""); // input search
@@ -40,7 +42,6 @@ export const PackageManager = () => {
     const value = e.target.value;
     setFilterText(value);
   };
-
   useEffect(() => {
     const fetchListPackage = async () => {
       setLoading(true);
@@ -62,78 +63,84 @@ export const PackageManager = () => {
     fetchListPackage();
   }, [response, currentPage, filterText]);
   return (
-    <div id="page-wrapper">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="page-bar page-header">
-              <ul className="page-breadcrumb">
-                <li>
-                  <i className="fa fa-home"></i>
-                  <a href="/admin">Home</a>
-                  <i className="fa fa-angle-right"></i>
-                </li>
-                <li>
-                  <a href="/admin/packages">Quản lý gói khám bệnh</a>
-                </li>
-              </ul>
+    <>
+      {isLoading && <Preloader />}
+      <ErrorNotifi error={error} />
+      <div id="page-wrapper">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="page-bar page-header">
+                <ul className="page-breadcrumb">
+                  <li>
+                    <i className="fa fa-home"></i>
+                    <a href="/admin">Home</a>
+                    <i className="fa fa-angle-right"></i>
+                  </li>
+                  <li>
+                    <a href="/admin/packages">Quản lý gói khám bệnh</a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-        <ErrorNotifi error={error} />
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="panel panel-default">
-              <div className="panel-heading d-flex">
-                <div>
-                  <i className="fa  fa-user fa-fw"></i>
-                  Gói khám bệnh
-                </div>
-                <a className="add" onClick={() => setShowModalAddPackage(true)}>
-                  <div id="add">
-                    <i className="fa fa-plus"></i>
-                    <span>Thêm mới</span>
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="panel panel-default">
+                <div className="panel-heading d-flex">
+                  <div>
+                    <i className="fa  fa-user fa-fw"></i>
+                    Gói khám bệnh
                   </div>
-                </a>
-              </div>
-              <Col xs={3}>
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm tên gói khám..."
-                  value={filterText}
-                  onChange={handleFilterChange}
-                  className="custom-select-input"
-                  style={{ margin: "15px" }}
-                />
-              </Col>
-              <ModalPackage
-                title="Thêm gói dịch vụ"
-                add={true}
-                packageEntity={undefined}
-                show={showModalAddPackage}
-                onHide={() => setShowModalAddPackage(false)}
-                responseStatus={(status) => setResponse(status)}
-              />
-              <div className="panel-body">
-                <div className="table-responsive">
-                  <DataTablePackage
-                    responseStatus={(status) => setResponse(status)}
-                    data={packages}
-                  />
+                  <a
+                    className="add"
+                    onClick={() => setShowModalAddPackage(true)}
+                  >
+                    <div id="add">
+                      <i className="fa fa-plus"></i>
+                      <span>Thêm mới</span>
+                    </div>
+                  </a>
                 </div>
-                <div style={{ marginBottom: "30px" }}>
-                  <Pagination
-                    totalPage={totalPages}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                  />{" "}
+                <Col xs={3}>
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm tên gói khám..."
+                    value={filterText}
+                    onChange={handleFilterChange}
+                    className="custom-select-input"
+                    style={{ margin: "15px" }}
+                  />
+                </Col>
+                <ModalPackage
+                  title="Thêm gói dịch vụ"
+                  add={true}
+                  packageEntity={undefined}
+                  show={showModalAddPackage}
+                  onHide={() => setShowModalAddPackage(false)}
+                  responseStatus={(status) => setResponse(status)}
+                />
+                <div className="panel-body">
+                  <div className="table-responsive">
+                    <DataTablePackage
+                      responseStatus={(status) => setResponse(status)}
+                      data={packages}
+                    />
+                  </div>
+                  <div style={{ marginBottom: "30px" }}>
+                    <Pagination
+                      totalPage={totalPages}
+                      currentPage={currentPage}
+                      setCurrentPage={setCurrentPage}
+                    />{" "}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 interface ModalPackageProps {
@@ -144,6 +151,7 @@ interface ModalPackageProps {
   onHide: () => void;
   responseStatus: (status: number) => void;
 }
+// Create-Update gói khám
 export const ModalPackage: React.FC<ModalPackageProps> = ({
   title,
   add,
@@ -152,7 +160,7 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
   onHide,
   responseStatus,
 }) => {
-  const [error, setError] = useState();
+  const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [showMess, setShowMess] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -181,41 +189,31 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
   const [dataClinic, setDataClinic] = useState<Clinic[]>([]);
 
   const fetchClinic = async () => {
-    setLoading(true);
     try {
       const response = await fetch(`${API_ENDPOINTS.GET_CLINIC_ALL}`);
       const data = (await response.json()) as Clinic[];
       setDataClinic(data);
     } catch (e: any) {
       setError(e);
-    } finally {
-      setLoading(false);
     }
   };
   useEffect(() => {
     fetchClinic();
   }, []);
-
   useEffect(() => {
     setServicesSelected(getListServices(listPackageService));
   }, [listPackageService]);
-
   const fetchServices = async () => {
-    setLoading(true);
     try {
       const response = await getServicesNotSelected(servicesSelected);
       setDataServices(response);
     } catch (error: any) {
       setError(error);
-    } finally {
-      setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchServices();
   }, [servicesSelected]);
-
   const handlePackageNameChange = (e: {
     target: { name: any; value: any };
   }) => {
@@ -251,6 +249,7 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
   };
   const handleFormSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    setLoading(true);
     const listPackageServices = packageEntity
       ? packageEntity.packageServices
       : []; // ds dich vu da chon (api)
@@ -293,19 +292,22 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
             setShowMess(true);
             onHide();
             responseStatus(response.status);
-          } else {
+          }
+        })
+        .catch((error: any) => {
+          if (error.response.status === 400) {
             setMessage("Gói khám đã tồn tại");
             setLevelMessage("danger");
             setShowMess(true);
           }
-        })
-        .catch((error: any) => {
           console.error("Error:", error);
-          setMessage("Không thành công");
-          setLevelMessage("danger");
-          setShowMess(true);
+          setError(true);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
+    setLoading(true);
   };
   return (
     <>
@@ -316,6 +318,7 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
           onClose={() => setShowMess(false)}
         />
       )}
+      <ErrorNotifi error={error} />
       <Modal
         show={show}
         onHide={onHide}
@@ -476,6 +479,7 @@ interface DataTablePackageProps {
   responseStatus: (status: number) => void;
   data: PackageEntity[];
 }
+// danh sách gói khám
 export const DataTablePackage: React.FC<DataTablePackageProps> = ({
   responseStatus,
   data,

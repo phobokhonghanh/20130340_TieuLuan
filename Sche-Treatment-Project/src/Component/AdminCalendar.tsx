@@ -12,11 +12,12 @@ import {
   ClinicDTO,
   DoctorEntity,
 } from "../Models/Model";
-import { Notifi } from "./Notification.tsx";
+import { ErrorNotifi, Notifi } from "./Notification.tsx";
 import { ChooseDoctor } from "./SelectWithSearch.tsx";
 import { API_ENDPOINTS, createCalendar, createClinic } from "../apiConfig.ts";
+import Preloader from "./Preloader.tsx";
 
-// page main
+// Quản lý lịch phòng
 export const CalendarManager = () => {
   const [response, setResponse] = useState<number>(0); // get/set value response create Clinic
   const [areaSelected, setAreaSelected] = useState<Area>(); // get/set value area selected
@@ -84,7 +85,7 @@ interface DataTableRoomProps {
   refesh: number; // response add or update clinic
 }
 const itemsPerPage = 10; // 10 items one per page
-// page main 2
+// danh sách phòng
 export const DataTableRoom: React.FC<DataTableRoomProps> = ({
   refesh,
   areaChoose,
@@ -131,13 +132,10 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
       setFetchDataOne(false);
     }
   }, [refesh, responseStatus]);
-
   useEffect(() => {
     setFilteredRows(areaSelected ? areaSelected.clinics : []);
   }, [areaSelected]);
-
   const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-
   const handleAreaChange: React.ChangeEventHandler<HTMLSelectElement> = async (
     e
   ) => {
@@ -166,129 +164,131 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
   const startIndex = currentPage * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
   const currentRows = filteredRows.slice(startIndex, endIndex);
-
   return (
-    <div>
-      <Row style={{ padding: "10px", width: "100%" }}>
-        <Col xs={4}>
-          <input
-            type="text"
-            placeholder="Tìm kiếm ..."
-            value={filterText}
-            onChange={handleFilterChange}
-            className="custom-select-input"
-          />
-        </Col>
-        <Col xs={4}>
-          <Form.Group controlId="formClinic">
-            <select
+    <>
+      {isLoading && <Preloader />}
+      <div>
+        <Row style={{ padding: "10px", width: "100%" }}>
+          <Col xs={4}>
+            <input
+              type="text"
+              placeholder="Tìm kiếm ..."
+              value={filterText}
+              onChange={handleFilterChange}
               className="custom-select-input"
-              value={areaSelected ? areaSelected.id : ""}
-              onChange={handleAreaChange}
-              required
-            >
-              {isLoading && <option>Loading...</option>}
-              {error && <option>Không có data</option>}
-              <option value="">-- Chọn khu khám --</option>
-              {areas.map((area) => (
-                <option key={area.id} value={area.id}>
-                  {area.areaName}
-                </option>
-              ))}
-            </select>
-          </Form.Group>
-        </Col>
-      </Row>
-      <Table striped bordered hover>
-        <thead>
-          <tr className="text-small">
-            <th># </th>
-            <th>ID</th>
-            <th style={{ cursor: "pointer" }}>Tên phòng</th>
-            <th style={{ cursor: "pointer" }}>Trạng thái</th>
-            <th style={{ textAlign: "center" }}>Lịch</th>
-            <th className="remove" style={{ textAlign: "center" }}>
-              Sửa
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentRows.map((row, rowIndex) => (
-            <tr key={row.id}>
-              <td>{++rowIndex}</td>
-              <td style={{ width: "350px" }}>{row.id}</td>
-              <td>{row.clinicName}</td>
-              <td>{row.supportStatus.supportValue}</td>
-              <td style={{ textAlign: "center" }}>
-                <a
-                  className="btn purple"
-                  onClick={() =>
-                    setModalShow({ ...modalShow, [rowIndex]: true })
-                  }
-                >
-                  <i className="fa fa-calendar"></i>
-                </a>
-                {modalShow && (
-                  <ModalCalendar
-                    id_clinic={row.id}
-                    data={row.calendars}
-                    show={modalShow[rowIndex] || false}
-                    onHide={() =>
-                      setModalShow({ ...modalShow, [rowIndex]: false })
+            />
+          </Col>
+          <Col xs={4}>
+            <Form.Group controlId="formClinic">
+              <select
+                className="custom-select-input"
+                value={areaSelected ? areaSelected.id : ""}
+                onChange={handleAreaChange}
+                required
+              >
+                {isLoading && <option>Loading...</option>}
+                {error && <option>Không có data</option>}
+                <option value="">-- Chọn khu khám --</option>
+                {areas.map((area) => (
+                  <option key={area.id} value={area.id}>
+                    {area.areaName}
+                  </option>
+                ))}
+              </select>
+            </Form.Group>
+          </Col>
+        </Row>
+        <Table striped bordered hover>
+          <thead>
+            <tr className="text-small">
+              <th># </th>
+              <th>ID</th>
+              <th style={{ cursor: "pointer" }}>Tên phòng</th>
+              <th style={{ cursor: "pointer" }}>Trạng thái</th>
+              <th style={{ textAlign: "center" }}>Lịch</th>
+              <th className="remove" style={{ textAlign: "center" }}>
+                Sửa
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentRows.map((row, rowIndex) => (
+              <tr key={row.id}>
+                <td>{++rowIndex}</td>
+                <td style={{ width: "350px" }}>{row.id}</td>
+                <td>{row.clinicName}</td>
+                <td>{row.supportStatus.supportValue}</td>
+                <td style={{ textAlign: "center" }}>
+                  <a
+                    className="btn purple"
+                    onClick={() =>
+                      setModalShow({ ...modalShow, [rowIndex]: true })
                     }
-                    responseStatus={(status) => setResponse(status)}
-                  />
-                )}
-              </td>
-              <td style={{ textAlign: "center" }} key={row.id}>
-                <a
-                  className="btn default btn-xs purple btn-edit"
-                  onClick={() =>
-                    setShowModalAddClinic({
-                      ...showModalAddClinic,
-                      [rowIndex]: true,
-                    })
-                  }
-                >
-                  <i className="fa fa-edit"></i>
-                </a>
-                {showModalAddClinic && (
-                  <ModalClinic
-                    title={"Sửa phòng khám"}
-                    clinic={row}
-                    add={false}
-                    area={areaSelected}
-                    show={showModalAddClinic[rowIndex] || false}
-                    responseStatus={(status) => setResponse(status)}
-                    onHide={() =>
+                  >
+                    <i className="fa fa-calendar"></i>
+                  </a>
+                  {modalShow && (
+                    <ModalCalendar
+                      id_clinic={row.id}
+                      data={row.calendars}
+                      show={modalShow[rowIndex] || false}
+                      onHide={() =>
+                        setModalShow({ ...modalShow, [rowIndex]: false })
+                      }
+                      responseStatus={(status) => setResponse(status)}
+                    />
+                  )}
+                </td>
+                <td style={{ textAlign: "center" }} key={row.id}>
+                  <a
+                    className="btn default btn-xs purple btn-edit"
+                    onClick={() =>
                       setShowModalAddClinic({
                         ...showModalAddClinic,
-                        [rowIndex]: false,
+                        [rowIndex]: true,
                       })
                     }
-                  />
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-      <div>
-        <button
-          onClick={() => handleChangePage(currentPage - 1)}
-          disabled={currentPage === 0}
-        >
-          Previous
-        </button>
-        <span>{`Page ${currentPage + 1} of ${totalPages}`} </span>
-        <button
-          onClick={() => handleChangePage(currentPage + 1)}
-          disabled={currentPage === totalPages - 1}
-        >
-          Next
-        </button>
+                  >
+                    <i className="fa fa-edit"></i>
+                  </a>
+                  {showModalAddClinic && (
+                    <ModalClinic
+                      title={"Sửa phòng khám"}
+                      clinic={row}
+                      add={false}
+                      area={areaSelected}
+                      show={showModalAddClinic[rowIndex] || false}
+                      responseStatus={(status) => setResponse(status)}
+                      onHide={() =>
+                        setShowModalAddClinic({
+                          ...showModalAddClinic,
+                          [rowIndex]: false,
+                        })
+                      }
+                    />
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+        <div>
+          <button
+            onClick={() => handleChangePage(currentPage - 1)}
+            disabled={currentPage === 0}
+          >
+            Previous
+          </button>
+          <span>{`Page ${currentPage + 1} of ${totalPages}`} </span>
+          <button
+            onClick={() => handleChangePage(currentPage + 1)}
+            disabled={currentPage === totalPages - 1}
+          >
+            Next
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 export function convertTime(
@@ -330,6 +330,7 @@ interface CalendarProps {
   onHide: () => void;
   responseStatus: (status: number) => void;
 }
+// modal thêm lịch 
 export const ModalCalendar: React.FC<CalendarProps> = ({
   id_clinic,
   data,
@@ -419,6 +420,7 @@ interface Props {
   onHide: () => void;
   responseStatusDoctor: (status: number) => void;
 }
+// modal danh sách bác sĩ
 export const ModalDoctorCalendar: React.FC<Props> = ({
   id_clinc,
   title,
@@ -435,14 +437,11 @@ export const ModalDoctorCalendar: React.FC<Props> = ({
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
     "danger"
   );
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowMess(false);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [showMess]);
+  const [listDoctor, setListDoctor] = useState<DoctorEntity[]>([]);
+  const [error, setError] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const handleDoneClick = (ca: string) => {
+    setLoading(true);
     if (selectedDoctor) {
       const formattedDate = format(new Date(title), "yyyy-MM-dd");
       const calendarForm: CalendarDTO = {
@@ -468,16 +467,15 @@ export const ModalDoctorCalendar: React.FC<Props> = ({
           setMessage("Thêm ca trực không thành công!");
           setLevelMessage("danger");
           setShowMess(true);
-        });
+        })
+        .finally(() => setLoading(false));
     } else {
       setMessage("Vui lòng chọn bác sĩ !");
       setLevelMessage("danger");
       setShowMess(true);
     }
+    setLoading(false);
   };
-  const [listDoctor, setListDoctor] = useState<DoctorEntity[]>([]);
-  const [error, setError] = useState();
-  const [isLoading, setLoading] = useState(false);
   useEffect(() => {
     const fetchClinic = async () => {
       setLoading(true);
@@ -486,7 +484,8 @@ export const ModalDoctorCalendar: React.FC<Props> = ({
         const data = (await response.json()) as DoctorEntity[];
         setListDoctor(data);
       } catch (e: any) {
-        setError(e);
+        console.error("Error:", e);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -495,6 +494,7 @@ export const ModalDoctorCalendar: React.FC<Props> = ({
   }, []);
   return (
     <>
+      {isLoading && <Preloader />}
       {showMess && (
         <Notifi
           message={message}
@@ -502,6 +502,7 @@ export const ModalDoctorCalendar: React.FC<Props> = ({
           onClose={() => setShowMess(false)}
         />
       )}
+      <ErrorNotifi error={error} />
       <Modal
         show={show}
         onHide={onHide}
@@ -515,8 +516,6 @@ export const ModalDoctorCalendar: React.FC<Props> = ({
         <Modal.Body className="grid-example" style={{ width: "500px" }}>
           <Form>
             <Row style={{ textAlign: "left" }}>
-              {isLoading && <div>Loading...</div>}
-              {error && <div>Không có data doctor</div>}
               <Col className="col-xs-6">
                 <b>Ca sáng</b>
                 <ChooseDoctor
@@ -555,6 +554,7 @@ interface ModalClinicProps {
   onHide: () => void;
   responseStatus: (status: number) => void;
 }
+// modal Create-Update phòng khám
 export const ModalClinic: React.FC<ModalClinicProps> = ({
   title,
   add,
@@ -574,13 +574,8 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
   const [supportStatus, setSupportStatus] = useState(
     clinic ? clinic.supportStatus.id : "S1"
   );
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowMess(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [showMess]);
-
+  const [error, setError] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   // Hàm xử lý khi người dùng thay đổi thông tin
   const handleClinicChange = (e: { target: { name: any; value: any } }) => {
     const selected = e.target.value;
@@ -593,6 +588,7 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
   };
   const handleFormSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    setLoading(true);
     const formData: ClinicDTO = {
       id: clinicId,
       clinicName: clinicName,
@@ -612,17 +608,18 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
             setName("");
             onHide();
             responseStatus(response.status);
-          } else {
-            setMessage("Phòng khám đã tồn tại");
-            setLevelMessage("danger");
-            setShowMess(true);
           }
         })
         .catch((error: any) => {
-          console.error("Error:", error);
-          setMessage("Không thành công");
-          setLevelMessage("danger");
-          setShowMess(true);
+          if (error.status === 400) {
+            setMessage(error.response.data);
+            setLevelMessage("danger");
+            setShowMess(true);
+          }
+          setError(true);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   };
@@ -635,6 +632,8 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
           onClose={() => setShowMess(false)}
         />
       )}
+      <ErrorNotifi error={error} />
+      {isLoading && <Preloader />}
       <Modal
         show={show}
         onHide={onHide}

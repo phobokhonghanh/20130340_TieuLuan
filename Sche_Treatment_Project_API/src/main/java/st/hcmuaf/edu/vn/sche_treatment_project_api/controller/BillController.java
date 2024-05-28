@@ -12,6 +12,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.MessageUtils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Appointment;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Bill;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AppointmentDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.BillDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.StatisticalResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AppointmentService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.BillService;
@@ -35,10 +36,21 @@ public class BillController {
         return ResponseEntity.ok(billService.getBillByAppointmentId(appointmentId));
     }
 
+    @PatchMapping("/doctor/payment/cash/{id}")
+    public ResponseEntity updatePaid(@PathVariable String id, @RequestParam(name = "is_pay", defaultValue = "false") boolean is_pay) {
+        billService.updateBillByPaid(id, is_pay);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/admin/bill/sum/months")
     public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "is_pay", defaultValue = "true") boolean is_pay) {
         return ResponseEntity.ok(billService.sumBillMonths(is_pay));
     }
+    @GetMapping("/admin/bill/all")
+    public ResponseEntity<Page<BillDTO>> getAll(@RequestParam(name = "page", defaultValue = "1") Integer pageNo, @RequestParam(name = "keyword", defaultValue = "") String keyword) {
+        return ResponseEntity.ok(billService.getAll(pageNo,keyword));
+    }
+
 
     @GetMapping("/admin/bill/sum/week")
     public ResponseEntity<Double> getSumBillWeek() {

@@ -1,6 +1,6 @@
 import { Alert } from "react-bootstrap";
 import Header from "./Header";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 interface NotificationProps {
   message: string;
   variant: "danger" | "success";
@@ -12,7 +12,13 @@ export const Notifi: React.FC<NotificationProps> = ({
   onClose,
 }) => {
   const notifications = message.split("\n");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
 
+    return () => clearTimeout(timer);
+  }, [onClose]);
   return (
     <>
       <Alert
@@ -32,9 +38,20 @@ interface ErrorProps {
   error: boolean;
 }
 export const ErrorNotifi: React.FC<ErrorProps> = ({ error }) => {
+  const [showError, setShowError] = useState(error);
+  useEffect(() => {
+    if (error) {
+      setShowError(true);
+      const timer = setTimeout(() => {
+        setShowError(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
   return (
     <>
-      {error && (
+      {showError && (
         <div
           style={{
             textAlign: "center",

@@ -1,5 +1,7 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,16 +16,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.JwtTokenUtils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.MessageUtils;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.Utils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.AccountMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Account;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AccountDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.LoginDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.PatientDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.SupportDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Doctor;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Patient;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Support;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.AccountRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.BillRepository;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.DoctorRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.AccountResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AccountService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.MailService;
@@ -39,6 +44,10 @@ import java.util.Random;
 public class AccountImpl implements AccountService {
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    DoctorRepository doctorRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
     @Autowired
     BillRepository billRepository;
     @Autowired
@@ -91,12 +100,26 @@ public class AccountImpl implements AccountService {
 
     @Override
     public boolean updateRole(String accountId, String roleId) {
-        Optional<Account> account = accountRepository.findById(accountId);
-        if (account.isPresent()) {
+        Optional<Account> optional = accountRepository.findById(accountId);
+        if (optional.isPresent()) {
+            Account account = optional.get();
             Support support = new Support();
             support.setId(roleId);
-            account.get().setSupportRole(support);
-            accountRepository.save(account.get());
+            account.setSupportRole(support);
+            if (entityManager.contains(account)) {
+                entityManager.detach(account);
+            }
+            if (roleId.equals(SupportDTO.STATUS_ROLE_PATIENT)) {
+//                Account patient = new Patient();
+//                patient = Utils.copyCommonAttributes(account, patient);
+                accountRepository.savePatient(accountId);
+            } else {
+//                Account doctor = new Doctor();
+//                doctor = Utils.copyCommonAttributes(account, doctor);
+                accountRepository.saveDoctor(accountId);
+            }
+            accountRepository.save(account);
+
             return true;
         }
         return false;
@@ -183,17 +206,9 @@ public class AccountImpl implements AccountService {
     }
 
     public String forgotPassword(String email, String phone) {
-//        if (checkEmailAndPhone(email, phone)) {
-//            Account account = findByAccountPhone(phone);
-//            String password = generatePassword();
-//            account.setAccountPassword(passwordEncoder.encode(password));
-//            accountRepository.save(account);
-//            emailService.sendMail(account.getAccountEmail(), MessageUtils.EMAIL_SUBJECT_FORGOT_PASSWORD, MessageUtils.EMAIL_CONTENT_FORGOT_PASSWORD + password);
-//            return true;
-//        }
         if (checkEmailAndPhone(email, phone)) {
             Account account = findByAccountPhone(phone);
-            if(sendOTPResetPassword(account.getId())){
+            if (sendOTPResetPassword(account.getId())) {
                 return account.getId();
             }
         }

@@ -222,6 +222,14 @@ export interface Bill {
   updatedAt: string;
   appointment: AppointmentEntity;
 }
+export interface BillDTO {
+  id: string;
+  packagePrice: string;
+  billSum: string;
+  paid: boolean;
+  appointmentId: string;
+  paymentId: string;
+}
 export interface EvaluateDTO {
   id: string;
   evaluateContent: string;

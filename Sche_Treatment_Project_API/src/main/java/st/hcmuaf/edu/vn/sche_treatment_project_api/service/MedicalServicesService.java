@@ -14,7 +14,7 @@ public interface MedicalServicesService {
 
     List<MedicalService> getListServicesArea(String medicalAreaId);
 
-    Page<MedicalServiceDTO> getListServiceCalendarPageable(Integer pageNo);
+    Page<MedicalServiceDTO> getListServiceCalendarPageable(Integer pageNo,String sortBy,String filter,String search);
 
     MedicalServiceDTO createService(MedicalServiceDTO medicalServiceDTO);
 

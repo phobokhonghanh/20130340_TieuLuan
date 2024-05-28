@@ -1,7 +1,6 @@
 import "../assets/css/Modals.css";
 import { Button, Col, Container, Form, Modal, Row } from "react-bootstrap";
 import { FC, useEffect, useState } from "react";
-import { Dialog } from "./AdminDialog";
 import { EvaluateDTO, ResultDTO } from "../Models/Model";
 import {
   API_ENDPOINTS,
@@ -12,250 +11,6 @@ import { ErrorNotifi, Notifi } from "./Notification";
 import { v4 as uuidv4 } from "uuid";
 import { checkRoleDoctor } from "../Authentication/Authentication";
 
-interface Props {
-  title: string;
-  obj?: any;
-  show: boolean;
-  onHide?: () => void;
-  handleCloseModal?: () => void;
-}
-
-interface InterfaceProps {
-  title: string;
-  isCreate: boolean;
-  obj?: any;
-  isPackage?: boolean;
-}
-type Service = {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  status: string;
-};
-const generateMockDataService = (length: number): Service[] => {
-  const mockData: Service[] = [];
-  for (let i = 1; i <= length; i++) {
-    mockData.push({
-      id: `ServiceID${i}`,
-      name: `Service Number ${i}`,
-      description: `Mô tả dịch vụ`,
-      price: `1000$`,
-      status: i % 2 === 0 ? "0" : "1",
-    } as Service);
-  }
-  return mockData;
-};
-export const ModalInterface = (props: InterfaceProps) => {
-  const [showDialog, setshowDialog] = useState(false);
-  const [formData, setFormData] = useState({
-    name: props.obj?.name,
-    description: props.obj?.description,
-    price: props.obj?.price,
-    status: props.obj?.status || "0",
-    listServices: props.obj?.listServices || [],
-  });
-  // Hàm xử lý khi người dùng thay đổi thông tin
-  const handleChange = (e: { target: { name: any; value: any } }) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-    setshowDialog(false);
-  };
-
-  // Hàm xử lý khi người dùng submit form
-  const handleSubmit = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setshowDialog(true);
-    // Thực hiện gửi dữ liệu đã cập nhật lên server
-    props.isCreate &&
-      setFormData({
-        name: "",
-        description: "",
-        price: "",
-        status: "0",
-        listServices: [],
-      });
-    // Gọi hàm cập nhật thông tin người dùng ở đây
-  };
-  return (
-    <div
-      className="modal-dialog"
-      role="document"
-      style={{ maxWidth: "500px", margin: "auto" }}
-    >
-      <div className="modal-content" style={{ borderRadius: "10px" }}>
-        <div
-          className="modal-header"
-          style={{
-            backgroundColor: "#007bff",
-            color: "#fff",
-            padding: "10px 15px",
-            borderTopLeftRadius: "10px",
-            borderTopRightRadius: "10px",
-          }}
-        >
-          <button
-            type="button"
-            className="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true" style={{ color: "#fff" }}>
-              &times;
-            </span>
-          </button>
-          {props.isCreate ? (
-            <h4>Thêm {props.title}</h4>
-          ) : (
-            <h4>Cập nhật {props.title}</h4>
-          )}
-          {showDialog && <Dialog />}
-        </div>
-        <div className="modal-body" style={{ padding: "20px" }}>
-          <form onSubmit={handleSubmit}>
-            <input
-              className="custom-select-input"
-              type="hidden"
-              name="action"
-              value="add"
-            />
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="name"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
-                Tên <span style={{ color: "red" }}>*</span>
-              </label>
-              <input
-                className="custom-select-input"
-                type="text"
-                name="name"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                }}
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </div>
-            {props.title !== "phòng khám" && (
-              <>
-                <div style={{ marginBottom: "20px" }}>
-                  <label
-                    htmlFor="name"
-                    style={{ display: "block", marginBottom: "5px" }}
-                  >
-                    Mô tả <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <textarea
-                    name="description"
-                    rows={5}
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                    }}
-                    value={formData.description}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div style={{ marginBottom: "20px" }}>
-                  <label
-                    htmlFor="price"
-                    style={{ display: "block", marginBottom: "5px" }}
-                  >
-                    Giá tiền <span style={{ color: "red" }}>*</span>
-                  </label>
-                  <input
-                    className="custom-select-input"
-                    type="text"
-                    name="price"
-                    style={{
-                      width: "100%",
-                      padding: "10px",
-                      borderRadius: "5px",
-                      border: "1px solid #ccc",
-                    }}
-                    value={formData.price}
-                    onChange={handleChange}
-                  />
-                </div>
-              </>
-            )}
-            {/* {props.isPackage && (
-              <div>
-                <ChooseServices
-                  dataSelected={formData.listServices}
-                  data={formData.listServices}
-                />
-              </div>
-            )} */}
-
-            <div style={{ marginBottom: "20px" }}>
-              <label
-                htmlFor="gender"
-                style={{ display: "block", marginBottom: "5px" }}
-              >
-                Trạng thái
-              </label>
-              <select
-                name="status"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #ccc",
-                }}
-                value={formData.status === null ? "0" : formData.status}
-                onChange={handleChange}
-              >
-                <option value="0">Mở</option>
-                <option value="1">Tắt</option>
-              </select>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <button
-                type="submit"
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-              >
-                Hoàn tất
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary ml-2"
-                data-dismiss="modal"
-                style={{
-                  marginLeft: "10px",
-                  padding: "10px 20px",
-                  backgroundColor: "#ccc",
-                  color: "#333",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-              >
-                Đóng
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
 interface ResultProps {
   appointmentId: string;
   doctorId: string;
@@ -580,43 +335,42 @@ export const ModalComment: React.FC<CommentProps> = ({
     </>
   );
 };
-function Modals(props: Props) {
-  return (
-    <Modal {...props} aria-labelledby="contained-modal-title-vcenter">
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Chi tiết {props.title}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="grid-example">
-        <Container>
-          <Row>
-            <Col xs={1} md={1} className="p-0">
-              STT
-            </Col>
-            <Col xs={6} md={6}>
-              Dịch vụ
-            </Col>
-            <Col xs={5} md={5}>
-              Mô tả dịch vụ
-            </Col>
-          </Row>
-          {props.obj.map((prop: any, index: any) => (
-            <Row>
-              <Col xs={1} md={1}>
-                {++index}
-              </Col>
-              <Col xs={6} md={6}>
-                {prop.name}
-              </Col>
-              <Col xs={5} md={5}>
-                {prop.description}
-              </Col>
-            </Row>
-          ))}
-        </Container>
-      </Modal.Body>
-    </Modal>
-  );
+interface ThankYouProps {
+  show: boolean;
+  onHide: () => void;
 }
-export default Modals;
+export const ModalThankYou: React.FC<ThankYouProps> = ({ show, onHide }) => {
+  return (
+    <>
+      <Modal
+        show={show}
+        onHide={onHide}
+        aria-labelledby="contained-modal-title-vcenter"
+        style={{ padding: "0px " }}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title
+            id="contained-modal-title-vcenter"
+            style={{
+              fontFamily: "Arial, sans-serif",
+              fontSize: "20px",
+              fontWeight: "bold",
+            }}
+          >
+            Mẹo nhỏ
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          className="grid-example"
+          style={{ fontFamily: "Arial, sans-serif", fontSize: "16px" }}
+        >
+          <Modal.Title id="contained-modal-title-vcenter">
+            Bạn sẽ được khám sớm hơn nếu như người khác hủy lịch. Vậy nên hãy
+            đến sớm hơn 15 phút nhé!
+          </Modal.Title>
+        </Modal.Body>
+      </Modal>
+    </>
+  );
+};
+

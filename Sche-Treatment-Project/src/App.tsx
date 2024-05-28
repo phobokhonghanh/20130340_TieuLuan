@@ -21,7 +21,6 @@ import { AdminPackagePage } from "./Module/Admin/AdminPackagePage";
 import { AdminCalendarPage } from "./Module/Admin/AdminCalendarPage";
 import AppointmentPackageForm from "./Module/AppointmentPackagePage";
 import AppointmentDoctor from "./Module/AppointmentDoctorPage";
-import { BillPage } from "./Module/BillPage";
 import { AdminAppointmnetPage } from "./Module/Admin/AdminAppointmnentPage";
 import {
   AdminRoutes,
@@ -30,6 +29,7 @@ import {
 } from "./Authentication/RoutesAuthentication";
 import ForgotPassword, { ResetPassword } from "./Module/ResetPasswordPage";
 import { ErrorPaymentPage, SuccessPage } from "./Component/Notification";
+import { AdminBillPage } from "./Module/Admin/AdminBillPage";
 function App() {
   return (
     <>
@@ -51,7 +51,6 @@ function App() {
         <Route path="/about-us" element={<AboutUsPage />} />
         <Route path="/error" element={<ErrorPage />} />
         <Route element={<UserRoutes />}>
-          <Route path="/bill" element={<BillPage />} />
           <Route path="/account" element={<Account />} />
           <Route path="/history" element={<History />} />
           <Route path="/appointment" element={<AppointmentForm />} />
@@ -78,6 +77,8 @@ function App() {
           <Route path="/admin/services" element={<AdminServicePage />} />
           <Route path="/admin/packages" element={<AdminPackagePage />} />
           <Route path="/admin/clinic" element={<AdminCalendarPage />} />
+          <Route path="admin/bill" element={<AdminBillPage />} />
+
           <Route
             path="/admin/appointments"
             element={<AdminAppointmnetPage />}

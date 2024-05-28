@@ -107,7 +107,7 @@ export const Doctor: React.FC<DoctorProps> = ({ doctorEntity }) => {
         </div>
         <div className="table-head">
           <h4 className=" amount title-package price">
-            {doctorEntity.doctorDegree}. {doctorEntity.doctorRank}{" "}
+            {doctorEntity.doctorDegree} {doctorEntity.doctorRank}{" "}
             {doctorEntity.accountName}
           </h4>
           <div className="price">
@@ -146,7 +146,6 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
   const [isLoading, setLoading] = useState(false);
   useEffect(() => {
     const fetchListDoctor = async () => {
-      setLoading(true);
       try {
         const response = await fetch(
           API_ENDPOINTS.GET_CALENDAR_DOCTOR(doctorEntity.id)
@@ -155,8 +154,6 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
         setCalendar(data);
       } catch (e: any) {
         setError(e);
-      } finally {
-        setLoading(false);
       }
     };
     fetchListDoctor();
@@ -179,7 +176,7 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
             />
           </div>
           <h4 className="amount title-package price">
-            {doctorEntity.doctorDegree}. {doctorEntity.doctorRank}{" "}
+            {doctorEntity.doctorDegree} {doctorEntity.doctorRank}{" "}
             {doctorEntity.accountName}
           </h4>
           <div className="price">
@@ -192,8 +189,6 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
             className="price"
             style={{ overflowY: "auto", height: " 150px" }}
           >
-            {isLoading && <p>"Loading....</p>}
-            {error && <p>"Không có data"</p>}
             {calendars ? (
               calendars.map((calendar) => (
                 <div key={calendar.id}>

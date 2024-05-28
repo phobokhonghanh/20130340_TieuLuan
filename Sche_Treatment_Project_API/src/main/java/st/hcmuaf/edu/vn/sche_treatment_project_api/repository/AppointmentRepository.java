@@ -16,7 +16,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     List<Appointment> getListAppointmentCalendarId(@Param("calendarId") String calendarId);
     @Query(value = "SELECT " +
             "    CASE " +
-            "        WHEN EXISTS (SELECT 1 FROM appointment WHERE calendar_id= :calendarId AND support_time_id = :supportTimeId) THEN 'TRUE' " +
+            "        WHEN EXISTS (SELECT 1 FROM appointment WHERE calendar_id= :calendarId AND support_time_id = :supportTimeId AND support_status_id ='S1') THEN 'TRUE' " +
             "        ELSE 'FALSE' " +
             "    END AS result; ", nativeQuery = true)
     boolean checkTimeAppointment(@Param("calendarId")String calendarId, @Param("supportTimeId")String supportTimeId);

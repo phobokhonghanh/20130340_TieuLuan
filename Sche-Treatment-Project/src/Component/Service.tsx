@@ -92,7 +92,7 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
   onHide,
   responseStatus,
 }) => {
-  const [error, setError] = useState();
+  const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [showMess, setShowMess] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -154,7 +154,9 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
   };
   const handleFormSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    setLoading(true);
     if (!clinic) {
+      setLoading(false);
       return;
     }
     const formData: ServiceDTO = {
@@ -177,17 +179,19 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
             setShowMess(true);
             onHide();
             responseStatus(response.status);
-          } else {
+          }
+        })
+        .catch((error: any) => {
+          if (error.status === 400) {
             setMessage("Dịch vụ đã tồn tại");
             setLevelMessage("danger");
             setShowMess(true);
           }
-        })
-        .catch((error: any) => {
           console.error("Error:", error);
-          setMessage("Không thành công");
-          setLevelMessage("danger");
-          setShowMess(true);
+          setError(true);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   };

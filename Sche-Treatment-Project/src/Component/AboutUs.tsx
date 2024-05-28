@@ -77,7 +77,7 @@ function AboutUs() {
                 <i className="fas fa-home"></i>
                 <div className="content">
                   <span className="counter">3468</span>
-                  <p>Hospital Rooms</p>
+                  <p>Phòng khám</p>
                 </div>
               </div>
               {/* <!-- End Single Fun --> */}
@@ -88,7 +88,7 @@ function AboutUs() {
                 <i className="fas fa-user"></i>
                 <div className="content">
                   <span className="counter">557</span>
-                  <p>Specialist Doctors</p>
+                  <p>Bác sĩ</p>
                 </div>
               </div>
               {/* <!-- End Single Fun --> */}
@@ -99,7 +99,7 @@ function AboutUs() {
                 <i className="fas fa-smile"></i>
                 <div className="content">
                   <span className="counter">4379</span>
-                  <p>Happy Patients</p>
+                  <p>Bệnh nhân vui vẻ</p>
                 </div>
               </div>
               {/* <!-- End Single Fun --> */}
@@ -110,7 +110,7 @@ function AboutUs() {
                 <i className="fas fa-table"></i>
                 <div className="content">
                   <span className="counter">32</span>
-                  <p>Years of Experience</p>
+                  <p>Năm kinh nghiệm</p>
                 </div>
               </div>
               {/* <!-- End Single Fun --> */}

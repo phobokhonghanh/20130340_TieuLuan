@@ -15,7 +15,7 @@ public interface DoctorService {
 
     List<DoctorDTO> getListDoctorLimit();
 
-    Page<DoctorDTO> getListDoctorCalendarPageable(Integer pageNo);
+    Page<DoctorDTO> getListDoctorCalendarPageable(Integer pageNo,String sortBy,String filter,String search);
     DoctorDTO getDoctorByIdCalendar(String idCalendar);
     DoctorDTO getDoctor(String id);
 

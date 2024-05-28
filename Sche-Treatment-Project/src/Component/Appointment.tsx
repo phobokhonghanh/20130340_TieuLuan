@@ -1,6 +1,6 @@
 import "../assets/css/Account.css";
 import { useEffect, useState } from "react";
-import { ModalResult } from "./Modal";
+import { ModalResult, ModalThankYou } from "./Modal";
 import Pagination from "./Pagination";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -13,7 +13,12 @@ import {
   PackageEntity,
   Support,
 } from "../Models/Model";
-import { API_ENDPOINTS, payment_paypal, updateStatus } from "../apiConfig";
+import {
+  API_ENDPOINTS,
+  payment_paycash,
+  payment_paypal,
+  updateStatus,
+} from "../apiConfig";
 import { formatDate } from "../Module/AppointmentPage";
 import { Button } from "react-bootstrap";
 import { ErrorNotifi, Notifi } from "./Notification";
@@ -21,11 +26,13 @@ import {
   checkRoleDoctor,
   getIdAccount,
 } from "../Authentication/Authentication";
+import Preloader from "./Preloader";
 interface appointmentDetailsProps {
   refesh: boolean;
   appointmentId: AppointmentDTO;
   setRefesh: (rf: boolean) => void;
 }
+// chi tiết lịch hẹn
 export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   refesh,
   appointmentId,
@@ -41,6 +48,8 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   const [bill, setBill] = useState<Bill>();
   const [clinic, setClinic] = useState<ClinicDTO>();
   const [area, setArea] = useState<Area>();
+  const [modalThankYou, showModalThankYou] = useState<boolean>(false);
+
   // gọi api - lấy danh sách khu vực khám
   // gán mặc định cho area đầu tiên
   // gán danh sách phòng khám
@@ -56,11 +65,13 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
     } catch (e: any) {
       setError(true);
     } finally {
-      setLoading(false);
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   };
   const fetchClinic = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         API_ENDPOINTS.GET_CLINIC_CALENDAR(appointmentId.calendarId)
@@ -69,12 +80,9 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
       setClinic(data);
     } catch (e: any) {
       setError(true);
-    } finally {
-      setLoading(false);
     }
   };
   const fetchArea = async () => {
-    setLoading(true);
     try {
       if (clinic && clinic.medicalAreaId !== null) {
         const response = await fetch(
@@ -85,8 +93,6 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
       }
     } catch (e: any) {
       setError(true);
-    } finally {
-      setLoading(false);
     }
   };
   // fetch data khi appointmentId thay đổi
@@ -98,24 +104,38 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   }, [appointmentId, refesh]);
   const handleCancel = (appointmentid: string) => {
     if (appointmentid) {
-      updateStatus(appointmentid).then((response: any) => {
-        if (response.status === 200) {
-          setRefesh(true);
-        } else {
-          setError(true);
-          setMessage("Cập nhật trạng thái không thành công!");
-          setLevelMessage("danger");
-          setShowMess(true);
-        }
-      });
+      updateStatus(appointmentid)
+        .then((response: any) => {
+          if (response.status === 200) {
+            setRefesh(true);
+          }
+        })
+        .catch((error: any) => {
+          if (error.code === 400) {
+            setMessage("Cập nhật trạng thái không thành công!");
+            setLevelMessage("danger");
+            setShowMess(true);
+          } else {
+            setError(true);
+          }
+        });
     }
   };
+  const width = 800;
+  const height = 800;
+  const left = window.innerWidth / 2 - width / 2;
+  const top = window.innerHeight / 2 - height / 2;
   const handPayment = (id: string) => {
     if (id !== "") {
       payment_paypal(id)
         .then((response: any) => {
           if (response.status === 200) {
-            window.open(response.data, "mywin", "width=800,height=800");
+            showModalThankYou(true);
+            window.open(
+              response.data,
+              "mywin",
+              `width=${width},height=${height},left=${left},top=${top}`
+            );
           }
         })
         .catch((error: any) => {
@@ -126,33 +146,49 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
           } else {
             setError(true);
           }
-        })
-        .finally(() => {});
+        });
     }
+  };
+  const handlePay = (id: string) => {
+    if (id !== "") {
+      payment_paycash(id)
+        .then((response: any) => {
+          if (response.status === 200) {
+            setRefesh(true);
+            setMessage("Thành công");
+            setLevelMessage("success");
+            setShowMess(true);
+          }
+        })
+        .catch((error: any) => {
+          if (error.code === 400) {
+            setMessage("Không thành công");
+            setLevelMessage("danger");
+            setShowMess(true);
+          } else {
+            setError(true);
+          }
+        });
+    }
+  };
+  const handleCloseModal = () => {
+    showModalThankYou(false);
+    setRefesh(true);
   };
   return (
     <>
+      {isLoading && <Preloader />}
+      <ErrorNotifi error={error} />
+      {showMess && (
+        <Notifi
+          message={message}
+          variant={levelMessage}
+          onClose={() => setShowMess(false)}
+        />
+      )}
+      <ModalThankYou show={modalThankYou} onHide={handleCloseModal} />
       <div className="card col-md-4" style={{ height: "max-content" }}>
         <h5 className="card-header fw-bold">Chi tiết cuộc hẹn</h5>
-        {isLoading && (
-          <div
-            style={{
-              textAlign: "center",
-              fontWeight: "bold",
-              fontSize: "larger",
-            }}
-          >
-            Loading...
-          </div>
-        )}
-        <ErrorNotifi error={error} />
-        {showMess && (
-          <Notifi
-            message={message}
-            variant={levelMessage}
-            onClose={() => setShowMess(false)}
-          />
-        )}
         <div className="card-body">
           <div className="align-items-start align-items-sm-center gap-4">
             <div className="button-wrapper w90">
@@ -243,8 +279,15 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
                     <span className="fw-bold">
                       {bill?.paid ? (
                         <span style={{ color: "green" }}>Đã thanh toán</span>
+                      ) : checkRoleDoctor() ? (
+                        <Button
+                          style={{ background: "#e53c33" }}
+                          onClick={() => handlePay(bill ? bill.id : "")}
+                        >
+                          Chưa thanh toán
+                        </Button>
                       ) : (
-                        <span style={{ color: "red" }}>Chưa thanh toán</span>
+                        <span style={{ color: "red" }}> Chưa thanh toán</span>
                       )}
                     </span>
                   </p>
@@ -279,20 +322,20 @@ interface AppointmentProps {
   refeshDetails: (modalRefreshDetails: boolean) => void;
   appointmentDTO: AppointmentDTO;
 }
+// lịch hẹn
 export const Appointment: React.FC<AppointmentProps> = ({
   refeshDetails,
   appointmentDTO,
 }) => {
+  const navigator = useNavigate();
   const [modalShow, setModalShow] = useState(false);
   const [packageFetch, setPackage] = useState<PackageEntity>();
   const [supportFetch, setSupport] = useState<Support>();
   const [calendarFetch, setCalendar] = useState<CalendarDTO>();
   const [accountFetch, setAccount] = useState<DoctorEntity>();
-  const [error, setError] = useState();
-  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const fetchSupport = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         `${API_ENDPOINTS.GET_SUPPORT(appointmentDTO.supportTimeId)}`
@@ -300,13 +343,11 @@ export const Appointment: React.FC<AppointmentProps> = ({
       const data = await response.json();
       setSupport(data);
     } catch (e: any) {
-      setError(e);
-    } finally {
-      setLoading(false);
+      console.error(e.message);
+      setError(true);
     }
   };
   const fetchGetCalendar = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         `${API_ENDPOINTS.GET_CALENDAR(appointmentDTO.calendarId)}`
@@ -314,13 +355,11 @@ export const Appointment: React.FC<AppointmentProps> = ({
       const data = await response.json();
       setCalendar(data);
     } catch (e: any) {
-      setError(e);
-    } finally {
-      setLoading(false);
+      console.error(e.message);
+      setError(true);
     }
   };
   const fetchGetPackage = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         `${API_ENDPOINTS.GET_PACKAGE(appointmentDTO.packageId)}`
@@ -328,13 +367,11 @@ export const Appointment: React.FC<AppointmentProps> = ({
       const data = await response.json();
       setPackage(data);
     } catch (e: any) {
-      setError(e);
-    } finally {
-      setLoading(false);
+      console.error(e.message);
+      setError(true);
     }
   };
   const fetchGetDoctor = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         `${API_ENDPOINTS.GET_DOCTOR_CALENDAR_ID(appointmentDTO.calendarId)}`
@@ -342,9 +379,8 @@ export const Appointment: React.FC<AppointmentProps> = ({
       const data = await response.json();
       setAccount(data);
     } catch (e: any) {
-      setError(e);
-    } finally {
-      setLoading(false);
+      console.error(e.message);
+      setError(true);
     }
   };
   useEffect(() => {
@@ -354,11 +390,12 @@ export const Appointment: React.FC<AppointmentProps> = ({
       fetchGetCalendar();
       fetchSupport();
     } else {
-      // navigator("/404");
+      navigator("/error");
     }
   }, [appointmentDTO]);
   return (
     <>
+      <ErrorNotifi error={error} />
       <div className="card-body">
         <div className="d-flex align-items-start align-items-sm-center gap-4">
           <img
@@ -401,7 +438,6 @@ export const Appointment: React.FC<AppointmentProps> = ({
                 />
               )}
             </div>
-
             {/* <!-- Table Bottom --> */}
           </div>
           <div className="mt-2">
@@ -423,6 +459,7 @@ export const Appointment: React.FC<AppointmentProps> = ({
     </>
   );
 };
+// lịch sử lịch hẹn
 export const HistoryAppointment = () => {
   const navigator = useNavigate();
   const [listAppointment, setListAppointment] = useState<AppointmentDTO[]>([]);
@@ -468,6 +505,7 @@ export const HistoryAppointment = () => {
   return (
     <>
       <ErrorNotifi error={error} />
+      {isLoading && <Preloader />}
       <div className="content-wrapper">
         <div className="container-xxl flex-grow-1 container-p-y">
           <h4 className="fw-bold py-3 mb-4">
@@ -481,11 +519,13 @@ export const HistoryAppointment = () => {
                   <i className="bx bx-user me-1"></i> Tài khoản
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/account-doctor">
-                  <i className="bx bx-bell me-1"></i> Thông tin bác sĩ
-                </Link>
-              </li>
+              {checkRoleDoctor() && (
+                <li className="nav-item">
+                  <Link className="nav-link" to="/account-doctor">
+                    <i className="bx bx-bell me-1"></i> Thông tin bác sĩ
+                  </Link>
+                </li>
+              )}
               <li className="nav-item">
                 <a className="nav-link active">
                   <i className="bx bx-bell me-1"></i> Lịch sử cuộc hẹn
@@ -495,12 +535,18 @@ export const HistoryAppointment = () => {
             <div className="col-md-8 w90">
               <div className="card mb-4 col-md-8 w100">
                 <h5 className="card-header">Lịch sử cuộc hẹn</h5>
-                {isLoading && <div>Loading...</div>}
                 {listAppointment &&
                   listAppointment.map((appointment) => (
                     <div
                       key={appointment.id}
-                      style={{ cursor: "pointer" }}
+                      style={
+                        appointment.id === selectAppointment?.id
+                          ? {
+                              cursor: "pointer",
+                              backgroundColor: "#d5d5d5",
+                            }
+                          : { cursor: "pointer" }
+                      }
                       onClick={() => setSelectAppointment(appointment)}
                     >
                       <Appointment

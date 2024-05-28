@@ -6,11 +6,17 @@ import "../assets/Admin/css/font-awesome.min.css";
 // import "../assets/Admin/js/aos-animation/aos.css";
 import "../assets/Admin/css/styleAdmin.css";
 
-import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
+import { getNameAccount, removeToken } from "../Authentication/Authentication";
 
 export const AdminSidebar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    removeToken("benhviendakhoathuduc");
+    navigate("/");
+  };
   return (
     <>
       <Navbar
@@ -24,17 +30,6 @@ export const AdminSidebar = () => {
             ADMIN
           </Link>
         </div>
-        {/* <button
-          type="button"
-          className="navbar-toggle"
-          data-toggle="collapse"
-          data-target=".navbar-collapse"
-        >
-          <span className="sr-only">Toggle navigation</span>
-          <span className="icon-bar"></span>
-          <span className="icon-bar"></span>
-          <span className="icon-bar"></span>
-        </button> */}
         <ul className="nav navbar-nav navbar-left navbar-top-links">
           <li>
             <Link to="/home">
@@ -42,18 +37,23 @@ export const AdminSidebar = () => {
             </Link>
           </li>
         </ul>
-
-        <ul className="nav navbar-right navbar-top-links">
-          <li className="dropdown">
+        <ul
+          className="nav navbar-nav navbar-top-links"
+          style={{ position: "absolute", right: "0", padding: "10px" }}
+        >
+          <li>
             <Link className="dropdown-toggle" data-toggle="dropdown" to="#">
-              <i className="fa fa-user fa-fw"></i>ADMIN
-              <b className="caret"></b>
+              <i className="fa fa-user fa-fw"></i> {getNameAccount()}
             </Link>
-            <ul className="dropdown-menu dropdown-user">
+            <ul>
               <li>
-                <Link to="#Login">
-                  <i className="fa fa-sign-out fa-fw"></i> Logout
-                </Link>
+                <span
+                  onClick={handleLogout}
+                  style={{ cursor: "pointer", color: "white" }}
+                >
+                  Đăng xuất
+                  <i className="fa fa-sign-out icon-cus" aria-hidden="true"></i>
+                </span>
               </li>
             </ul>
           </li>
@@ -80,54 +80,34 @@ export const AdminSidebar = () => {
                   <i className="fa  fa-dashboard fa-fw"></i> Thống kê
                 </Link>
               </li>
-              <li className="sidebar-search">
-                <Link to="#">
-                  <i className="fa fa-bar-chart-o fa-fw"></i> Danh mục
-                  <span className="fa arrow"></span>
-                </Link>
-                <ul className="nav nav-second-level">
-                  <li>
-                    <Link to="/admin/services">
-                      <i className="fa fa-home fa-fw"></i>Dịch vụ khám bệnh
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/admin/packages">
-                      <i className="fa fa-pencil-square-o fa-fw"></i>Gói khám
-                      bệnh
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/admin/comments">
-                      <i className="fa fa-comments fa-fw"></i>Quản lý bình luận
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/admin/appointments">
-                      <i className="fa fa-newspaper-o fa-fw"></i> Lịch hẹn bệnh
-                      nhân
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/admin/clinic">
-                      <i className="fa fa-calendar fa-fw"></i> Phòng khám
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-              <li className="sidebar-search">
-                <Link to="/admin/revenue">
-                  <i className="fa fa-table fa-fw"></i>Doanh thu
+              <li>
+                <Link to="/admin/services">
+                  <i className="fa fa-home fa-fw"></i>Dịch vụ khám bệnh
                 </Link>
               </li>
-              <li className="sidebar-search">
-                <Link to="/admin/bill">
-                  <i className="fa fa-shopping-cart fa-fw"></i> Quản lý hóa đơn
+              <li>
+                <Link to="/admin/packages">
+                  <i className="fa fa-pencil-square-o fa-fw"></i>Gói khám bệnh
                 </Link>
               </li>
               <li className="sidebar-search">
                 <Link to="/admin/account">
                   <i className="fa  fa-user fa-fw"></i>Quản lý tài khoản
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/appointments">
+                  <i className="fa fa-newspaper-o fa-fw"></i> Lịch hẹn bệnh nhân
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/clinic">
+                  <i className="fa fa-calendar fa-fw"></i> Phòng khám
+                </Link>
+              </li>
+              <li className="sidebar-search">
+                <Link to="/admin/bill">
+                  <i className="fa fa-shopping-cart fa-fw"></i> Quản lý hóa đơn
                 </Link>
               </li>
             </ul>
@@ -139,21 +119,6 @@ export const AdminSidebar = () => {
           ADMIN - Website Đăng Ký Khám Bệnh Trực Tuyến
         </div>
       </div>
-      {/* <Helmet>
-        <script src="/src/assets/Admin/js/jquery.min.js"></script>
-        <script src="/src/assets/Admin/js/bootstrap.min.js"></script>
-        <script src="/src/assets/Admin/js/metisMenu.min.js"></script>
-        <script src="/src/assets/Admin/js/metisMenu.min.js"></script>
-        <script src="/src/assets/Admin/js/raphael.min.js"></script>
-        <script src="/src/assets/Admin/js/startmin.js"></script>
-        <script src="/src/assets/Admin/js/aos-animation/bs-animation.js"></script>
-        <script src="/src/assets/Admin/js/aos-animation/aos.js"></script>
-      </Helmet> */}
-
-      {/* <script src="/Content/assets/ckfinder/ckfinder.js"></script>
-        <script src="/Content/assets/ckeditor/ckeditor.js"></script>
-        <script src="/Content/Admin/js/form-style.js"></script>
-        <script src="/Content/Admin/js/validation-form/vali-form.js"></script> */}
     </>
   );
 };

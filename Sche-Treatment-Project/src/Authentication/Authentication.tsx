@@ -1,6 +1,8 @@
 import { LoginResponse } from "../Models/Model";
 
-const localStorageKey = "response";
+const localStorageKey = "benhviendakhoathuduc";
+const localStorageRefesh = "refesh";
+
 const ROLE_ADMIN = "ROLE_ADMIN";
 const ROLE_DOCTOR = "ROLE_DOCTOR";
 const ROLE_PATIENT = "ROLE_PATIENT";
@@ -13,11 +15,19 @@ export const getToken = (): LoginResponse | null => {
   }
   return null;
 };
+export const isRefeshStorage = (): boolean => {
+  const token = localStorage.getItem(localStorageRefesh);
+  if (token) {
+    const json = JSON.parse(token) as boolean;
+    return json;
+  }
+  return false;
+};
 export const setToken = (token: string): void => {
   localStorage.setItem(localStorageKey, token);
 };
-export const removeToken = (): void => {
-  localStorage.removeItem(localStorageKey);
+export const removeToken = (name:string): void => {
+  localStorage.removeItem(name);
 };
 export const checkToken = (): boolean => {
   return getToken() ? true : false;

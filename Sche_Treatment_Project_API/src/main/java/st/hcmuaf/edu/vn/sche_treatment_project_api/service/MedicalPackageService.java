@@ -20,6 +20,6 @@ public interface MedicalPackageService {
 
     List<MedicalPackageDTO> getListPackageCalendar();
 
-    Page<MedicalPackageDTO> getListPackageCalendar(Integer pageNo);
+    Page<MedicalPackageDTO> getListPackageCalendar(Integer pageNo,String sortBy,String filter,String search);
     List<MedicalPackage> getListPackageArea(String medical_area_id);
 }

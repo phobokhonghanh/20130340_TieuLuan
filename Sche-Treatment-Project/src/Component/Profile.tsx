@@ -120,7 +120,7 @@ export const Profile = () => {
     sendOTPRestPassword(idAccount)
       .then((response: any) => {
         if (response.status === 200) {
-          removeToken();
+          removeToken("benhviendakhoathuduc");
           navigate(`/otp/${idAccount}?reset-password=true`);
         }
       })
@@ -364,7 +364,6 @@ export const ProfileDoctorDetails = () => {
   const [doctorImage, setDoctorImage] = useState("");
 
   const [isChange, setIsChange] = useState(false);
-  const [prevImage, setPrevImage] = useState(null);
 
   let idAccount = getIdAccount();
 
@@ -460,7 +459,7 @@ export const ProfileDoctorDetails = () => {
         }
       })
       .catch((error: any) => {
-        if (error.response && error.response.status === 400) {
+        if (error.response.status === 400) {
           setMessage(error.response.data);
         } else {
           console.log("error:", error);
@@ -519,7 +518,9 @@ export const ProfileDoctorDetails = () => {
                   >
                     <img
                       src={
-                        doctorImage ? doctorImage : "/src/assets/img/doctor.jpg"
+                        doctorImage === null
+                          ? doctorImage
+                          : "/src/assets/img/doctor.jpg"
                       }
                       alt="user-avatar"
                       className="d-block rounded"
@@ -568,8 +569,8 @@ export const ProfileDoctorDetails = () => {
                           onChange={handleDegree}
                         >
                           <option value="">Vui lòng chọn</option>
-                          <option value="PGS">PGS</option>
-                          <option value="GS">GS</option>
+                          <option value="PGS.">PGS</option>
+                          <option value="GS.">GS</option>
                         </select>
                       </div>
                       <div className="mb-3 col-md-1">

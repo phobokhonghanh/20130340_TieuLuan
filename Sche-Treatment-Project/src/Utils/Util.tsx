@@ -2,7 +2,6 @@ const ROLE_ADMIN = "ADMIN";
 const ROLE_DOCTOR = "DOCTOR";
 const ROLE_PATIENT = "PATIENT";
 
-const STATUS_UNLOCK = "S1";
 const STATUS_LOCK = "Khóa";
 export const checkAdmin = (role: string): boolean => {
   return role === ROLE_ADMIN;
