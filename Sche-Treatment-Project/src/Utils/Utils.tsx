@@ -1,5 +1,22 @@
-import { PackageService, ServiceEntity } from "./Models/Model";
+import { PackageService, ServiceEntity } from "../Models/Model";
 
+const ROLE_ADMIN = "ADMIN";
+const ROLE_DOCTOR = "DOCTOR";
+const ROLE_PATIENT = "PATIENT";
+
+const STATUS_LOCK = "Khóa";
+export const checkAdmin = (role: string): boolean => {
+  return role === ROLE_ADMIN;
+};
+export const checkDoctor = (role: string): boolean => {
+  return role === ROLE_DOCTOR;
+};
+export const checkPatient = (role: string): boolean => {
+  return role === ROLE_PATIENT;
+};
+export const checkLockAccount = (status: string): boolean => {
+  return status === STATUS_LOCK;
+};
 export function convertDate(dateInput: string): string {
   const date = new Date(dateInput);
   const ngay = date.getDate();

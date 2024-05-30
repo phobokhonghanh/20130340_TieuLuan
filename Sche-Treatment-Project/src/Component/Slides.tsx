@@ -89,22 +89,15 @@ const Slides = () => {
             subtitle="Là Người Bạn Có Thể Tin Tưởng!"
             children={
               <div className="button-div">
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder={`Tìm kiếm bác sĩ...`}
-                />
-                <SelectWithSearch
-                  label=""
-                  options={dataDepartments}
-                  value={selectedDepartment}
-                  style={3}
-                  onSelectChange={setSelectedDepartment}
-                  placeholder={"Chọn khoa"}
-                />
-                <a href="#" className="btn">
-                  Tìm kiếm
-                </a>
+                <Link
+                  to="/doctos"
+                  state={{
+                    packageId: "44c79a43-5739-4cc2-89d9-5e48e145a0a0",
+                  }}
+                  className="btn"
+                >
+                  Đặt lịch ngay với bác sĩ
+                </Link>
               </div>
             }
           />
@@ -114,14 +107,15 @@ const Slides = () => {
             subtitle="Giá Rẻ Không Tưởng!"
             children={
               <div className="button-div">
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder={`Tìm kiếm gói khám...`}
-                />
-                <a href="#" className="btn">
-                  Tìm kiếm
-                </a>
+                <Link
+                  to="/doctos"
+                  state={{
+                    packageId: "44c79a43-5739-4cc2-89d9-5e48e145a0a0",
+                  }}
+                  className="btn"
+                >
+                  Tìm kiếm gói khám
+                </Link>
               </div>
             }
           />

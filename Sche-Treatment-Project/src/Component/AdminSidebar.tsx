@@ -27,16 +27,9 @@ export const AdminSidebar = () => {
       >
         <div className="navbar-header">
           <Link className="navbar-brand" to="/admin/home">
-            ADMIN
+            ADMIN SIDE
           </Link>
         </div>
-        <ul className="nav navbar-nav navbar-left navbar-top-links">
-          <li>
-            <Link to="/home">
-              <i className="fa fa-home fa-fw"></i> Website
-            </Link>
-          </li>
-        </ul>
         <ul
           className="nav navbar-nav navbar-top-links"
           style={{ position: "absolute", right: "0", padding: "10px" }}
@@ -63,16 +56,10 @@ export const AdminSidebar = () => {
             <ul className="nav" id="side-menu">
               <li className="sidebar-search">
                 <div className="input-group custom-search-form">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search..."
-                  />
-                  <span className="input-group-btn">
-                    <button className="btn btn-primary" type="button">
-                      <i className="fa fa-search"></i>
-                    </button>
-                  </span>
+                  
+                  <Link to="/home" className="form-control">
+                    <i className="fa fa-home fa-fw"></i> Website
+                  </Link>
                 </div>
               </li>
               <li className="sidebar-search">
@@ -81,10 +68,11 @@ export const AdminSidebar = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/admin/services">
-                  <i className="fa fa-home fa-fw"></i>Dịch vụ khám bệnh
+                <Link to="/admin/clinic">
+                  <i className="fa fa-home fa-fw"></i> Phòng khám
                 </Link>
               </li>
+
               <li>
                 <Link to="/admin/packages">
                   <i className="fa fa-pencil-square-o fa-fw"></i>Gói khám bệnh
@@ -95,19 +83,19 @@ export const AdminSidebar = () => {
                   <i className="fa  fa-user fa-fw"></i>Quản lý tài khoản
                 </Link>
               </li>
-              <li>
-                <Link to="/admin/appointments">
-                  <i className="fa fa-newspaper-o fa-fw"></i> Lịch hẹn bệnh nhân
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin/clinic">
-                  <i className="fa fa-calendar fa-fw"></i> Phòng khám
-                </Link>
-              </li>
               <li className="sidebar-search">
                 <Link to="/admin/bill">
                   <i className="fa fa-shopping-cart fa-fw"></i> Quản lý hóa đơn
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/services">
+                  <i className="fa fa-calendar fa-fw"></i>Dịch vụ khám bệnh
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/appointments">
+                  <i className="fa fa-newspaper-o fa-fw"></i> Lịch hẹn bệnh nhân
                 </Link>
               </li>
             </ul>

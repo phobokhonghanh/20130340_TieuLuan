@@ -18,7 +18,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.MedicalServicesServic
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/service")
+@RequestMapping("/api")
 public class MedicalServiceController {
     @Autowired
     MedicalServicesService medicalServicesService;
@@ -28,12 +28,12 @@ public class MedicalServiceController {
     public ResponseEntity<Object> handleDataAccessException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-    @GetMapping("/all")
+    @GetMapping("/service/all")
     public ResponseEntity<Page<MedicalServiceDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
         Page<MedicalServiceDTO> medicalServiceDTOs =  medicalServicesService.getAll(keyword,pageNo);
         return ResponseEntity.ok(medicalServiceDTOs);
     }
-    @PostMapping
+    @PostMapping("/admin/service")
     public ResponseEntity<MedicalServiceDTO> createService(@RequestBody MedicalServiceDTO medicalServiceDTO) {
         MedicalServiceDTO saveService = medicalServicesService.createService(medicalServiceDTO);
         if (saveService != null) {
@@ -41,17 +41,17 @@ public class MedicalServiceController {
         }
         return new ResponseEntity<>(null,HttpStatus.OK);
     }
-    @PostMapping("/all/select")
+    @PostMapping("/service/all/select")
     public List<MedicalService> getAllServices(@RequestBody List<MedicalService> medicalServices) {
         return medicalServicesService.getServicesNotSelected(medicalServices);
     }
 
-    @GetMapping("/area/{medicalAreaId}")
+    @GetMapping("/service/area/{medicalAreaId}")
     public List<MedicalService> getListServices(@PathVariable("medicalAreaId") String medicalAreaId) {
         return medicalServicesService.getListServicesArea(medicalAreaId);
     }
 
-    @GetMapping("/calendar")
+    @GetMapping("/service/calendar")
     public ResponseEntity<Page<MedicalServiceDTO>> getListServiceCalendarPageable(
             @RequestParam(name = "page", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "sort", required = false, defaultValue = "asc") String sortBy,

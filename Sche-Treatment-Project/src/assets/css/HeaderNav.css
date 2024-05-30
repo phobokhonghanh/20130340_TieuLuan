@@ -12,6 +12,7 @@ z-index: 2 !important;
 .header {
     background-color: #fff;
     position: relative;
+    overflow: hidden;
 }
 
 .header .navbar-collapse {

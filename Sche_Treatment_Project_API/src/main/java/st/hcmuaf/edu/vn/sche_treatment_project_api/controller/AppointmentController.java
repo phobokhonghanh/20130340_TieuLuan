@@ -61,7 +61,7 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentDTOs);
     }
 
-    @GetMapping("/appointment/admin")
+    @GetMapping("/admin/appointment")
     public ResponseEntity<Page<AppointmentDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "0") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
         Page<AppointmentDTO> appointmentDTOs = appointmentService.getAll(keyword, pageNo);
         return ResponseEntity.ok(appointmentDTOs);

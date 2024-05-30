@@ -44,7 +44,6 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
     "danger"
   );
-  const [isLoading, setLoading] = useState(false);
   const [bill, setBill] = useState<Bill>();
   const [clinic, setClinic] = useState<ClinicDTO>();
   const [area, setArea] = useState<Area>();
@@ -54,7 +53,6 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   // gán mặc định cho area đầu tiên
   // gán danh sách phòng khám
   const fetchBill = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         API_ENDPOINTS.GET_BILL_APPOINTMENT(appointmentId.id)
@@ -64,12 +62,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
       setBill(data);
     } catch (e: any) {
       setError(true);
-    } finally {
-      const timer = setTimeout(() => {
-        setLoading(false);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
+    } 
   };
   const fetchClinic = async () => {
     try {
@@ -177,7 +170,6 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   };
   return (
     <>
-      {isLoading && <Preloader />}
       <ErrorNotifi error={error} />
       {showMess && (
         <Notifi

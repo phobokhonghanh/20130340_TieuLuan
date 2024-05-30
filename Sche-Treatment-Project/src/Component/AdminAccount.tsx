@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { AccountResponse } from "../Models/Model";
 import { Col, Table } from "react-bootstrap";
 import Pagination from "./Pagination";
-import { checkLockAccount, checkPatient } from "../Utils/Util";
+import { checkLockAccount, checkPatient } from "../Utils/Utils";
 import {
   API_ENDPOINTS,
   lockAccount,

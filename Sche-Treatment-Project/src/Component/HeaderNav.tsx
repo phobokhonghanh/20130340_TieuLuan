@@ -6,10 +6,12 @@ import { API_ENDPOINTS } from "../apiConfig";
 import { PackageEntity } from "../Models/Model";
 import {
   checkRoleAdmin,
+  checkRoleDoctor,
   getIdAccount,
   getNameAccount,
   removeToken,
 } from "../Authentication/Authentication";
+import { checkDoctor } from "../Utils/Utils";
 
 function HeaderNav() {
   const [sliderMobile, setSliderMobile] = useState(false);
@@ -172,12 +174,25 @@ function HeaderNav() {
                         </i>
                       </Link>
                     ) : (
-                      <span onClick={handleLogout}>
-                        <i
-                          className="fa fa-sign-out icon-cus"
-                          aria-hidden="true"
-                        ></i>
-                      </span>
+                      <>
+                        {checkRoleDoctor() && (
+                          <Link to={"/admin/appointments"}>
+                            <i
+                              className="fa fa-reply-all icon-cus"
+                              aria-hidden="true"
+                            >
+                              {" "}
+                              Doctor
+                            </i>
+                          </Link>
+                        )}
+                        <span onClick={handleLogout}>
+                          <i
+                            className="fa fa-sign-out icon-cus"
+                            aria-hidden="true"
+                          ></i>
+                        </span>
+                      </>
                     )}
                   </Col>
                 )}

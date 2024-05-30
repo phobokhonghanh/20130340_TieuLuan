@@ -14,7 +14,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.ClinicService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/clinic")
+@RequestMapping("/api")
 public class ClinicController {
     @Autowired
     ClinicService clinicService;
@@ -27,30 +27,30 @@ public class ClinicController {
         this.clinicService = clinicService;
     }
 
-    @GetMapping("{clinicId}")
+    @GetMapping("/clinic/{clinicId}")
     public Clinic getClinicById(@PathVariable("clinicId") String clinicId) {
         return clinicService.getClinic(clinicId);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/clinic/all")
     public List<ClinicDTO> getAllClinic() {
         return clinicService.getAll();
     }
 
-    @GetMapping("/service/{servicesId}")
+    @GetMapping("/clinic/service/{servicesId}")
     public List<Clinic> getListClinicService(@PathVariable("servicesId") String servicesId) {
         return clinicService.getListClinicService(servicesId);
     }
 
-    @GetMapping("/package/{packageId}")
+    @GetMapping("/clinic/package/{packageId}")
     public List<Clinic> getListClinicPackage(@PathVariable("packageId") String packageId) {
         return clinicService.getListClinicPackage(packageId);
     }
-    @GetMapping("/calendar/{calendarId}")
+    @GetMapping("/clinic/calendar/{calendarId}")
     public ResponseEntity<ClinicDTO> getClinicByCalendar(@PathVariable("calendarId") String calendarId) {
         return new ResponseEntity<>(clinicService.getClinicByCalendar(calendarId),HttpStatus.OK);
     }
-    @PostMapping
+    @PostMapping("/admin/clinic")
     public ResponseEntity<ClinicDTO>  createClinic(@RequestBody ClinicDTO clinicDTO) {
         ClinicDTO saveClinicDTO = clinicService.createClinic(clinicDTO);
         if (saveClinicDTO != null) {
@@ -59,12 +59,12 @@ public class ClinicController {
         return new ResponseEntity<>(null,HttpStatus.OK);
     }
 
-    @PutMapping
+    @PutMapping("/admin/clinic")
     public boolean updateClinic(@RequestBody Clinic clinic) {
         return clinicService.updateClinic(clinic);
     }
 
-    @DeleteMapping("{clinicId}")
+    @DeleteMapping("/admin/clinic/{clinicId}")
     public boolean deleteClinicById(@PathVariable("clinicId") String clinicId) {
         return clinicService.deleteClinic(clinicId);
     }

@@ -16,7 +16,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.PackageServiceService
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/package")
+@RequestMapping("/api")
 public class MedicalPackageController {
     @Autowired
     MedicalPackageService medicalPackageService;
@@ -28,18 +28,18 @@ public class MedicalPackageController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping("/all")
+    @GetMapping("/package/all")
     public ResponseEntity<Page<MedicalPackageDTO>> getAllPackages(@RequestParam(name = "keyword", defaultValue = "") String keyword,@RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
         Page<MedicalPackageDTO> medicalPackageDTOs =  medicalPackageService.getAll(keyword,pageNo);
         return ResponseEntity.ok(medicalPackageDTOs);
     }
 
-    @GetMapping("/slides")
+    @GetMapping("/package/slides")
     public List<MedicalPackageDTO> getListPackageLimit() {
         return medicalPackageService.getListPackageLimit();
     }
 
-    @GetMapping("/calendar")
+    @GetMapping("/package/calendar")
     public ResponseEntity<Page<MedicalPackageDTO>> getListPackageCalendar(
             @RequestParam(name = "page", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "sort", required = false, defaultValue = "asc") String sortBy,
@@ -49,27 +49,27 @@ public class MedicalPackageController {
         return ResponseEntity.ok(medicalPackageDTOs);
     }
 
-    @GetMapping("/calendar/list")
+    @GetMapping("/package/calendar/list")
     public List<MedicalPackageDTO> getListPackageCalendar() {
         return medicalPackageService.getListPackageCalendar();
     }
 
-    @GetMapping("/area/{medicalAreaId}")
+    @GetMapping("/package/area/{medicalAreaId}")
     public List<MedicalPackage> getListPackage(@PathVariable("medicalAreaId") String medicalAreaId) {
         return medicalPackageService.getListPackageArea(medicalAreaId);
     }
 
-    @GetMapping("/default")
+    @GetMapping("/package/default")
     public MedicalPackageDTO getPackageDefault() {
         return medicalPackageService.getPackageDefault();
     }
 
-    @GetMapping("/{packageId}")
+    @GetMapping("/package/{packageId}")
     public MedicalPackageDTO getPackageDefault(@PathVariable("packageId") String packageId) {
         return medicalPackageService.getPackage(packageId);
     }
 
-    @PostMapping
+    @PostMapping("/admin/package")
     public ResponseEntity<MedicalPackageDTO> createPackage(@RequestBody MedicalPackageDTO medicalPackageDTO) {
         MedicalPackageDTO savePackage = medicalPackageService.createPackage(medicalPackageDTO);
         if (savePackage != null) {
@@ -77,7 +77,7 @@ public class MedicalPackageController {
         }
         return new ResponseEntity<>(null,HttpStatus.OK);
     }
-    @DeleteMapping("/packageService/{packageServiceId}")
+    @DeleteMapping("/admin/package/packageService/{packageServiceId}")
     public ResponseEntity deleteServicesOfPackage(@PathVariable String packageServiceId){
         packageServiceServices.delete(packageServiceId);
         return new ResponseEntity(HttpStatus.OK);

@@ -11,6 +11,8 @@ import {
   getRole,
 } from "../../Authentication/Authentication";
 import { useNavigate } from "react-router-dom";
+import { ErrorNotifi } from "../../Component/Notification";
+import Preloader from "../../Component/Preloader";
 
 export function AdminAppointmnetPage() {
   const [filterText, setFilterText] = useState(""); // input search
@@ -18,13 +20,10 @@ export function AdminAppointmnetPage() {
   const [areas, setArea] = useState<Area[]>([]); // get / set areas (fetch data)
   const [areaSelected, setAreaSelected] = useState<Area>(); // get / set areas selected
 
-  const [clinic, setClinic] = useState(""); // get / set clinic
-
   const [listAppointment, setListAppointment] = useState<AppointmentDTO[]>([]);
   const [selectAppointment, setSelectAppointment] = useState<AppointmentDTO>();
 
-  const [error, setError] = useState();
-  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const [currentPage, setCurrentPage] = useState<number>(1); // State để lưu trang hiện tại
   const [totalPages, setTotalPages] = useState<number>(1); // State để lưu tổng số trang
@@ -33,9 +32,7 @@ export function AdminAppointmnetPage() {
   const navigate = useNavigate();
 
   const account = getIdAccount();
-  const role = getRole();
   const fetchArea = async () => {
-    setLoading(true);
     try {
       const response = await fetch(API_ENDPOINTS.GET_AREA_ALL);
       const data = (await response.json()) as Area[];
@@ -43,8 +40,6 @@ export function AdminAppointmnetPage() {
       setAreaSelected(data[0]);
     } catch (e: any) {
       setError(e);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -55,7 +50,6 @@ export function AdminAppointmnetPage() {
   useEffect(() => {
     if (account) {
       const fetchAppointment = async (page: number) => {
-        setLoading(true);
         try {
           let response;
           console.log(account);
@@ -79,9 +73,8 @@ export function AdminAppointmnetPage() {
           setCurrentPage(data.number + 1);
           setTotalPages(data.totalPages);
         } catch (e: any) {
-          setError(e);
-        } finally {
-          setLoading(false);
+          console.error(e);
+          setError(true);
         }
       };
       if (refesh) {
@@ -100,6 +93,7 @@ export function AdminAppointmnetPage() {
   return (
     <>
       <AdminSidebar />
+      <ErrorNotifi error={error} />
       <div id="page-wrapper">
         <div className="container-fluid">
           <div className="row">
@@ -122,8 +116,8 @@ export function AdminAppointmnetPage() {
             <div className="col-lg-12">
               <div className="panel panel-default">
                 <div className="panel-heading d-flex">
-                  <div>
-                    <i className="fa  fa-user fa-fw"></i>
+                  <div style={{ padding: "10px" }}>
+                    <i className="fa fa-newspaper-o fa-fw"></i>
                     Lịch hẹn
                   </div>
                 </div>
@@ -147,21 +141,6 @@ export function AdminAppointmnetPage() {
                       style={{ marginLeft: "10px" }}
                     >
                       <div className="card mb-4 w100">
-                        {isLoading && <div>Loading...</div>}
-                        {error && (
-                          <div
-                            style={{
-                              textAlign: "center",
-                              color: "rgb(116, 136, 151)",
-                              fontWeight: "bold",
-                              fontSize: "larger",
-                            }}
-                          >
-                            <i>&#9888;</i> Đang gặp sự cố kỹ thuật, xin vui lòng
-                            đợi trong giây lát !
-                          </div>
-                        )}
-
                         {listAppointment &&
                           listAppointment.map((appointment) => (
                             <div
@@ -171,7 +150,6 @@ export function AdminAppointmnetPage() {
                             >
                               <Appointment
                                 appointmentDTO={appointment}
-                                role={role}
                                 refeshDetails={(rf) => setRefesh(rf)}
                               />
                             </div>
@@ -181,7 +159,6 @@ export function AdminAppointmnetPage() {
                     {selectAppointment && (
                       <AppointmentDetail
                         appointmentId={selectAppointment}
-                        role={role}
                         refesh={refesh}
                         setRefesh={(rf) => setRefesh(rf)}
                       />

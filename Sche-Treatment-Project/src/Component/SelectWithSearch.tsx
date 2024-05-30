@@ -5,7 +5,7 @@ import {
   DoctorEntity,
   ServiceEntity,
 } from "../Models/Model";
-import { formatPrice } from "../Utils";
+import { formatPrice } from "../Utils/Utils";
 
 export interface Option {
   value: string;

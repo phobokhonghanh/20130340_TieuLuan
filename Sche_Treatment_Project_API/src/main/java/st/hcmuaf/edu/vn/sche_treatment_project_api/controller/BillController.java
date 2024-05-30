@@ -36,11 +36,7 @@ public class BillController {
         return ResponseEntity.ok(billService.getBillByAppointmentId(appointmentId));
     }
 
-    @PatchMapping("/doctor/payment/cash/{id}")
-    public ResponseEntity updatePaid(@PathVariable String id, @RequestParam(name = "is_pay", defaultValue = "false") boolean is_pay) {
-        billService.updateBillByPaid(id, is_pay);
-        return ResponseEntity.ok().build();
-    }
+
 
     @GetMapping("/admin/bill/sum/months")
     public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "is_pay", defaultValue = "true") boolean is_pay) {
@@ -55,6 +51,11 @@ public class BillController {
     @GetMapping("/admin/bill/sum/week")
     public ResponseEntity<Double> getSumBillWeek() {
         return ResponseEntity.ok(billService.sumBillWeek());
+    }
+    @PatchMapping("/doctor-side/payment/cash/{id}")
+    public ResponseEntity updatePaid(@PathVariable String id, @RequestParam(name = "is_pay", defaultValue = "false") boolean is_pay) {
+        billService.updateBillByPaid(id, is_pay);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/payment/paypal/{id}")

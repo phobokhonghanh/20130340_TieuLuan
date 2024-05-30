@@ -5,10 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.AppointmentMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.CalendarMapper;
@@ -118,8 +115,8 @@ public class AppointmentImpl implements AppointmentService {
 
     @Override
     public Page<AppointmentDTO> getAll(String keyword, Integer pageNo) {
-        Pageable pageable = PageRequest.of(pageNo - 1, 5);
-        Page<Appointment> appointments = appointmentRepository.findAllByAppointmentPhoneIsContaining(keyword, pageable);
+        Pageable pageable = PageRequest.of(pageNo - 1, 5, Sort.by("calendar.calendarDate").descending());
+        Page<Appointment> appointments = appointmentRepository.findAllByAppointmentPhoneIsContainingIgnoreCase(keyword, pageable);
         long total = appointments.getTotalElements();
         List<AppointmentDTO> appointmentDTOs = appointmentMapper.convertListAppointmentETD(appointments.stream().toList());
         return new PageImpl<>(appointmentDTOs, pageable, total);

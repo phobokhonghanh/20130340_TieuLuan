@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Col, Table } from "react-bootstrap";
 
 import Pagination from "./Pagination";
-import { formatPrice } from "../Utils";
+import { formatPrice } from "../Utils/Utils";
 import { ModalService } from "./Service";
 import { ErrorNotifi } from "./Notification";
 import { API_ENDPOINTS } from "../apiConfig";
@@ -72,8 +72,8 @@ export const ServiceManager = () => {
             <div className="col-lg-12">
               <div className="panel panel-default">
                 <div className="panel-heading d-flex">
-                  <div>
-                    <i className="fa  fa-user fa-fw"></i>
+                  <div style={{ padding: "10px" }}>
+                    <i className="fa fa-calendar fa-fw"></i>
                     Dịch vụ khám bệnh
                   </div>
                   <a className="add" onClick={() => setShowModalService(true)}>

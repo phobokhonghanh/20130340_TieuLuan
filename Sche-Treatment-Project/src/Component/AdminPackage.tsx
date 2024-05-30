@@ -24,7 +24,7 @@ import {
   getListServices,
   getServicesRemoved,
   getServicesSelected,
-} from "../Utils";
+} from "../Utils/Utils";
 import Preloader from "./Preloader";
 
 //Quản lý gói khám
@@ -88,8 +88,8 @@ export const PackageManager = () => {
             <div className="col-lg-12">
               <div className="panel panel-default">
                 <div className="panel-heading d-flex">
-                  <div>
-                    <i className="fa  fa-user fa-fw"></i>
+                  <div style={{ padding: "10px" }}>
+                    <i className="fa fa-pencil-square-o fa-fw"></i>
                     Gói khám bệnh
                   </div>
                   <a

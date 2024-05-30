@@ -15,7 +15,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.SupportService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/result")
+@RequestMapping("/api")
 public class AppointmentResultController {
     @Autowired
     AppointmentResultService appointmentResultService;
@@ -25,7 +25,7 @@ public class AppointmentResultController {
     public ResponseEntity<Object> handleDataAccessException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-    @GetMapping("/appointment/{appointmentId}")
+    @GetMapping("/result/appointment/{appointmentId}")
     public ResponseEntity<AppointmentResultDTO> getResultByAppointmentId(@PathVariable String appointmentId) {
         AppointmentResultDTO appointmentResultDTO= appointmentResultService.getAppointmentResultByAppointment(appointmentId);
         if (appointmentResultDTO == null) {
@@ -33,7 +33,7 @@ public class AppointmentResultController {
         }
         return new ResponseEntity<>(appointmentResultDTO,HttpStatus.OK) ;
     }
-    @PostMapping
+    @PostMapping("/doctor-side/result")
     public ResponseEntity<AppointmentResultDTO>  createResult(@RequestBody AppointmentResultDTO appointmentResultDTO) {
         AppointmentResultDTO saveAppointmentResultDTO = appointmentResultService.create(appointmentResultDTO);
         if (saveAppointmentResultDTO != null) {

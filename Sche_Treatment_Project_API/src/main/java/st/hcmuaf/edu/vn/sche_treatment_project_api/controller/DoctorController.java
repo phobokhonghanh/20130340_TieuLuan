@@ -16,7 +16,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.DoctorService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/doctor")
+@RequestMapping("/api")
 public class DoctorController {
     @Autowired
     DoctorService doctorService;
@@ -27,15 +27,15 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping("/all")
+    @GetMapping("/doctor/all")
     public List<Doctor> getAllDoctor() {
         return doctorService.getAll();
     }
-    @GetMapping("/slides")
+    @GetMapping("/doctor/slides")
     public List<DoctorDTO> getListDoctorLimit() {
         return doctorService.getListDoctorLimit();
     }
-    @GetMapping("/calendar")
+    @GetMapping("/doctor/calendar")
     public ResponseEntity<Page<DoctorDTO>> getListDoctorCalendarPageable(
             @RequestParam(name = "page", defaultValue = "1") Integer pageNo,
             @RequestParam(name = "sort", required = false, defaultValue = "asc") String sortBy,
@@ -45,18 +45,18 @@ public class DoctorController {
         Page<DoctorDTO> doctors = doctorService.getListDoctorCalendarPageable(pageNo,sortBy,filter,keyword);
         return ResponseEntity.ok(doctors);
     }
-    @PutMapping("/update")
+    @PutMapping("/doctor-side/doctor/update")
     public ResponseEntity updateAccount(@RequestBody DoctorDTO doctorDTO) {
         if (doctorService.updateDoctor(doctorDTO)) {
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity(MessageUtils.MESSAGE_ACCOUNT_NOT_EXISTS, HttpStatus.BAD_REQUEST);
     }
-    @GetMapping("/calendar/{calendarId}")
+    @GetMapping("/doctor/calendar/{calendarId}")
     public DoctorDTO getDoctorByIdCalendar(@PathVariable("calendarId") String calendarId) {
         return doctorService.getDoctorByIdCalendar(calendarId);
     }
-    @GetMapping("/{accountId}")
+    @GetMapping("/doctor/{accountId}")
     public ResponseEntity<DoctorDTO> getPatientById(@PathVariable("accountId") String accountId) {
         AccountDTO account = doctorService.getDoctor(accountId);
         if (account != null)

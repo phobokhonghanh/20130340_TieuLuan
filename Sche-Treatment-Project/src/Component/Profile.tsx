@@ -18,7 +18,7 @@ import {
   updateDoctor,
 } from "../apiConfig";
 import { ErrorNotifi, Notifi } from "./Notification";
-import { convertDate, convertDateTime } from "../Utils";
+import { convertDate, convertDateTime } from "../Utils/Utils";
 import Pagination from "./Pagination";
 import {
   checkRoleDoctor,
@@ -460,12 +460,13 @@ export const ProfileDoctorDetails = () => {
       })
       .catch((error: any) => {
         if (error.response.status === 400) {
-          setMessage(error.response.data);
+          setMessage(error.data);
+          setLevelMessage("danger");
         } else {
           console.log("error:", error);
           setMessage("Update Failed");
+          setLevelMessage("danger");
         }
-        setLevelMessage("danger");
       })
       .finally(() => {
         setShowMess(true);

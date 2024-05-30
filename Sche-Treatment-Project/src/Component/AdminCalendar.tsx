@@ -45,8 +45,8 @@ export const CalendarManager = () => {
           <div className="col-lg-12">
             <div className="panel panel-default">
               <div className="panel-heading d-flex">
-                <div>
-                  <i className="fa  fa-user fa-fw"></i>
+                <div style={{ padding: "10px" }}>
+                  <i className="fa fa-home fa-fw"></i>
                   Phòng khám
                 </div>
                 <a className="add" onClick={() => setShowModalAddClinic(true)}>
@@ -100,7 +100,7 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
   const [areas, setArea] = useState<Area[]>([]); // get / set areas (fetch data)
   const [areaSelected, setAreaSelected] = useState<Area>(); // get / set areas selected
   const [filteredRows, setFilteredRows] = useState<Clinic[]>([]); // get clinic search
-  const [error, setError] = useState();
+  const [error, setError] = useState(false);
   const [isLoading, setLoading] = useState(false);
   // gọi api - lấy danh sách khu vực khám
   // gán mặc định cho area đầu tiên
@@ -115,7 +115,7 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
       areaChoose(data[0]);
       setFilteredRows(areaSelected ? areaSelected.clinics : []);
     } catch (e: any) {
-      setError(e);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -167,6 +167,7 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
   return (
     <>
       {isLoading && <Preloader />}
+      <ErrorNotifi error={error}/>
       <div>
         <Row style={{ padding: "10px", width: "100%" }}>
           <Col xs={4}>
@@ -186,8 +187,6 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
                 onChange={handleAreaChange}
                 required
               >
-                {isLoading && <option>Loading...</option>}
-                {error && <option>Không có data</option>}
                 <option value="">-- Chọn khu khám --</option>
                 {areas.map((area) => (
                   <option key={area.id} value={area.id}>
@@ -330,7 +329,7 @@ interface CalendarProps {
   onHide: () => void;
   responseStatus: (status: number) => void;
 }
-// modal thêm lịch 
+// modal thêm lịch
 export const ModalCalendar: React.FC<CalendarProps> = ({
   id_clinic,
   data,
@@ -605,7 +604,6 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
             }
             setLevelMessage("success");
             setShowMess(true);
-            setName("");
             onHide();
             responseStatus(response.status);
           }

@@ -128,6 +128,9 @@ public class DoctorImpl implements DoctorService {
     }
     @Override
     public DoctorDTO getDoctor(String id) {
+        if(!doctorRepository.findById(id).isPresent()){
+            return null;
+        }
         return accountMapper.convertDoctorETD(doctorRepository.findById(id).get());
     }
 

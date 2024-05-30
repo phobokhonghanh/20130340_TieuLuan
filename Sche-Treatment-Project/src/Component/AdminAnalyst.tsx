@@ -3,12 +3,15 @@ import { dataAppointment, dataDoanhThu } from "../Utils/Data";
 import BarChart from "./PieChart";
 import { useEffect, useState } from "react";
 import { API_ENDPOINTS } from "../apiConfig";
-import { formatPrice } from "../Utils";
+import { formatPrice } from "../Utils/Utils";
 import Preloader from "./Preloader";
+import { ErrorNotifi } from "./Notification";
 
 // thống kê
 export function Analyst() {
   const [isLoading, setLoading] = useState(false); // loading
+  const [error, setError] = useState(false);
+
   // method call api data months
   function fetchDataMonths(api: string): number[] {
     const [charBilltData, setChartBillData] = useState<number[]>([]);
@@ -20,6 +23,7 @@ export function Analyst() {
         setChartBillData(data);
       } catch (e: any) {
         console.log(e);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -83,6 +87,7 @@ export function Analyst() {
   return (
     <>
       {isLoading && <Preloader />}
+      <ErrorNotifi error={error} />
       <div id="page-wrapper">
         <div className="container-fluid">
           <div className="row">
