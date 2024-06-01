@@ -14,6 +14,7 @@ import "../assets/css/Account.css";
 import { ErrorNotifi, Notifi } from "./Notification";
 import { Link } from "react-router-dom";
 import Preloader from "./Preloader";
+import { headerAuth } from "../Authentication/Authentication";
 
 // Quản lý tài khoản
 export const AccountManager = () => {
@@ -40,7 +41,8 @@ export const AccountManager = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `${API_ENDPOINTS.GET_ACCOUNT_ALL}?page=${currentPage}&keyword=${filterText}`
+          `${API_ENDPOINTS.GET_ACCOUNT_ALL}?page=${currentPage}&keyword=${filterText}`,
+          headerAuth()
         );
         const data = await response.json();
         setData(data.content);

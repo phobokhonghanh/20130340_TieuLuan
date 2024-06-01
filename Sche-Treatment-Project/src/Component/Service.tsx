@@ -6,6 +6,7 @@ import { Notifi } from "./Notification";
 import { API_ENDPOINTS, createService } from "../apiConfig";
 import { ClinicSelected } from "./Department";
 import { Clinic, ServiceDTO, ServiceEntity } from "../Models/Model";
+import { headerAuth } from "../Authentication/Authentication";
 
 interface ServiceProps {
   serviceEnity: ServiceEntity;
@@ -116,7 +117,10 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
   const fetchClinic = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_ENDPOINTS.GET_CLINIC_ALL}`);
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_CLINIC_ALL}`,
+        headerAuth()
+      );
       const data = (await response.json()) as Clinic[];
       setDataClinic(data);
     } catch (e: any) {

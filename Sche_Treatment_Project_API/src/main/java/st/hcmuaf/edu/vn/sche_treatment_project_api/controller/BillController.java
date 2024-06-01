@@ -20,7 +20,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.BillService;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.v1}")
+@RequestMapping("${api}")
 public class BillController {
     @Autowired
     private BillService billService;
@@ -31,13 +31,6 @@ public class BillController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping("/bill/appointment/{appointmentId}")
-    public ResponseEntity<Bill> getListAppointmentUser(@PathVariable String appointmentId) {
-        return ResponseEntity.ok(billService.getBillByAppointmentId(appointmentId));
-    }
-
-
-
     @GetMapping("/admin/bill/sum/months")
     public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "is_pay", defaultValue = "true") boolean is_pay) {
         return ResponseEntity.ok(billService.sumBillMonths(is_pay));
@@ -47,7 +40,6 @@ public class BillController {
         return ResponseEntity.ok(billService.getAll(pageNo,keyword));
     }
 
-
     @GetMapping("/admin/bill/sum/week")
     public ResponseEntity<Double> getSumBillWeek() {
         return ResponseEntity.ok(billService.sumBillWeek());
@@ -56,6 +48,10 @@ public class BillController {
     public ResponseEntity updatePaid(@PathVariable String id, @RequestParam(name = "is_pay", defaultValue = "false") boolean is_pay) {
         billService.updateBillByPaid(id, is_pay);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/bill/appointment/{appointmentId}")
+    public ResponseEntity<Bill> getListAppointmentUser(@PathVariable String appointmentId) {
+        return ResponseEntity.ok(billService.getBillByAppointmentId(appointmentId));
     }
 
     @PutMapping("/payment/paypal/{id}")

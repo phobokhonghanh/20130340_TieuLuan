@@ -1,4 +1,4 @@
-package st.hcmuaf.edu.vn.sche_treatment_project_api.config;
+package st.hcmuaf.edu.vn.sche_treatment_project_api.config.mail;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

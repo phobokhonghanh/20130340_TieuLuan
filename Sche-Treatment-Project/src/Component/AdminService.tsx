@@ -8,6 +8,7 @@ import { ErrorNotifi } from "./Notification";
 import { API_ENDPOINTS } from "../apiConfig";
 import { ServiceEntity } from "../Models/Model";
 import Preloader from "./Preloader";
+import { headerAuth } from "../Authentication/Authentication";
 
 // quản lý dịch vụ
 export const ServiceManager = () => {
@@ -31,7 +32,8 @@ export const ServiceManager = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `${API_ENDPOINTS.GET_SERVICE_ALL}?page=${currentPage}&keyword=${filterText}`
+          `${API_ENDPOINTS.GET_SERVICE_ALL}?page=${currentPage}&keyword=${filterText}`,
+          headerAuth()
         );
         const data = await response.json();
         setDataService(data.content);

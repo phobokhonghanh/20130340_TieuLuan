@@ -8,6 +8,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.LoginDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.PatientDTO;
 
 import java.util.List;
+
 @Service
 public interface AccountService {
     boolean createAccount(AccountDTO accountDTO);
@@ -23,9 +24,11 @@ public interface AccountService {
     AccountDTO getAccount(String id);
 
     boolean checkEmailOrPhone(String email, String phone);
+
     boolean checkEmailAndPhone(String email, String phone);
 
     String forgotPassword(String email, String phone);
+
     boolean resetPassword(LoginDTO loginDTO);
 
     boolean sendOTPResetPassword(String accountId);
@@ -36,8 +39,13 @@ public interface AccountService {
 
     Account findByAccountPhone(String phone);
 
+    Account findById(String id);
+
     boolean register(PatientDTO patientDTO);
+
     String login(LoginDTO loginDTO, Account account);
+
+    String generateToken(Account account);
 
     Page getAll(String keyword, Integer pageNo);
 }

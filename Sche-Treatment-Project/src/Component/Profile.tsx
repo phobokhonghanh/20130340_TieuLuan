@@ -23,6 +23,7 @@ import Pagination from "./Pagination";
 import {
   checkRoleDoctor,
   getIdAccount,
+  headerAuth,
   removeToken,
 } from "../Authentication/Authentication";
 import { Button } from "react-bootstrap";
@@ -62,14 +63,22 @@ export const Profile = () => {
       setBHYT(patient.patientBhyt || "");
     }
   }, [account, patient]);
+
   const fetchAccount = async () => {
     setLoading(true);
+
     try {
       if (idAccount !== "") {
-        const response = await fetch(API_ENDPOINTS.GET_ACCOUNT(idAccount));
+        const response = await fetch(
+          API_ENDPOINTS.GET_ACCOUNT(idAccount),
+          headerAuth()
+        );
         const data = (await response.json()) as Account;
         if (!checkRoleDoctor()) {
-          const response2 = await fetch(API_ENDPOINTS.GET_PATIENT(idAccount));
+          const response2 = await fetch(
+            API_ENDPOINTS.GET_PATIENT(idAccount),
+            headerAuth()
+          );
           const data2 = (await response2.json()) as Patient;
           setPatient(data2);
         }
@@ -675,7 +684,8 @@ export const DoctorDetails: React.FC<DoctorInfProps> = ({ doctor }) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.GET_EVALUATE_DOCTOR(doctor.id)}`
+        `${API_ENDPOINTS.GET_EVALUATE_DOCTOR(doctor.id)}`,
+        headerAuth()
       );
       if (response.status === 204) {
         return;
@@ -697,7 +707,6 @@ export const DoctorDetails: React.FC<DoctorInfProps> = ({ doctor }) => {
   }, []);
   return (
     <>
-      {isLoading && <div> Loading...</div>}
       <section className="">
         <ErrorNotifi error={error} />
         <div className="container">
@@ -733,7 +742,6 @@ export const DoctorDetails: React.FC<DoctorInfProps> = ({ doctor }) => {
                   <div className="col-9">
                     <h3 className="news-title">
                       {doctor.doctorDegree}
-                      {". "}
                       {doctor.doctorRank} {doctor.accountName}
                     </h3>
                     <span>

@@ -6,6 +6,7 @@ import { API_ENDPOINTS } from "../apiConfig";
 import { formatPrice } from "../Utils/Utils";
 import Preloader from "./Preloader";
 import { ErrorNotifi } from "./Notification";
+import { headerAuth } from "../Authentication/Authentication";
 
 // thống kê
 export function Analyst() {
@@ -18,7 +19,7 @@ export function Analyst() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(api);
+        const response = await fetch(api, headerAuth());
         const data = (await response.json()) as number[];
         setChartBillData(data);
       } catch (e: any) {

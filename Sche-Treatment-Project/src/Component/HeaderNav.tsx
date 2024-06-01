@@ -1,17 +1,17 @@
-import { Navbar, Nav, Container, Row, Col, Button } from "react-bootstrap";
+import { Navbar, Nav, Container, Row, Col, Alert } from "react-bootstrap";
 import "../assets/css/HeaderNav.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from "../apiConfig";
-import { PackageEntity } from "../Models/Model";
+import { LoginResponse, PackageEntity } from "../Models/Model";
 import {
   checkRoleAdmin,
   checkRoleDoctor,
+  checkTokenRealtime,
   getIdAccount,
   getNameAccount,
   removeToken,
 } from "../Authentication/Authentication";
-import { checkDoctor } from "../Utils/Utils";
 
 function HeaderNav() {
   const [sliderMobile, setSliderMobile] = useState(false);
@@ -25,6 +25,11 @@ function HeaderNav() {
     removeToken("benhviendakhoathuduc");
     navigate("/");
   };
+
+  useEffect(() => {
+  checkTokenRealtime(navigate);
+  })
+  
   useEffect(() => {
     const fetchPackage = async () => {
       try {

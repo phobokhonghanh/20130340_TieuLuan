@@ -14,15 +14,17 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.ClinicService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("${api}")
 public class ClinicController {
     @Autowired
     ClinicService clinicService;
+
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Object> handleDataAccessException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
     public ClinicController(ClinicService clinicService) {
         this.clinicService = clinicService;
     }
@@ -46,17 +48,19 @@ public class ClinicController {
     public List<Clinic> getListClinicPackage(@PathVariable("packageId") String packageId) {
         return clinicService.getListClinicPackage(packageId);
     }
+
     @GetMapping("/clinic/calendar/{calendarId}")
     public ResponseEntity<ClinicDTO> getClinicByCalendar(@PathVariable("calendarId") String calendarId) {
-        return new ResponseEntity<>(clinicService.getClinicByCalendar(calendarId),HttpStatus.OK);
+        return new ResponseEntity<>(clinicService.getClinicByCalendar(calendarId), HttpStatus.OK);
     }
+
     @PostMapping("/admin/clinic")
-    public ResponseEntity<ClinicDTO>  createClinic(@RequestBody ClinicDTO clinicDTO) {
+    public ResponseEntity<ClinicDTO> createClinic(@RequestBody ClinicDTO clinicDTO) {
         ClinicDTO saveClinicDTO = clinicService.createClinic(clinicDTO);
         if (saveClinicDTO != null) {
             return new ResponseEntity<>(saveClinicDTO, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(null,HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @PutMapping("/admin/clinic")

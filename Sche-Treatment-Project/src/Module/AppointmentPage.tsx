@@ -20,7 +20,7 @@ import { ErrorNotifi, Notifi } from "../Component/Notification";
 import { convertTime } from "../Component/AdminCalendar";
 import { API_ENDPOINTS, createAppointment } from "../apiConfig";
 import { ClinicSelected } from "../Component/Department";
-import { getIdAccount } from "../Authentication/Authentication";
+import { getIdAccount, headerAuth } from "../Authentication/Authentication";
 import Preloader from "../Component/Preloader";
 
 export function formatDate(date: string) {
@@ -499,7 +499,8 @@ export const TimeTable: React.FC<Props> = ({
     const fetchAppointmentByCalendarId = async (calendarId: string) => {
       try {
         const response = await fetch(
-          API_ENDPOINTS.GET_SUPPORT_ALL_TIME_APPOINTMENT(calendarId)
+          API_ENDPOINTS.GET_SUPPORT_ALL_TIME_APPOINTMENT(calendarId),
+          headerAuth()
         );
         const data = await response.json();
         setSelectedTime(data);

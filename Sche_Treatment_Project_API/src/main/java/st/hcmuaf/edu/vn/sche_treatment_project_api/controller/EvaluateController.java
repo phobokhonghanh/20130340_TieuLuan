@@ -12,7 +12,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AppointmentResultServ
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.EvaluateService;
 
 @RestController
-@RequestMapping("/api/evaluate")
+@RequestMapping("${api}/evaluate")
 public class EvaluateController {
     @Autowired
     EvaluateService evaluateService;

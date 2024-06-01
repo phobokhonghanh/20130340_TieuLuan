@@ -1,6 +1,5 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;

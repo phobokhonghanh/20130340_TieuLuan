@@ -1,11 +1,9 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.Utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,14 +57,6 @@ public class JwtTokenUtils {
         return Keys.hmacShaKeyFor(bytes);
     }
 
-    private String generateSecretKey() {
-        SecureRandom random = new SecureRandom();
-        byte[] keyBytes = new byte[32]; // 256-bit key
-        random.nextBytes(keyBytes);
-        String secretKey = Encoders.BASE64.encode(keyBytes);
-        return secretKey;
-    }
-
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
@@ -90,16 +80,21 @@ public class JwtTokenUtils {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean validateToken(String token, Account account) {
+    public boolean validateJwtToken(String authToken) {
         try {
-            String phoneNumber = extractPhoneNumber(token);
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return phoneNumber.equals(account.getUsername()) && !account.getSupportRole().getSupportValue().equalsIgnoreCase("S2")
-                    && !isTokenExpired(token);
-        } catch (JwtException | IllegalArgumentException e) {
-            // Token không hợp lệ
-            logger.error("Invalid JWT token: {}", e.getMessage());
-            return false;
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(authToken);
+            return true;
+        } catch (SignatureException e) {
+            logger.error("Invalid JWT signature {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            logger.error("Invalid JWT expired {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            logger.error("Invalid JWT unsupported {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid JWT empty {}", e.getMessage());
         }
+        return false;
     }
 }

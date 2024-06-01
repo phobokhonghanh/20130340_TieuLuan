@@ -9,6 +9,7 @@ import {
   checkRoleAdmin,
   getIdAccount,
   getRole,
+  headerAuth,
 } from "../../Authentication/Authentication";
 import { useNavigate } from "react-router-dom";
 import { ErrorNotifi } from "../../Component/Notification";
@@ -58,11 +59,13 @@ export function AdminAppointmnetPage() {
             response = await fetch(
               `${API_ENDPOINTS.GET_APPOINTMENT_DOCTOR(
                 account
-              )}?page=${page}&keyword=${filterText}`
+              )}?page=${page}&keyword=${filterText}`,
+              headerAuth()
             );
           } else {
             response = await fetch(
-              `${API_ENDPOINTS.GET_APPOINTMENT_ADMIN}?page=${page}&keyword=${filterText}`
+              `${API_ENDPOINTS.GET_APPOINTMENT_ADMIN}?page=${page}&keyword=${filterText}`,
+              headerAuth()
             );
           }
           const data = await response.json();

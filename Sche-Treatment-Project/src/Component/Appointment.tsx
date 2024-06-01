@@ -25,6 +25,7 @@ import { ErrorNotifi, Notifi } from "./Notification";
 import {
   checkRoleDoctor,
   getIdAccount,
+  headerAuth,
 } from "../Authentication/Authentication";
 import Preloader from "./Preloader";
 interface appointmentDetailsProps {
@@ -55,19 +56,20 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   const fetchBill = async () => {
     try {
       const response = await fetch(
-        API_ENDPOINTS.GET_BILL_APPOINTMENT(appointmentId.id)
+        API_ENDPOINTS.GET_BILL_APPOINTMENT(appointmentId.id),
+        headerAuth()
       );
       const data = (await response.json()) as Bill;
-      console.log(data);
       setBill(data);
     } catch (e: any) {
       setError(true);
-    } 
+    }
   };
   const fetchClinic = async () => {
     try {
       const response = await fetch(
-        API_ENDPOINTS.GET_CLINIC_CALENDAR(appointmentId.calendarId)
+        API_ENDPOINTS.GET_CLINIC_CALENDAR(appointmentId.calendarId),
+        headerAuth()
       );
       const data = (await response.json()) as ClinicDTO;
       setClinic(data);
@@ -79,7 +81,8 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
     try {
       if (clinic && clinic.medicalAreaId !== null) {
         const response = await fetch(
-          API_ENDPOINTS.GET_AREA(clinic.medicalAreaId.id)
+          API_ENDPOINTS.GET_AREA(clinic.medicalAreaId.id),
+          headerAuth()
         );
         const data = (await response.json()) as Area;
         setArea(data);
@@ -109,6 +112,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
             setLevelMessage("danger");
             setShowMess(true);
           } else {
+            console.error("checkError", error);
             setError(true);
           }
         });
@@ -330,7 +334,8 @@ export const Appointment: React.FC<AppointmentProps> = ({
   const fetchSupport = async () => {
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.GET_SUPPORT(appointmentDTO.supportTimeId)}`
+        `${API_ENDPOINTS.GET_SUPPORT(appointmentDTO.supportTimeId)}`,
+        headerAuth()
       );
       const data = await response.json();
       setSupport(data);
@@ -342,7 +347,8 @@ export const Appointment: React.FC<AppointmentProps> = ({
   const fetchGetCalendar = async () => {
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.GET_CALENDAR(appointmentDTO.calendarId)}`
+        `${API_ENDPOINTS.GET_CALENDAR(appointmentDTO.calendarId)}`,
+        headerAuth()
       );
       const data = await response.json();
       setCalendar(data);
@@ -354,7 +360,8 @@ export const Appointment: React.FC<AppointmentProps> = ({
   const fetchGetPackage = async () => {
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.GET_PACKAGE(appointmentDTO.packageId)}`
+        `${API_ENDPOINTS.GET_PACKAGE(appointmentDTO.packageId)}`,
+        headerAuth()
       );
       const data = await response.json();
       setPackage(data);
@@ -366,7 +373,8 @@ export const Appointment: React.FC<AppointmentProps> = ({
   const fetchGetDoctor = async () => {
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.GET_DOCTOR_CALENDAR_ID(appointmentDTO.calendarId)}`
+        `${API_ENDPOINTS.GET_DOCTOR_CALENDAR_ID(appointmentDTO.calendarId)}`,
+        headerAuth()
       );
       const data = await response.json();
       setAccount(data);
@@ -471,7 +479,8 @@ export const HistoryAppointment = () => {
         setLoading(true);
         try {
           const response = await fetch(
-            `${API_ENDPOINTS.GET_APPOINTMENT_USER(account)}?page=${page}`
+            `${API_ENDPOINTS.GET_APPOINTMENT_USER(account)}?page=${page}`,
+            headerAuth()
           );
           const data = await response.json();
           setListAppointment(data.content);

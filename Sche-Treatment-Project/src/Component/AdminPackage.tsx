@@ -26,6 +26,7 @@ import {
   getServicesSelected,
 } from "../Utils/Utils";
 import Preloader from "./Preloader";
+import { headerAuth } from "../Authentication/Authentication";
 
 //Quản lý gói khám
 export const PackageManager = () => {
@@ -47,7 +48,8 @@ export const PackageManager = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `${API_ENDPOINTS.GET_PACKAGE_ALL}?page=${currentPage}&keyword=${filterText}`
+          `${API_ENDPOINTS.GET_PACKAGE_ALL}?page=${currentPage}&keyword=${filterText}`,
+          headerAuth()
         );
         const data = await response.json();
         setPackages(data.content);
@@ -190,7 +192,10 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
 
   const fetchClinic = async () => {
     try {
-      const response = await fetch(`${API_ENDPOINTS.GET_CLINIC_ALL}`);
+      const response = await fetch(
+        `${API_ENDPOINTS.GET_CLINIC_ALL}`,
+        headerAuth()
+      );
       const data = (await response.json()) as Clinic[];
       setDataClinic(data);
     } catch (e: any) {

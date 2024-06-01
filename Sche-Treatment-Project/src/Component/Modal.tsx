@@ -9,7 +9,7 @@ import {
 } from "../apiConfig";
 import { ErrorNotifi, Notifi } from "./Notification";
 import { v4 as uuidv4 } from "uuid";
-import { checkRoleDoctor } from "../Authentication/Authentication";
+import { checkRoleDoctor, headerAuth } from "../Authentication/Authentication";
 
 interface ResultProps {
   appointmentId: string;
@@ -56,7 +56,8 @@ export const ModalResult: React.FC<ResultProps> = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.GET_RESULT_APPOINTMENT(appointmentId)}`
+        `${API_ENDPOINTS.GET_RESULT_APPOINTMENT(appointmentId)}`,
+        headerAuth()
       );
       if (response.status === 204) {
         return;
@@ -247,7 +248,8 @@ export const ModalComment: React.FC<CommentProps> = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.GET_EVALUATE_APPOINTMENT(appointmentId)}`
+        `${API_ENDPOINTS.GET_EVALUATE_APPOINTMENT(appointmentId)}`,
+        headerAuth()
       );
       if (response.status === 204) {
         return;

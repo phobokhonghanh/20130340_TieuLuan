@@ -4,6 +4,7 @@ import { API_ENDPOINTS } from "../apiConfig";
 import { ErrorNotifi } from "./Notification";
 import { Col, Table } from "react-bootstrap";
 import Pagination from "./Pagination";
+import { headerAuth } from "../Authentication/Authentication";
 
 export const BillManager = () => {
   const [filterText, setFilterText] = useState(""); // input search
@@ -22,7 +23,8 @@ export const BillManager = () => {
     const fetchDataBill = async () => {
       try {
         const response = await fetch(
-          `${API_ENDPOINTS.GET_BILL_ALL}?page=${currentPage}&keyword=${filterText}`
+          `${API_ENDPOINTS.GET_BILL_ALL}?page=${currentPage}&keyword=${filterText}`,
+          headerAuth()
         );
         const data = await response.json();
         setData(data.content);

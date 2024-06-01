@@ -1,4 +1,4 @@
-package st.hcmuaf.edu.vn.sche_treatment_project_api.config;
+package st.hcmuaf.edu.vn.sche_treatment_project_api.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.v1}")
+@RequestMapping("${api}")
 public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
@@ -31,6 +31,29 @@ public class AppointmentController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Object> handleDataAccessException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping("/admin/appointment/sum/months")
+    public ResponseEntity<List<Double>> getSumAppointmentMonths() {
+        return ResponseEntity.ok(appointmentService.sumAppointmentMonths());
+    }
+
+    @GetMapping("/admin/appointment/sum/status/months")
+    public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "status", defaultValue = "S4") String status) {
+        return ResponseEntity.ok(appointmentService.sumAppointmentStatusMonths(status));
+    }
+
+    @GetMapping("/admin/appointment")
+    public ResponseEntity<Page<AppointmentDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "0") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
+        Page<AppointmentDTO> appointmentDTOs = appointmentService.getAll(keyword, pageNo);
+        return ResponseEntity.ok(appointmentDTOs);
+    }
+
+    @GetMapping("/doctor-side/appointment/{accountId}")
+    public ResponseEntity<Page<AppointmentDTO>> getListAppointmentDoctor(@PathVariable("accountId") String accountId, @RequestParam(name = "keyword", defaultValue = "0") String keyword,
+                                                                         @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
+        Page<AppointmentDTO> appointmentDTOs = appointmentService.getListAppointmentDoctor(accountId, keyword, pageNo);
+        return ResponseEntity.ok(appointmentDTOs);
     }
 
     @PostMapping("/appointment")
@@ -44,11 +67,13 @@ public class AppointmentController {
         }
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
+
     @PatchMapping("/appointment/status/{appointmentId}")
-    public ResponseEntity<?> updateAppointmentStatus(@PathVariable String appointmentId) {
-        appointmentService.updateStatus(appointmentId,"S4");
-        return ResponseEntity.ok().build();
+    public ResponseEntity updateAppointmentStatus(@PathVariable String appointmentId) {
+        appointmentService.updateStatus(appointmentId, "S4");
+        return new ResponseEntity(HttpStatus.OK);
     }
+
     @GetMapping("/appointment/calendar/{calendarId}")
     public List<Appointment> getListAppointmentCalendarId(@PathVariable("calendarId") String calendarId) {
         return appointmentService.getListAppointmentCalendarId(calendarId);
@@ -61,24 +86,4 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentDTOs);
     }
 
-    @GetMapping("/admin/appointment")
-    public ResponseEntity<Page<AppointmentDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "0") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
-        Page<AppointmentDTO> appointmentDTOs = appointmentService.getAll(keyword, pageNo);
-        return ResponseEntity.ok(appointmentDTOs);
-    }
-
-    @GetMapping("/appointment/doctor/{accountId}")
-    public ResponseEntity<Page<AppointmentDTO>> getListAppointmentDoctor(@PathVariable("accountId") String accountId, @RequestParam(name = "keyword", defaultValue = "0") String keyword,
-                                                                         @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
-        Page<AppointmentDTO> appointmentDTOs = appointmentService.getListAppointmentDoctor(accountId, keyword, pageNo);
-        return ResponseEntity.ok(appointmentDTOs);
-    }
-    @GetMapping("/admin/appointment/sum/months")
-    public ResponseEntity<List<Double>> getSumAppointmentMonths() {
-        return ResponseEntity.ok(appointmentService.sumAppointmentMonths());
-    }
-    @GetMapping("/admin/appointment/sum/status/months")
-    public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "status", defaultValue = "S4") String status) {
-        return ResponseEntity.ok(appointmentService.sumAppointmentStatusMonths(status));
-    }
 }

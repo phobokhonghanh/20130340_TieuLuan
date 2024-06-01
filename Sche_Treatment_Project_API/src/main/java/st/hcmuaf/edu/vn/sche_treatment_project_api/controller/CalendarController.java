@@ -12,20 +12,23 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.CalendarService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("${api}")
 public class CalendarController {
     @Autowired
     private CalendarService calendarService;
+
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Object> handleDataAccessException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
     @PostMapping("/admin/calendar")
     public ResponseEntity<CalendarDTO> createCalendar(@RequestBody CalendarDTO calendarDTO) {
         CalendarDTO saveCalendar = calendarService.createCalendar(calendarDTO);
         return new ResponseEntity<>(saveCalendar, HttpStatus.CREATED);
     }
+
     @GetMapping("/calendar/{calendarId}")
     public ResponseEntity<CalendarDTO> getCalendarById(@PathVariable("calendarId") String calendarId) {
         CalendarDTO calendarDTOs = calendarService.getCalendarById(calendarId);

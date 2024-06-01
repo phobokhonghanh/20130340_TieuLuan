@@ -1,7 +1,6 @@
 import CardInfo from "../Component/CardInfo";
 import Footer from "../Component/Footer";
 import HeaderNav from "../Component/HeaderNav";
-import Preloader from "../Component/Preloader";
 import { DoctorDetails } from "../Component/Profile";
 import Slides from "../Component/Slides";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -14,7 +13,6 @@ export function DoctorInfor() {
   const doctorState: DoctorEntity = state.doctorState;
   return (
     <>
-      <Preloader />
       <HeaderNav />
       <Slides />
       <CardInfo />

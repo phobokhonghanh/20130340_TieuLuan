@@ -18,7 +18,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.MedicalServicesServic
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("${api}")
 public class MedicalServiceController {
     @Autowired
     MedicalServicesService medicalServicesService;
@@ -28,19 +28,22 @@ public class MedicalServiceController {
     public ResponseEntity<Object> handleDataAccessException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-    @GetMapping("/service/all")
-    public ResponseEntity<Page<MedicalServiceDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
-        Page<MedicalServiceDTO> medicalServiceDTOs =  medicalServicesService.getAll(keyword,pageNo);
-        return ResponseEntity.ok(medicalServiceDTOs);
-    }
+
     @PostMapping("/admin/service")
     public ResponseEntity<MedicalServiceDTO> createService(@RequestBody MedicalServiceDTO medicalServiceDTO) {
         MedicalServiceDTO saveService = medicalServicesService.createService(medicalServiceDTO);
         if (saveService != null) {
             return new ResponseEntity<>(saveService, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(null,HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
+
+    @GetMapping("/service/all")
+    public ResponseEntity<Page<MedicalServiceDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
+        Page<MedicalServiceDTO> medicalServiceDTOs = medicalServicesService.getAll(keyword, pageNo);
+        return ResponseEntity.ok(medicalServiceDTOs);
+    }
+
     @PostMapping("/service/all/select")
     public List<MedicalService> getAllServices(@RequestBody List<MedicalService> medicalServices) {
         return medicalServicesService.getServicesNotSelected(medicalServices);
@@ -57,7 +60,7 @@ public class MedicalServiceController {
             @RequestParam(name = "sort", required = false, defaultValue = "asc") String sortBy,
             @RequestParam(name = "filter", required = false, defaultValue = "id") String filter,
             @RequestParam(name = "search", required = false, defaultValue = "") String keyword) {
-        Page<MedicalServiceDTO> serviceDTOs = medicalServicesService.getListServiceCalendarPageable(pageNo,sortBy,filter,keyword);
+        Page<MedicalServiceDTO> serviceDTOs = medicalServicesService.getListServiceCalendarPageable(pageNo, sortBy, filter, keyword);
         return ResponseEntity.ok(serviceDTOs);
     }
 

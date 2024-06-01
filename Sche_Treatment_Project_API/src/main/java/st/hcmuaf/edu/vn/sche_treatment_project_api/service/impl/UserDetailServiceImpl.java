@@ -24,6 +24,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
         Account userEntity = accountRepository.findByAccountPhoneIgnoreCase(phone);
         //tìm trong dtb xem user có phone đó có tồn tại hay khong
         if (userEntity == null) throw new UsernameNotFoundException(phone + " không tồn tại trong database");
+        if (userEntity.getSupportStatus().getId().equalsIgnoreCase("S2")) {
+            throw new RuntimeException("[Error] Account locked");
+        }
         //tạo grantedAuthority với roleNames tương ứng
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         grantedAuthorities.add(new SimpleGrantedAuthority(userEntity.getSupportRole().getSupportValue()));

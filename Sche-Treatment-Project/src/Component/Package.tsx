@@ -42,7 +42,6 @@ export const PackageSlider = () => {
       try {
         const response = await fetch(API_ENDPOINTS.GET_PACKAGE_SLIDES);
         const data = (await response.json()) as PackageEntity[];
-        console.log(data);
         setListPackage(data);
       } catch (e: any) {
         setError(e);

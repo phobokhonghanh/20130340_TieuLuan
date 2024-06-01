@@ -8,7 +8,8 @@ import "../assets/Admin/css/styleAdmin.css";
 
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
-import { getNameAccount, removeToken } from "../Authentication/Authentication";
+import { checkTokenRealtime, getNameAccount, removeToken } from "../Authentication/Authentication";
+import { useEffect } from "react";
 
 export const AdminSidebar = () => {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ export const AdminSidebar = () => {
     removeToken("benhviendakhoathuduc");
     navigate("/");
   };
+  
+  useEffect(() => {
+    checkTokenRealtime(navigate);
+  }, []);
   return (
     <>
       <Navbar
@@ -56,7 +61,6 @@ export const AdminSidebar = () => {
             <ul className="nav" id="side-menu">
               <li className="sidebar-search">
                 <div className="input-group custom-search-form">
-                  
                   <Link to="/home" className="form-control">
                     <i className="fa fa-home fa-fw"></i> Website
                   </Link>

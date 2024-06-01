@@ -1,4 +1,4 @@
-package st.hcmuaf.edu.vn.sche_treatment_project_api.config;
+package st.hcmuaf.edu.vn.sche_treatment_project_api.config.mapper;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

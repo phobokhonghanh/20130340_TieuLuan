@@ -208,6 +208,9 @@ public class AccountImpl implements AccountService {
     public String forgotPassword(String email, String phone) {
         if (checkEmailAndPhone(email, phone)) {
             Account account = findByAccountPhone(phone);
+            if (account.getSupportStatus().getId().equalsIgnoreCase("S2")) {
+                return null;
+            }
             if (sendOTPResetPassword(account.getId())) {
                 return account.getId();
             }
@@ -233,6 +236,15 @@ public class AccountImpl implements AccountService {
     @Override
     public Account findByAccountPhone(String phone) {
         return accountRepository.findByAccountPhoneIgnoreCase(phone);
+    }
+
+    @Override
+    public Account findById(String id) {
+        Optional optional = accountRepository.findById(id);
+        if (optional.isPresent()) {
+            return (Account) optional.get();
+        }
+        return null;
     }
 
     @Override
@@ -275,7 +287,6 @@ public class AccountImpl implements AccountService {
         return false;
     }
 
-
     @Override
     public String login(LoginDTO loginDTO, Account account) {
         if (account == null) {
@@ -284,17 +295,21 @@ public class AccountImpl implements AccountService {
         if (account.getSupportStatus().getId().equalsIgnoreCase(SupportDTO.STATUS_VERIFY)) {
             return "VERIFY";
         }
-        if (account.getSupportStatus().getId().equalsIgnoreCase(SupportDTO.STATUS_LOCK)) {
-            return "LOCK";
-        }
         if (!passwordEncoder.matches(loginDTO.getPassword(), account.getAccountPassword())) {
             return "PASSWORD";
+        }
+        if (account.getSupportStatus().getId().equalsIgnoreCase(SupportDTO.STATUS_LOCK)) {
+            return "LOCK";
         }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDTO.getPhone(), loginDTO.getPassword(),
                 account.getAuthorities()
         );
         authenticationManager.authenticate(authenticationToken);
+        return jwtTokenUtil.generateToken(account);
+    }
+
+    public String generateToken(Account account) {
         return jwtTokenUtil.generateToken(account);
     }
 

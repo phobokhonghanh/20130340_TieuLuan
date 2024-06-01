@@ -7,7 +7,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { Notifi } from "../Component/Notification";
 import { forgotPassword, login, resetPassword } from "../apiConfig";
 import Preloader from "../Component/Preloader";
-import { LoginResponse, Signin } from "../Models/Model";
+import { Signin } from "../Models/Model";
 function ForgotPassword() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +59,7 @@ function ForgotPassword() {
       .catch((error: any) => {
         setIsLoading(false);
         if (error.response && error.response.status === 400) {
-          setMessage(error.response.data.message);
+          setMessage(error.response.data);
           setLevelMessage("danger");
           setShowMess(true);
         } else {

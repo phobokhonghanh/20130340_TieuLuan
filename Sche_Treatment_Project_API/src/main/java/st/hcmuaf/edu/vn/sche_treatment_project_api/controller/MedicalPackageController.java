@@ -16,12 +16,13 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.PackageServiceService
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("${api}")
 public class MedicalPackageController {
     @Autowired
     MedicalPackageService medicalPackageService;
     @Autowired
     PackageServiceServices packageServiceServices;
+
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Object> handleDataAccessException() {
@@ -29,8 +30,8 @@ public class MedicalPackageController {
     }
 
     @GetMapping("/package/all")
-    public ResponseEntity<Page<MedicalPackageDTO>> getAllPackages(@RequestParam(name = "keyword", defaultValue = "") String keyword,@RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
-        Page<MedicalPackageDTO> medicalPackageDTOs =  medicalPackageService.getAll(keyword,pageNo);
+    public ResponseEntity<Page<MedicalPackageDTO>> getAllPackages(@RequestParam(name = "keyword", defaultValue = "") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
+        Page<MedicalPackageDTO> medicalPackageDTOs = medicalPackageService.getAll(keyword, pageNo);
         return ResponseEntity.ok(medicalPackageDTOs);
     }
 
@@ -45,7 +46,7 @@ public class MedicalPackageController {
             @RequestParam(name = "sort", required = false, defaultValue = "asc") String sortBy,
             @RequestParam(name = "filter", required = false, defaultValue = "id") String filter,
             @RequestParam(name = "search", required = false, defaultValue = "") String keyword) {
-        Page<MedicalPackageDTO> medicalPackageDTOs = medicalPackageService.getListPackageCalendar(pageNo,sortBy,filter,keyword);
+        Page<MedicalPackageDTO> medicalPackageDTOs = medicalPackageService.getListPackageCalendar(pageNo, sortBy, filter, keyword);
         return ResponseEntity.ok(medicalPackageDTOs);
     }
 
@@ -75,10 +76,11 @@ public class MedicalPackageController {
         if (savePackage != null) {
             return new ResponseEntity<>(savePackage, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(null,HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
+
     @DeleteMapping("/admin/package/packageService/{packageServiceId}")
-    public ResponseEntity deleteServicesOfPackage(@PathVariable String packageServiceId){
+    public ResponseEntity deleteServicesOfPackage(@PathVariable String packageServiceId) {
         packageServiceServices.delete(packageServiceId);
         return new ResponseEntity(HttpStatus.OK);
     }

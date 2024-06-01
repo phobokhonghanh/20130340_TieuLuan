@@ -14,7 +14,7 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
-@RequestMapping("/api/area")
+@RequestMapping("${api}/area")
 public class MedicalAreaController {
     @Autowired
     MedicalAreaService medicalAreaService;

@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { API_ENDPOINTS } from "../apiConfig";
 import { formatDate } from "../Module/AppointmentPage";
 import { CalendarDTO, DoctorEntity } from "../Models/Model";
+import { headerAuth } from "../Authentication/Authentication";
 
 const settings = {
   infinite: true,
@@ -143,12 +144,11 @@ export const Doctor: React.FC<DoctorProps> = ({ doctorEntity }) => {
 export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
   const [calendars, setCalendar] = useState<CalendarDTO[]>([]);
   const [error, setError] = useState();
-  const [isLoading, setLoading] = useState(false);
   useEffect(() => {
     const fetchListDoctor = async () => {
       try {
         const response = await fetch(
-          API_ENDPOINTS.GET_CALENDAR_DOCTOR(doctorEntity.id)
+          API_ENDPOINTS.GET_CALENDAR_DOCTOR(doctorEntity.id),headerAuth()
         );
         const data = (await response.json()) as CalendarDTO[];
         setCalendar(data);

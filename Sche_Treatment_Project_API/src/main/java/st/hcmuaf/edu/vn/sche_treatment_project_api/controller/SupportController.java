@@ -12,7 +12,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.SupportService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/support")
+@RequestMapping("${api}/support")
 public class SupportController {
     @Autowired
     SupportService supportService;
