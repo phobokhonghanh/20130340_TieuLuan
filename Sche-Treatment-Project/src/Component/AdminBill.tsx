@@ -17,7 +17,6 @@ export const BillManager = () => {
     const value = e.target.value;
     setFilterText(value);
   };
-  console.log(data);
   // lấy data
   useEffect(() => {
     const fetchDataBill = async () => {
@@ -28,7 +27,6 @@ export const BillManager = () => {
         );
         const data = await response.json();
         setData(data.content);
-        console.log(data.content);
         setCurrentPage(data.number + 1);
         setTotalPages(data.totalPages);
       } catch (e: any) {

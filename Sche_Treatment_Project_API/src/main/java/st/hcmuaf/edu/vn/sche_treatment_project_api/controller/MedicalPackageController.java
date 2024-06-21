@@ -76,7 +76,7 @@ public class MedicalPackageController {
         if (savePackage != null) {
             return new ResponseEntity<>(savePackage, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/admin/package/packageService/{packageServiceId}")

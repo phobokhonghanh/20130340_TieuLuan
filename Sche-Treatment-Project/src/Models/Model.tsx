@@ -195,7 +195,7 @@ export interface AppointmentEntity {
   createAt: Date;
   updateAt: Date;
   supportStatus: Support;
-  account: Patient;
+  account: Account;
   medicalPackage: PackageEntity;
   calendar: CalendarModel;
   supportTime: Support;
@@ -244,6 +244,13 @@ export interface ResultDTO {
   resultDiagnostic: string;
   resultNote: string;
   appointmentId: string;
+}
+export interface LogResponse {
+  logContent: string;
+  level: string;
+  accountName: string;
+  role: string;
+  createdAt: Date;
 }
 export interface StatisticalResponse {
   sum: number;

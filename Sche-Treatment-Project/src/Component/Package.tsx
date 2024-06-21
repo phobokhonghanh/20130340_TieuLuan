@@ -9,33 +9,34 @@ import { useEffect, useRef, useState } from "react";
 
 import { API_ENDPOINTS } from "../apiConfig";
 import { PackageEntity } from "../Models/Model";
+import { formatPrice } from "../Utils/Utils";
 
-const settings = {
-  dots: true,
-  infinite: true,
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  loop: true,
-  autoplay: true,
-  smartSpeed: 10000,
-  autoplayTimeout: 10000,
-  singleItem: true,
-  autoplayHoverPause: true,
-  items: 1,
-  nav: true,
-  responsive: [
-    {
-      breakpoint: 992,
-      settings: {
-        slidesToShow: 1,
-      },
-    },
-  ],
-};
 export const PackageSlider = () => {
   const [listPackage, setListPackage] = useState<PackageEntity[]>([]);
   const [error, setError] = useState();
   const [isLoading, setLoading] = useState(false);
+  const settings = {
+    dots: true,
+    infinite: listPackage.length < 3 ? false : true,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    loop: true,
+    autoplay: false,
+    smartSpeed: 10000,
+    autoplayTimeout: 10000,
+    singleItem: true,
+    autoplayHoverPause: true,
+    items: 2,
+    nav: true,
+    responsive: [
+      {
+        breakpoint: 992,
+        settings: {
+          slidesToShow: 1,
+        },
+      },
+    ],
+  };
   useEffect(() => {
     const fetchListPackage = async () => {
       setLoading(true);
@@ -73,7 +74,7 @@ export const PackageSlider = () => {
             {/* <!-- Single Table --> */}
             <Slider {...settings} className="custom-slider">
               {listPackage.map((pack) => (
-                <PackageInfo packageEntity={pack} />
+                  <PackageInfo packageEntity={pack} />
               ))}
             </Slider>
             {/* <!-- End Single Table--> */}
@@ -126,7 +127,7 @@ export const Package: React.FC<PackageProps> = ({ packageEntity }) => {
   );
 };
 export const PackageInfo: React.FC<PackageProps> = ({ packageEntity }) => (
-  <div className="col-md-12 col-12 custom-slider">
+  <div className="col-md-12 col-12 custom-slider" key={packageEntity.id}>
     <div className="single-table">
       {/* <!-- Table Head --> */}
       <div className="table-head">
@@ -259,7 +260,7 @@ export function PackageSelected({
                     key={option.id}
                     onClick={() => handleSelectChange(option)}
                   >
-                    {option.packageName}
+                    {option.packageName} - {formatPrice(option.packagePrice)}
                   </li>
                 ))}
               </ul>

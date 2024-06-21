@@ -7,8 +7,9 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "medical_service")
-public class MedicalService {
+public class MedicalService extends BaseEntity{
 
     @Id
     @Column(name = "id", length = 36)
@@ -22,11 +23,11 @@ public class MedicalService {
     @Column(name = "service_description", columnDefinition = "TEXT")
     private String serviceDescription;
 
-    @Column(name = "create_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
+//    @Column(name = "create_at")
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "update_at")
+//    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "clinic_id")

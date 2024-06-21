@@ -7,10 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.MessageUtils;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Account;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AccountDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.DoctorDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.PatientDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.SupportDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Doctor;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AccountService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.DoctorService;
 
 import java.util.List;
@@ -20,16 +23,11 @@ import java.util.List;
 public class DoctorController {
     @Autowired
     DoctorService doctorService;
-
-    @ExceptionHandler(DataAccessException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleDataAccessException() {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
+    @Autowired
+    AccountService accountService;
     @GetMapping("/doctor/all")
-    public List<Doctor> getAllDoctor() {
-        return doctorService.getAll();
+    public List<Account> getAllDoctor() {
+        return accountService.findAllByRoleAndStatus(SupportDTO.STATUS_ROLE_DOCTOR, SupportDTO.STATUS_UNLOCK);
     }
 
     @GetMapping("/doctor/slides")

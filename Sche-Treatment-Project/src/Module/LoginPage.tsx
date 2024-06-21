@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Header from "../Component/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/style.css";
@@ -66,7 +65,7 @@ function Login() {
       .then((response: any) => {
         if (response.status === 200) {
           const responseData: LoginResponse = response.data;
-          localStorage.setItem("benhviendakhoathuduc", JSON.stringify(responseData));
+          localStorage.setItem("essaymedical", JSON.stringify(responseData));
           const timer = setTimeout(() => {
             setIsLoading(false);
             if (responseData.roles && responseData.roles[0] === "ROLE_ADMIN") {
@@ -80,7 +79,7 @@ function Login() {
       })
       .catch((error: any) => {
         setIsLoading(false);
-        if (error.response && error.response.status === 400) {
+        if (error.response.status === 400) {
           setMessage(error.response.data.message);
           setLevelMessage("danger");
           setShowMess(true);
@@ -95,7 +94,7 @@ function Login() {
   return (
     <>
       {isLoading && <Preloader />}
-      <Header />
+      {/* <Header /> */}
       {showMess && (
         <Notifi
           message={message}
@@ -132,6 +131,7 @@ function Login() {
                     inputMode="numeric"
                     value={phone}
                     placeholder="+84"
+                    autoFocus
                     required
                   />{" "}
                 </div>

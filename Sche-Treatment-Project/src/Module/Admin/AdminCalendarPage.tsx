@@ -1,12 +1,12 @@
-
-import { AdminSidebar } from "../../Component/AdminSidebar";
 import { CalendarManager } from "../../Component/AdminCalendar";
+import { ModalProvider } from "../../hooks/ModalProvider";
 
 export function AdminCalendarPage() {
   return (
     <>
-      <AdminSidebar />
-      <CalendarManager />
+      <ModalProvider>
+        <CalendarManager />
+      </ModalProvider>
     </>
   );
 }

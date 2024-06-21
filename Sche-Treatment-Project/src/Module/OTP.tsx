@@ -1,10 +1,9 @@
 import { useState, useRef, ChangeEvent, KeyboardEvent, useEffect } from "react";
-import Header from "../Component/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/style.css";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { confirmOTP } from "../apiConfig";
+import { confirmOTP, resetOTP } from "../apiConfig";
 import { Notifi } from "../Component/Notification";
 import Preloader from "../Component/Preloader";
 function OTP() {
@@ -72,36 +71,74 @@ function OTP() {
       otpInputs.current[index - 1].focus();
     }
   };
+  const handResetOTP = () => {
+    if (accountId) {
+      setIsLoading(true);
+      resetOTP(accountId, isResetPassword === "true" ? true : false)
+        .then((response: any) => {
+          if (response.status === 200) {
+            setMessage("Vui lòng kiểm tra email");
+            setLevelMessage("success");
+          }
+        })
+        .catch((error: any) => {
+          if (error.response && error.response.status === 400) {
+            setMessage(error.response.data);
+          } else {
+            setMessage("Vui lòng thử lại sau");
+          }
+          setLevelMessage("danger");
+        })
+        .finally(() => {
+          setShowMess(true);
+          setIsLoading(false);
+        });
+    } else {
+      setMessage(
+        "Hãy nhấn vào liên kết được gửi trong email để tiếp tục quá trình."
+      );
+      setLevelMessage("danger");
+      setShowMess(true);
+    }
+  };
   const handleSubmit = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     setIsLoading(true);
     const data = otp.join("");
-    confirmOTP(accountId ? accountId : "", data)
-      .then((response: any) => {
-        if (response.status === 200) {
-          const timer = setTimeout(() => {
-            setIsLoading(false);
-            if (isResetPassword == "true") {
-              navigate(`/reset-password/${accountId}`);
-            } else {
-              navigate("/login");
-            }
-          }, 2000);
-          return () => clearTimeout(timer);
-        }
-      })
-      .catch((error: any) => {
-        setIsLoading(false);
-        console.error(error);
-        setMessage("Sai OTP, Vui lòng nhập lại");
-        setLevelMessage("danger");
-        setShowMess(true);
-      });
+    if (accountId) {
+      confirmOTP(accountId, data, isResetPassword === "true" ? true : false)
+        .then((response: any) => {
+          if (response.status === 200) {
+            const timer = setTimeout(() => {
+              setIsLoading(false);
+              if (isResetPassword == "true") {
+                navigate(`/reset-password/${response.data}`);
+              } else {
+                navigate("/login");
+              }
+            }, 2000);
+            return () => clearTimeout(timer);
+          }
+        })
+        .catch((error: any) => {
+          setIsLoading(false);
+          console.error(error);
+          setMessage("Sai OTP, Vui lòng nhập lại");
+          setLevelMessage("danger");
+          setShowMess(true);
+        });
+    } else {
+      setMessage(
+        "Hãy nhấn vào liên kết được gửi trong email để tiếp tục quá trình."
+      );
+      setLevelMessage("danger");
+      setShowMess(true);
+    }
   };
   return (
     <>
       {isLoading && <Preloader />}
-      <Header />
+      {/* <Header /> */}
       {showMess && (
         <Notifi
           message={message}
@@ -141,7 +178,13 @@ function OTP() {
               Xác thực
             </button>
             <p>
-              Bạn không nhận được mã xác nhận ? <a>Gửi lại</a>
+              Bạn không nhận được mã xác nhận.{" "}
+              <span
+                style={{ cursor: "pointer", color: "blue" }}
+                onClick={() => handResetOTP()}
+              >
+                Gửi lại?
+              </span>
             </p>
           </div>
         </div>

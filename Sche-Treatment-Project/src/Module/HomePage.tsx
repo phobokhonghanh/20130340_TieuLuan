@@ -1,4 +1,3 @@
-import HeaderNav from "../Component/HeaderNav";
 import Slides from "../Component/Slides";
 import CardInfo from "../Component/CardInfo";
 import AboutUs from "../Component/AboutUs";
@@ -11,7 +10,7 @@ import "../assets/style.css";
 function HomePage() {
   return (
     <>
-      <HeaderNav />
+      {/* <HeaderNav /> */}
       <Slides  />
       <CardInfo />
       <PackageSlider />

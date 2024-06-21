@@ -29,15 +29,15 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Support;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.AccountRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.BillRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.DoctorRepository;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.SupportRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.AccountResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AccountService;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.service.LogService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.MailService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.PatientService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.text.MessageFormat;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -45,7 +45,11 @@ public class AccountImpl implements AccountService {
     @Autowired
     AccountRepository accountRepository;
     @Autowired
+    SupportRepository supportRepository;
+    @Autowired
     DoctorRepository doctorRepository;
+    @Autowired
+    private LogService logService;
     @PersistenceContext
     private EntityManager entityManager;
     @Autowired
@@ -72,8 +76,6 @@ public class AccountImpl implements AccountService {
         if (accountOptional.isPresent()) {
             Account account = accountOptional.get();
             account.setAccountName(accountDTO.getAccountName());
-            account.setAccountEmail(accountDTO.getAccountEmail());
-            account.setAccountPhone(accountDTO.getAccountPhone());
             account.setAccountGender(accountDTO.getAccountGender());
             accountRepository.save(account);
             return true;
@@ -83,19 +85,25 @@ public class AccountImpl implements AccountService {
     }
 
     @Override
-    public boolean checkOTP(String accountId, String otp) {
-        if (accountRepository.getOTPById(accountId) == null)
-            return false;
-        if (accountRepository.getOTPById(accountId).equalsIgnoreCase(otp)) {
-            Account account = accountRepository.findById(accountId).get();
-            account.setAccountOTP(null);
-            Support support = new Support();
-            support.setId(SupportDTO.STATUS_UNLOCK);
-            account.setSupportStatus(support);
-            accountRepository.save(account);
-            return true;
+    public String checkOTP(String accountId, String otp, boolean reset) {
+        Optional<Account> optional = accountRepository.findById(accountId);
+        String rs = "register";
+        if (optional.isPresent()) {
+            Account account = optional.get();
+            if (account.getAccountOTP().equalsIgnoreCase(otp)) {
+                account.setAccountOTP(null);
+                Support support = new Support();
+                support.setId(SupportDTO.STATUS_UNLOCK);
+                account.setSupportStatus(support);
+                accountRepository.save(account);
+                // reset password
+                if (reset) {
+                    rs = jwtTokenUtil.generateTokenMin(account);
+                }
+                return rs;
+            }
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -110,34 +118,41 @@ public class AccountImpl implements AccountService {
                 entityManager.detach(account);
             }
             if (roleId.equals(SupportDTO.STATUS_ROLE_PATIENT)) {
-//                Account patient = new Patient();
-//                patient = Utils.copyCommonAttributes(account, patient);
                 accountRepository.savePatient(accountId);
             } else {
-//                Account doctor = new Doctor();
-//                doctor = Utils.copyCommonAttributes(account, doctor);
                 accountRepository.saveDoctor(accountId);
             }
-            accountRepository.save(account);
-
+            Account accountSave = accountRepository.save(account);
+            String content = "Tài khoản - Tài khoản có ID: " + account.getId() + " đã được thay đổi quyền hạn là: " + accountSave.getSupportRole().getSupportValue();
+            // nâng quyền lên bác sĩ thì info còn lên admin hoặc xuống patient thì warn
+            if (roleId.equals(SupportDTO.STATUS_ROLE_DOCTOR)) {
+                logService.info(content);
+            } else {
+                logService.warn(content);
+            }
             return true;
         }
+        logService.error("Thất bại - Tài khoản có ID: " + accountId + " bị thao tác thay đổi quyền hạn");
         return false;
     }
 
     @Override
     public boolean updateStatus(String accountId, String statusId) {
-        Optional<Account> account = accountRepository.findById(accountId);
-        if (account.isPresent()) {
-            if (account.get().getSupportStatus().equals(SupportDTO.STATUS_VERIFY)) {
-                account.get().setAccountOTP(null);
+        Optional<Account> optional = accountRepository.findById(accountId);
+        if (optional.isPresent()) {
+            Account account = optional.get();
+
+            if (account.getSupportStatus().equals(SupportDTO.STATUS_VERIFY)) {
+                account.setAccountOTP(null);
             }
             Support support = new Support();
             support.setId(statusId);
-            account.get().setSupportStatus(support);
-            accountRepository.save(account.get());
+            account.setSupportStatus(support);
+            accountRepository.save(account);
+            logService.warn("Tài khoản - Tài khoản có ID: " + account.getId() + " đã được thay đổi trạng thái là: " + supportRepository.findById(statusId).get().getSupportValue());
             return true;
         }
+        logService.error("Thất bại - Tài khoản có ID: " + accountId + " bị thay đổi trạng thái");
         return false;
     }
 
@@ -173,7 +188,7 @@ public class AccountImpl implements AccountService {
         return new PageImpl<>(accountResponses, pageable, accounts.getTotalElements());
     }
 
-    public boolean checkEmailOrPhone(String email, String phone) {
+    public boolean checkEmailOrPhoneExists(String email, String phone) {
         return accountRepository.existsByAccountEmailIgnoreCaseOrAccountPhone(email, phone);
     }
 
@@ -182,11 +197,39 @@ public class AccountImpl implements AccountService {
     }
 
     public boolean resetPassword(LoginDTO loginDTO) {
-        Optional<Account> optional = accountRepository.findById(loginDTO.getPhone());
+        if (jwtTokenUtil.validateJwtToken(loginDTO.getPhone()) && !jwtTokenUtil.isTokenExpired(loginDTO.getPhone())) {
+            String id = jwtTokenUtil.extractSubject(loginDTO.getPhone());
+            Optional<Account> optional = accountRepository.findById(id);
+            if (optional.isPresent()) {
+                Account account = optional.get();
+                account.setAccountPassword(passwordEncoder.encode(loginDTO.getPassword()));
+                accountRepository.save(account);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean resetOTP(String accountId, boolean reset) {
+        Optional<Account> optional = accountRepository.findById(accountId);
         if (optional.isPresent()) {
             Account account = optional.get();
-            account.setAccountPassword(passwordEncoder.encode(loginDTO.getPassword()));
+            String otp = renderOTP();
+            account.setAccountOTP(otp);
+            String subject = MessageUtils.EMAIL_SUBJECT_REGISTER;
+            String link = MessageUtils.EMAIL_LINK_OTP + account.getId();
+            // reset password
+            if (reset) {
+                subject = MessageUtils.EMAIL_SUBJECT_RESET_PASSWORD;
+                link += "?reset-password=true";
+            }
+            Map<String, Object> attributes = Map.of(
+                    "token", account.getAccountOTP(),
+                    "link", link
+            );
             accountRepository.save(account);
+            emailService.sendVerificationToken(account.getAccountEmail(), subject, attributes);
             return true;
         }
         return false;
@@ -198,8 +241,11 @@ public class AccountImpl implements AccountService {
             Account account = optional.get();
             String otp = renderOTP();
             account.setAccountOTP(otp);
-            emailService.sendMail(account.getAccountEmail(), MessageUtils.EMAIL_SUBJECT_RESET_PASSWORD, MessageUtils.EMAIL_CONTENT_RESET_PASSWORD + account.getAccountOTP());
+            Map<String, Object> attributes = Map.of(
+                    "token", account.getAccountOTP(),
+                    "link", MessageUtils.EMAIL_LINK_OTP + account.getId() + "?reset-password=true");
             accountRepository.save(account);
+            emailService.sendVerificationToken(account.getAccountEmail(), MessageUtils.EMAIL_SUBJECT_RESET_PASSWORD, attributes);
             return true;
         }
         return false;
@@ -208,7 +254,7 @@ public class AccountImpl implements AccountService {
     public String forgotPassword(String email, String phone) {
         if (checkEmailAndPhone(email, phone)) {
             Account account = findByAccountPhone(phone);
-            if (account.getSupportStatus().getId().equalsIgnoreCase("S2")) {
+            if (account.getSupportStatus().getId().equalsIgnoreCase(SupportDTO.STATUS_LOCK)) {
                 return null;
             }
             if (sendOTPResetPassword(account.getId())) {
@@ -239,6 +285,11 @@ public class AccountImpl implements AccountService {
     }
 
     @Override
+    public List<Account> findAllByRoleAndStatus(String role, String status) {
+        return accountRepository.getAllBySupportRoleIdAndSupportStatusId(role, status);
+    }
+
+    @Override
     public Account findById(String id) {
         Optional optional = accountRepository.findById(id);
         if (optional.isPresent()) {
@@ -247,42 +298,56 @@ public class AccountImpl implements AccountService {
         return null;
     }
 
-    @Override
-    public boolean register(PatientDTO patientDTO) {
-        String email = patientDTO.getAccountEmail();
-        // set trạng thái sang verify
-        patientDTO.setSupportStatusId(SupportDTO.STATUS_VERIFY);
+    public void deleteAccountNotVerifyExists(String email, String phone, String status) {
         // tìm tài khoản có email, phone và trạng thái là verify (get tài khoản đã đăng ký nhưng chưa verify tài khoản )
-        Account account = findByAccountEmailAndAccountPhoneAndSupportStatus(email, patientDTO.getAccountPhone(), patientDTO.getSupportStatusId());
+        Account account = findByAccountEmailAndAccountPhoneAndSupportStatus(email, phone, status);
         // nếu tồn tại thì xóa tài khoản đó đi
         if (account != null) {
             if (account.getSupportRole().getId().equals(SupportDTO.STATUS_ROLE_PATIENT)) {
                 patientService.deletePatient(account.getId());
             }
-            if (patientDTO.getSupportRoleId().equals(SupportDTO.STATUS_ROLE_ADMIN)) {
+            if (account.getSupportRole().getId().equals(SupportDTO.STATUS_ROLE_ADMIN)) {
                 deleteAccount(account.getId());
             }
         }
+    }
+
+    @Override
+    public boolean register(PatientDTO patientDTO) {
+
+        String email = patientDTO.getAccountEmail();
+
+        // xóa tài khoản đã tồn tại (trùng email và phone nhưng chưa verify)
+        deleteAccountNotVerifyExists(email, patientDTO.getAccountPhone(), patientDTO.getSupportStatusId());
+
         // kiểm tra email và phone
-        if (!checkEmailOrPhone(patientDTO.getAccountEmail(), patientDTO.getAccountPhone())) {
+        if (!checkEmailOrPhoneExists(patientDTO.getAccountEmail(), patientDTO.getAccountPhone())) {
             // tạo otp và set vào account
             patientDTO.setAccountOTP(renderOTP());
+            // set trạng thái sang verify
+            patientDTO.setSupportStatusId(SupportDTO.STATUS_VERIFY);
             // mã hóa password
             patientDTO.setAccountPassword(passwordEncoder.encode(patientDTO.getAccountPassword()));
-            // send email
-            emailService.sendMail(email, MessageUtils.EMAIL_SUBJECT_REGISTER, MessageUtils.EMAIL_CONTENT_REGISTER + patientDTO.getAccountOTP() + ", " + MessageUtils.EMAIL_CONTENT_LINK_OTP + patientDTO.getId());
             // set role là bệnh nhân nếu null
             if (patientDTO.getSupportRoleId() == null)
                 patientDTO.setSupportRoleId(SupportDTO.STATUS_ROLE_PATIENT);
-
+            // tạo tài khoản bệnh nhân
             if (patientDTO.getSupportRoleId().equals(SupportDTO.STATUS_ROLE_PATIENT)) {
-                if (patientService.createPatient(patientDTO))
-                    return true;
+                if (!patientService.createPatient(patientDTO))
+                    return false;
             }
+            // tạo tài khoản admin
             if (patientDTO.getSupportRoleId().equals(SupportDTO.STATUS_ROLE_ADMIN)) {
-                if (createAccount(patientDTO))
-                    return true;
+                if (!createAccount(patientDTO))
+                    return false;
             }
+            // send email
+            Map<String, Object> attributes = Map.of(
+                    "token", patientDTO.getAccountOTP(),
+                    "link", MessageUtils.EMAIL_LINK_OTP + patientDTO.getId());
+            emailService.sendVerificationToken(email, MessageUtils.EMAIL_SUBJECT_REGISTER, attributes);
+
+            return true;
         }
         return false;
     }

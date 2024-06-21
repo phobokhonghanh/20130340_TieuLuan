@@ -2,24 +2,25 @@ import "../assets/Admin/css/styleAdmin.css";
 import { format } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 import Calendar, { TileArgs } from "react-calendar";
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Col, Form, Modal, Row, Table } from "react-bootstrap";
 import {
+  Account,
   Area,
   CalendarDTO,
   CalendarModel,
   Clinic,
   ClinicDTO,
-  DoctorEntity,
 } from "../Models/Model";
 import { ErrorNotifi, Notifi } from "./Notification.tsx";
 import { ChooseDoctor } from "./SelectWithSearch.tsx";
 import { API_ENDPOINTS, createCalendar, createClinic } from "../apiConfig.ts";
 import Preloader from "./Preloader.tsx";
+import Pagination from "./Pagination.tsx";
+import { useModalContext } from "../hooks/ModalProvider.tsx";
 
 // Quản lý lịch phòng
 export const CalendarManager = () => {
-  const [response, setResponse] = useState<number>(0); // get/set value response create Clinic
   const [areaSelected, setAreaSelected] = useState<Area>(); // get/set value area selected
   const [showModalAddClinic, setShowModalAddClinic] = useState(false); // get / set show modal clinic (add and update)
   return (
@@ -63,12 +64,10 @@ export const CalendarManager = () => {
                 area={areaSelected}
                 show={showModalAddClinic}
                 onHide={() => setShowModalAddClinic(false)}
-                responseStatus={(status) => setResponse(status)}
               />
               <div className="panel-body">
                 <div className="table-responsive">
                   <DataTableRoom // get Data Clinic
-                    refesh={response}
                     areaChoose={(area) => setAreaSelected(area)}
                   />
                 </div>
@@ -82,21 +81,20 @@ export const CalendarManager = () => {
 };
 interface DataTableRoomProps {
   areaChoose: (area: Area) => void; // callback area
-  refesh: number; // response add or update clinic
 }
 const itemsPerPage = 10; // 10 items one per page
 // danh sách phòng
 export const DataTableRoom: React.FC<DataTableRoomProps> = ({
-  refesh,
   areaChoose,
 }) => {
-  const [responseStatus, setResponse] = useState(0); // response status update
+  const { shouldRefreshFirstModal } = useModalContext();
+
   const [modalShow, setModalShow] = useState<{ [key: number]: boolean }>({}); // modal show calendar clinic
   const [showModalAddClinic, setShowModalAddClinic] = useState<{
     [key: number]: boolean;
   }>({}); // modal show update clinic
   const [filterText, setFilterText] = useState(""); // input search
-  const [currentPage, setCurrentPage] = useState(0); // page currently selected
+  const [currentPage, setCurrentPage] = useState(1); // page currently selected
   const [areas, setArea] = useState<Area[]>([]); // get / set areas (fetch data)
   const [areaSelected, setAreaSelected] = useState<Area>(); // get / set areas selected
   const [filteredRows, setFilteredRows] = useState<Clinic[]>([]); // get clinic search
@@ -117,21 +115,21 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
     } catch (e: any) {
       setError(true);
     } finally {
-      setLoading(false);
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   };
   const [fetchDataOne, setFetchDataOne] = useState(true); // fetch data lần đầu
   // fetch data khi response thay đổi
   useEffect(() => {
-    if (refesh === 201 || responseStatus === 201) {
-      fetchArea();
-      setResponse(0);
-    }
+    fetchArea();
     if (fetchDataOne) {
       fetchArea();
       setFetchDataOne(false);
     }
-  }, [refesh, responseStatus]);
+  }, [shouldRefreshFirstModal]);
   useEffect(() => {
     setFilteredRows(areaSelected ? areaSelected.clinics : []);
   }, [areaSelected]);
@@ -147,9 +145,6 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
       setFilteredRows(selectedArea.clinics);
     }
   };
-  const handleChangePage = (pageIndex: SetStateAction<number>) => {
-    setCurrentPage(pageIndex);
-  };
   const handleFilterChange = (e: { target: { value: string } }) => {
     const value = e.target.value;
     setFilterText(value);
@@ -159,15 +154,15 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
       )
     );
     setFilteredRows(filteredData ? filteredData : []);
-    setCurrentPage(0);
+    setCurrentPage(1);
   };
-  const startIndex = currentPage * itemsPerPage;
+  const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, filteredRows.length);
   const currentRows = filteredRows.slice(startIndex, endIndex);
   return (
     <>
       {isLoading && <Preloader />}
-      <ErrorNotifi error={error}/>
+      <ErrorNotifi error={error} />
       <div>
         <Row style={{ padding: "10px", width: "100%" }}>
           <Col xs={4}>
@@ -201,7 +196,6 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
           <thead>
             <tr className="text-small">
               <th># </th>
-              <th>ID</th>
               <th style={{ cursor: "pointer" }}>Tên phòng</th>
               <th style={{ cursor: "pointer" }}>Trạng thái</th>
               <th style={{ textAlign: "center" }}>Lịch</th>
@@ -214,7 +208,6 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
             {currentRows.map((row, rowIndex) => (
               <tr key={row.id}>
                 <td>{++rowIndex}</td>
-                <td style={{ width: "350px" }}>{row.id}</td>
                 <td>{row.clinicName}</td>
                 <td>{row.supportStatus.supportValue}</td>
                 <td style={{ textAlign: "center" }}>
@@ -234,7 +227,6 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
                       onHide={() =>
                         setModalShow({ ...modalShow, [rowIndex]: false })
                       }
-                      responseStatus={(status) => setResponse(status)}
                     />
                   )}
                 </td>
@@ -257,7 +249,6 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
                       add={false}
                       area={areaSelected}
                       show={showModalAddClinic[rowIndex] || false}
-                      responseStatus={(status) => setResponse(status)}
                       onHide={() =>
                         setShowModalAddClinic({
                           ...showModalAddClinic,
@@ -272,19 +263,11 @@ export const DataTableRoom: React.FC<DataTableRoomProps> = ({
           </tbody>
         </Table>
         <div>
-          <button
-            onClick={() => handleChangePage(currentPage - 1)}
-            disabled={currentPage === 0}
-          >
-            Previous
-          </button>
-          <span>{`Page ${currentPage + 1} of ${totalPages}`} </span>
-          <button
-            onClick={() => handleChangePage(currentPage + 1)}
-            disabled={currentPage === totalPages - 1}
-          >
-            Next
-          </button>
+          <Pagination
+            totalPage={totalPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         </div>
       </div>
     </>
@@ -327,7 +310,6 @@ interface CalendarProps {
   data: CalendarModel[];
   show: boolean;
   onHide: () => void;
-  responseStatus: (status: number) => void;
 }
 // modal thêm lịch
 export const ModalCalendar: React.FC<CalendarProps> = ({
@@ -335,7 +317,6 @@ export const ModalCalendar: React.FC<CalendarProps> = ({
   data,
   show,
   onHide,
-  responseStatus,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -360,11 +341,10 @@ export const ModalCalendar: React.FC<CalendarProps> = ({
                 <span
                   style={{ fontWeight: "600", color: "green", font: "initial" }}
                 >
-                  {value.map((calendar, index) => (
+                  {value.map((calendar) => (
                     <div key={calendar.id}>
                       <span style={{ fontWeight: "bold" }}>BS: </span>
                       {calendar.doctor.accountName}
-                      {/* {value.length > 1 && index % 2 === 0 ? ", " : ""} */}
                     </div>
                   ))}
                 </span>
@@ -404,7 +384,6 @@ export const ModalCalendar: React.FC<CalendarProps> = ({
             doctor={null}
             show={showModal}
             onHide={() => setShowModal(false)}
-            responseStatusDoctor={(status) => responseStatus(status)}
           />
         )}
       </Modal.Body>
@@ -414,10 +393,9 @@ export const ModalCalendar: React.FC<CalendarProps> = ({
 interface Props {
   id_clinc: string;
   title: string;
-  doctor: DoctorEntity | null;
+  doctor: Account | null;
   show: boolean;
   onHide: () => void;
-  responseStatusDoctor: (status: number) => void;
 }
 // modal danh sách bác sĩ
 export const ModalDoctorCalendar: React.FC<Props> = ({
@@ -426,74 +404,75 @@ export const ModalDoctorCalendar: React.FC<Props> = ({
   doctor,
   show,
   onHide,
-  responseStatusDoctor,
 }) => {
-  const [selectedDoctor, setSelectedDoctor] = useState<DoctorEntity | null>(
-    null
-  ); // State để lưu thông tin về bác sĩ đã chọn
+  const { refreshFirstModal } = useModalContext();
+  const handleRefresh = () => {
+    refreshFirstModal();
+  };
+  const [selectedDoctor, setSelectedDoctor] = useState<Account | null>(null); // State để lưu thông tin về bác sĩ đã chọn
+  const [selectedDoctor2, setSelectedDoctor2] = useState<Account | null>(null); // State để lưu thông tin về bác sĩ đã chọn
   const [showMess, setShowMess] = useState(false);
   const [message, setMessage] = useState("");
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
     "danger"
   );
-  const [listDoctor, setListDoctor] = useState<DoctorEntity[]>([]);
+  const [listDoctor, setListDoctor] = useState<Account[]>([]);
   const [error, setError] = useState(false);
-  const [isLoading, setLoading] = useState(false);
-  const handleDoneClick = (ca: string) => {
-    setLoading(true);
-    if (selectedDoctor) {
-      const formattedDate = format(new Date(title), "yyyy-MM-dd");
-      const calendarForm: CalendarDTO = {
-        id: uuidv4(),
-        calendarDate: formattedDate,
-        clinicId: id_clinc,
-        accountId: selectedDoctor.id,
-        idGroupTime: ca,
-      };
-      createCalendar(calendarForm)
-        .then((response) => {
-          if (response.status === 201) {
-            setMessage("Thêm ca trực thành công");
-            setLevelMessage("success");
-            setShowMess(true);
-            onHide();
-            responseStatusDoctor(response.status);
-          }
-        })
-        .catch((error: any) => {
-          // Xử lý lỗi khi request không thành công
-          console.error("Error:", error);
-          setMessage("Thêm ca trực không thành công!");
-          setLevelMessage("danger");
-          setShowMess(true);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setMessage("Vui lòng chọn bác sĩ !");
-      setLevelMessage("danger");
-      setShowMess(true);
-    }
-    setLoading(false);
+
+  const form = (doctor: Account, time: string) => {
+    const formattedDate = format(new Date(title), "yyyy-MM-dd");
+    const calendarForm: CalendarDTO = {
+      id: uuidv4(),
+      calendarDate: formattedDate,
+      clinicId: id_clinc,
+      accountId: doctor.id,
+      idGroupTime: time,
+    };
+    return calendarForm;
   };
+  const callApi = (calendarForm: CalendarDTO) => {
+    createCalendar(calendarForm)
+      .then((response) => {
+        if (response.status === 201) {
+          setMessage("Thêm ca trực thành công");
+          setLevelMessage("success");
+          setShowMess(true);
+          onHide();
+          handleRefresh();
+        }
+      })
+      .catch((error: any) => {
+        // Xử lý lỗi khi request không thành công
+        console.error("Error:", error);
+        setMessage("Thêm ca trực không thành công!");
+        setLevelMessage("danger");
+        setShowMess(true);
+      });
+  };
+  const handleCreateCalendar = () => {
+    if (selectedDoctor) {
+      callApi(form(selectedDoctor, "1"));
+    }
+    if (selectedDoctor2) {
+      callApi(form(selectedDoctor2, "2"));
+    }
+  };
+
   useEffect(() => {
-    const fetchClinic = async () => {
-      setLoading(true);
+    const fetchDoctor = async () => {
       try {
         const response = await fetch(API_ENDPOINTS.GET_DOCTOR_ALL);
-        const data = (await response.json()) as DoctorEntity[];
+        const data = (await response.json()) as Account[];
         setListDoctor(data);
       } catch (e: any) {
         console.error("Error:", e);
         setError(true);
-      } finally {
-        setLoading(false);
       }
     };
-    fetchClinic();
+    fetchDoctor();
   }, []);
   return (
     <>
-      {isLoading && <Preloader />}
       {showMess && (
         <Notifi
           message={message}
@@ -520,24 +499,30 @@ export const ModalDoctorCalendar: React.FC<Props> = ({
                 <ChooseDoctor
                   dataSelected={doctor}
                   data={listDoctor}
-                  onDoctorSelect={(doctor: DoctorEntity) =>
+                  onDoctorSelect={(doctor: Account) =>
                     setSelectedDoctor(doctor)
                   }
                 />
-                <Button onClick={() => handleDoneClick("1")}>Xong</Button>
               </Col>
               <Col className="col-xs-6">
                 <b>Ca chiều</b>
                 <ChooseDoctor
                   dataSelected={doctor}
                   data={listDoctor}
-                  onDoctorSelect={(doctor: DoctorEntity) =>
-                    setSelectedDoctor(doctor)
+                  onDoctorSelect={(doctor: Account) =>
+                    setSelectedDoctor2(doctor)
                   }
                 />
-                <Button onClick={() => handleDoneClick("2")}>Xong</Button>
               </Col>
             </Row>
+            <Col>
+              <Button
+                style={{ margin: "5px" }}
+                onClick={() => handleCreateCalendar()}
+              >
+                Thêm ca trực
+              </Button>
+            </Col>
           </Form>
         </Modal.Body>
       </Modal>
@@ -551,7 +536,6 @@ interface ModalClinicProps {
   area: Area | undefined;
   show: boolean;
   onHide: () => void;
-  responseStatus: (status: number) => void;
 }
 // modal Create-Update phòng khám
 export const ModalClinic: React.FC<ModalClinicProps> = ({
@@ -561,20 +545,28 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
   area,
   show,
   onHide,
-  responseStatus,
 }) => {
+  const { refreshFirstModal } = useModalContext();
+  const handleRefresh = () => {
+    refreshFirstModal();
+  };
   const [message, setMessage] = useState("");
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
     "danger"
   );
   const [showMess, setShowMess] = useState(false);
+  const [error, setError] = useState(false);
   const clinicId = clinic ? clinic.id : uuidv4();
   const [clinicName, setName] = useState(clinic ? clinic.clinicName : "");
-  const [supportStatus, setSupportStatus] = useState(
-    clinic ? clinic.supportStatus.id : "S1"
-  );
-  const [error, setError] = useState(false);
-  const [isLoading, setLoading] = useState(false);
+  const [supportStatus, setSupportStatus] = useState("S1");
+
+  useEffect(() => {
+    if (clinic) {
+      setName(clinic.clinicName);
+      setSupportStatus(clinic.supportStatus.id);
+    }
+  }, [clinic]);
+
   // Hàm xử lý khi người dùng thay đổi thông tin
   const handleClinicChange = (e: { target: { name: any; value: any } }) => {
     const selected = e.target.value;
@@ -587,7 +579,6 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
   };
   const handleFormSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    setLoading(true);
     const formData: ClinicDTO = {
       id: clinicId,
       clinicName: clinicName,
@@ -605,19 +596,20 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
             setLevelMessage("success");
             setShowMess(true);
             onHide();
-            responseStatus(response.status);
           }
         })
         .catch((error: any) => {
-          if (error.status === 400) {
-            setMessage(error.response.data);
+          if (error.response.status === 400) {
+            setMessage("Phòng khám đã tồn tại");
             setLevelMessage("danger");
             setShowMess(true);
+          } else {
+            setError(true);
           }
-          setError(true);
         })
         .finally(() => {
-          setLoading(false);
+          handleRefresh();
+          window.scrollTo({ top: 30, behavior: "smooth" });
         });
     }
   };
@@ -631,7 +623,6 @@ export const ModalClinic: React.FC<ModalClinicProps> = ({
         />
       )}
       <ErrorNotifi error={error} />
-      {isLoading && <Preloader />}
       <Modal
         show={show}
         onHide={onHide}

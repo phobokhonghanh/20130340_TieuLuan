@@ -10,10 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Account;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalPackage;
 
+import java.util.List;
+
 public interface AccountRepository extends JpaRepository<Account, String> {
 
-    @Query(value = "select account_OTP from account where id=:id", nativeQuery = true)
-    String getOTPById(@Param("id") String id);
+    List<Account> getAllBySupportRoleIdAndSupportStatusId(@Param("role") String role,@Param("status") String status);
 
     boolean existsByAccountEmailIgnoreCaseOrAccountPhone(String email, String phone);
     boolean existsByAccountEmailIgnoreCaseAndAccountPhone(String email, String phone);

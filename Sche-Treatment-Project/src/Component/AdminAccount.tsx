@@ -51,7 +51,10 @@ export const AccountManager = () => {
       } catch (e: any) {
         setError(true);
       } finally {
-        setLoading(false);
+        const timer = setTimeout(() => {
+          setLoading(false);
+        }, 500);
+        return () => clearTimeout(timer);
       }
     };
     setResponse(0);
@@ -59,7 +62,6 @@ export const AccountManager = () => {
   }, [response, currentPage, filterText]);
   // nâng role từ bệnh nhân -> bác sĩ
   const handleUpRole = (id: string) => {
-    setLoading(true);
     upRole(id)
       .then((response: any) => {
         if (response.status === 200) {
@@ -73,14 +75,10 @@ export const AccountManager = () => {
         setMessage(error.response.data);
         setLevelMessage("danger");
         setShowMess(true);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
   // giảm role từ bác sĩ, admin -> bệnh nhân
   const handleLowRole = (id: string) => {
-    setLoading(true);
     lowRole(id)
       .then((response: any) => {
         if (response.status === 200) {
@@ -94,14 +92,10 @@ export const AccountManager = () => {
         setMessage(error.response.data);
         setLevelMessage("danger");
         setShowMess(true);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
   // khóa tài khoản
   const handleLock = (id: string) => {
-    setLoading(true);
     lockAccount(id)
       .then((response: any) => {
         if (response.status === 200) {
@@ -115,14 +109,10 @@ export const AccountManager = () => {
         setMessage(error.response.data);
         setLevelMessage("danger");
         setShowMess(true);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
   // mở khóa tài khoản
   const handleUnLock = (id: string) => {
-    setLoading(true);
     unlockAccount(id)
       .then((response: any) => {
         if (response.status === 200) {
@@ -136,14 +126,10 @@ export const AccountManager = () => {
         setMessage(error.response.data);
         setLevelMessage("danger");
         setShowMess(true);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
   return (
     <>
-      {isLoading && <Preloader />}
       <div id="page-wrapper">
         <div className="container-fluid">
           <div className="row">

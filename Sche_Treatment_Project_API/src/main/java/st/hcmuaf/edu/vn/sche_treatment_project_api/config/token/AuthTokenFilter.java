@@ -30,7 +30,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 //            log.info("JWT after parse {}", jwt);
             if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
                 // Lấy username từ JWT
-                String username = jwtUtil.extractPhoneNumber(jwt);
+                String username = jwtUtil.extractSubject(jwt);
                 // Lấy userDetails theo username
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

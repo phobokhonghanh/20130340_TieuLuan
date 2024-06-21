@@ -1,4 +1,4 @@
-import { headerAuth } from "./Authentication/Authentication";
+import { headerAuth, headerAuthImage } from "./Authentication/Authentication";
 import {
   AccountDTO,
   AppointmentDTO,
@@ -6,10 +6,10 @@ import {
   ClinicDTO,
   DoctorDTO,
   EvaluateDTO,
+  LoginResponse,
   PackageDTO,
   ResultDTO,
   ServiceDTO,
-  ServiceEntity,
   Signin,
   Signup,
 } from "./Models/Model";
@@ -20,6 +20,9 @@ const API_BASE_URL = "http://localhost:8080/api/v1";
 export const API_ENDPOINTS = {
   //  ---------------- // ---------------- ADMIN ---------------- // ----------------  //
 
+  // ---------------- log ---------------- //
+  //http://localhost:8080/api/v1/admin/log/all
+  GET_LOG_ALL: `${API_BASE_URL}/admin/log/all`,
   // ---------------- calendar ---------------- //
 
   //http://localhost:8080/api/admin/calendar
@@ -87,6 +90,14 @@ export const API_ENDPOINTS = {
   //http://localhost:8080/api/admin/service
   POST_SERVICE: `${API_BASE_URL}/admin/service`,
 
+  // ---------------- evaluate ---------------- //
+
+  //http://localhost:8080/api/v1/admin/evaluate
+  GET_EVALUATE_ALL: `${API_BASE_URL}/admin/evaluate`,
+
+  //http://localhost:8080/api/v1/admin/evaluate/${id}
+  DELETE_EVALUATE: (id: string) => `${API_BASE_URL}/admin/evaluate/${id}`,
+
   //  ---------------- // ---------------- DOCTOR ---------------- // ----------------  //
 
   // ---------------- payment ---------------- //
@@ -123,8 +134,7 @@ export const API_ENDPOINTS = {
 
   // ---------------- account ---------------- //
   //http://localhost:8080/api/account/refresh-token/${accountId}
-  GET_REFRESH_TOKEN: (accountId: string) =>
-    `${API_BASE_URL}/account/refresh-token/${accountId}`,
+  GET_REFRESH_TOKEN: `${API_BASE_URL}/account/refresh-token`,
 
   //http://localhost:8080/api/account/${accountId}
   GET_ACCOUNT: (accountId: string) => `${API_BASE_URL}/account/${accountId}`,
@@ -136,15 +146,26 @@ export const API_ENDPOINTS = {
   PATCH_ACCOUNT_SEND_OTP_RESET_PASSWORD: (accountId: string) =>
     `${API_BASE_URL}/account/send-OTP-reset-password/${accountId}`,
 
-  //http://localhost:8080/api/register
+  //http://localhost:8080/api/auth/register
   POST_ACCOUNT: `${API_BASE_URL}/auth/register`,
+
+  //http://localhost:8080/api/admin/auth/register
+  POST_ACCOUNT_ADMIN: `${API_BASE_URL}/admin/auth/register`,
 
   //http://localhost:8080/api/auth/login
   POST_LOGIN: `${API_BASE_URL}/auth/login`,
 
   //http://localhost:8080/api/auth/confirm-OTP/{accountId}
-  PATCH_CONFIRM_OTP: (accountId: string, otp: string) =>
-    `${API_BASE_URL}/auth/confirm-OTP/${accountId}?otp=${otp}`,
+  PATCH_CONFIRM_OTP: (
+    accountId: string,
+    otp: string,
+    isResetPassword: boolean
+  ) =>
+    `${API_BASE_URL}/auth/confirm-OTP/${accountId}?otp=${otp}&reset=${isResetPassword}`,
+
+  //http://localhost:8080/api/auth/reset-OTP/{accountId}?reset=${isResetPassword}
+  PUT_RESET_OTP: (accountId: string, isResetPassword: boolean) =>
+    `${API_BASE_URL}/auth/reset-OTP/${accountId}?reset=${isResetPassword}`,
 
   //http://localhost:8080/api/auth/forgot/{email}/{phone}
   PUT_ACCOUNT_FORGOT: (email: string, phone: string) =>
@@ -155,7 +176,7 @@ export const API_ENDPOINTS = {
 
   // ---------------- doctor ---------------- //
 
-  //http://localhost:8080/api/doctor/all
+  //http://localhost:8080/api/v1/doctor/all
   GET_DOCTOR_ALL: `${API_BASE_URL}/doctor/all`,
 
   //http://localhost:8080/api/doctor/slides
@@ -229,15 +250,15 @@ export const API_ENDPOINTS = {
   //http://localhost:8080/api/service/calendar
   GET_SERVICE_CALENDAR: `${API_BASE_URL}/service/calendar`,
 
-  //http://localhost:8080/api/service/all
-  GET_SERVICE_ALL: `${API_BASE_URL}/service/all`,
+  //http://localhost:8080/api/admin/service/all
+  GET_SERVICE_ALL: `${API_BASE_URL}/admin/service/all`,
 
   //http://localhost:8080/api/service/area/{medicalAreaId}
   GET_SERVICE_AREA: (medicalAreaId: string) =>
     `${API_BASE_URL}/service/area/${medicalAreaId}`,
 
   //http://localhost:8080/api/service/all/select
-  GET_SERVICES_NOT_SELECTED: `${API_BASE_URL}/service/all/select`,
+  GET_SERVICES_NOT_SELECTED: `${API_BASE_URL}/admin/service/all/select`,
 
   // ---------------- appointment ---------------- //
 
@@ -272,7 +293,7 @@ export const API_ENDPOINTS = {
 
   // ---------------- bill ---------------- //
 
-  //http://localhost:8080/api/bill/appointment/${appointmentId}
+  //http://localhost:8080/api/v1/bill/appointment/${appointmentId}
   GET_BILL_APPOINTMENT: (appointmentId: string) =>
     `${API_BASE_URL}/bill/appointment/${appointmentId}`,
 
@@ -299,6 +320,10 @@ export const API_ENDPOINTS = {
   //http://localhost:8080/api/payment/paypal/{id}
   PUT_BILL_PAYMENT_PAYPAL: (id: string) =>
     `${API_BASE_URL}/payment/paypal/${id}`,
+  // ---------------- image ---------------- //
+
+  //http://localhost:8080/api/images/upload-single
+  POST_IMAGE_SINGLE: `${API_BASE_URL}/images/upload-single`,
 };
 
 export const createPackage = async (packageDTO: PackageDTO) => {
@@ -337,8 +362,14 @@ export const createEvaluate = (evaluate: EvaluateDTO) =>
 export const register = (signup: Signup) =>
   axios.post(API_ENDPOINTS.POST_ACCOUNT, signup);
 
+export const registerAdmin = (signup: Signup) =>
+  axios.post(API_ENDPOINTS.POST_ACCOUNT_ADMIN, signup, headerAuth());
+
 export const login = (signin: Signin) =>
   axios.post(API_ENDPOINTS.POST_LOGIN, signin);
+
+export const refreshToken = (loginResponse: LoginResponse) =>
+  axios.post(API_ENDPOINTS.GET_REFRESH_TOKEN, loginResponse, headerAuth());
 
 export const sendOTPRestPassword = (accountId: string) =>
   axios.patch(
@@ -364,6 +395,9 @@ export const updateAccount = (account: AccountDTO) =>
 export const updateDoctor = (doctor: DoctorDTO) =>
   axios.put(API_ENDPOINTS.PUT_DOCTOR_UPDATE, doctor, headerAuth());
 
+export const uploadImageSingle = (formData: FormData) =>
+  axios.post(API_ENDPOINTS.POST_IMAGE_SINGLE, formData, headerAuthImage());
+
 export const updateBHYT_Patient = (accountId: string, bhyt: string) =>
   axios.patch(
     API_ENDPOINTS.PATCH_PATIENT_BHYT(accountId, bhyt),
@@ -371,7 +405,7 @@ export const updateBHYT_Patient = (accountId: string, bhyt: string) =>
     headerAuth()
   );
 
-export const getServicesNotSelected = async (list: ServiceEntity[]) => {
+export const getServicesNotSelected = async (list: ServiceDTO[]) => {
   try {
     const response = await axios.post(
       API_ENDPOINTS.GET_SERVICES_NOT_SELECTED,
@@ -387,10 +421,19 @@ export const getServicesNotSelected = async (list: ServiceEntity[]) => {
 export const updateStatus = (appointmentId: string) =>
   axios.patch(API_ENDPOINTS.PATCH_APPOINTMENT(appointmentId), {}, headerAuth());
 
-export const confirmOTP = (accountId: string, otp: string) =>
+export const confirmOTP = (
+  accountId: string,
+  otp: string,
+  isResetPassword: boolean
+) =>
   axios.patch(
-    API_ENDPOINTS.PATCH_CONFIRM_OTP(accountId, otp),
+    API_ENDPOINTS.PATCH_CONFIRM_OTP(accountId, otp, isResetPassword),
     {},
+    headerAuth()
+  );
+export const resetOTP = (accountId: string, isResetPassword: boolean) =>
+  axios.put(
+    API_ENDPOINTS.PUT_RESET_OTP(accountId, isResetPassword),{},
     headerAuth()
   );
 
@@ -399,6 +442,9 @@ export const deletePackageService = (packageServicesId: string) =>
     API_ENDPOINTS.DELETE_PACKAGE_SERVICE(packageServicesId),
     headerAuth()
   );
+
+export const deleteEvaluate = (id: string) =>
+  axios.delete(API_ENDPOINTS.DELETE_EVALUATE(id), headerAuth());
 
 export const upRole = (accountId: string) =>
   axios.patch(

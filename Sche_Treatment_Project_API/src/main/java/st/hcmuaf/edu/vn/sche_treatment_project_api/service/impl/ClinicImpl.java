@@ -23,10 +23,9 @@ public class ClinicImpl implements ClinicService {
 
     @Override
     public ClinicDTO createClinic(ClinicDTO clinicDTO) {
-        if (!clinicRepository.existsById(clinicDTO.getId())) {
-            if (clinicRepository.existsByClinicName(clinicDTO.getMedicalAreaId().getId(), clinicDTO.getClinicName()) == 1) {
-                return null;
-            }
+        if (clinicRepository.existsByClinicName(clinicDTO.getMedicalAreaId().getId(), clinicDTO.getClinicName(), clinicDTO.getId()) == 1) {
+            return null;
+
         }
         Clinic clinic = clinicMapper.convertClinicDTE(clinicDTO);
         clinic.setCreatedAt(LocalDateTime.now());

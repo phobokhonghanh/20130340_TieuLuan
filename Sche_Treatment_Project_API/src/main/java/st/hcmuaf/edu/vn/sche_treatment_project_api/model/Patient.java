@@ -14,18 +14,11 @@ import java.util.List;
 @Table(name = "patient")
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 
 public class Patient extends Account implements Serializable {
 
     @Column(name = "patient_bhyt", length = 20)
     private String patientBHYT;
 
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Appointment> appointments;
-
-    public Patient(String id) {
-        super(id);
-    }
 }

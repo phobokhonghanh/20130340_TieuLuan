@@ -36,10 +36,29 @@ public class MedicalServiceMapper {
         }
         return listMedicalServiceDTO;
     }
+
+    public ServiceRequest covertServiceETRequest(MedicalService medicalService) {
+        ServiceRequest sr = new ServiceRequest();
+        sr.setId(medicalService.getId());
+        sr.setServiceName(medicalService.getServiceName());
+        sr.setServicePrice(medicalService.getServicePrice());
+        sr.setClinic(medicalService.getClinic().getClinicName());
+        return sr;
+    }
+
+    public List<ServiceRequest> covertListServiceETRequest(List<MedicalService> listMedicalServices) {
+        List<ServiceRequest> rs = new ArrayList<>();
+        for (MedicalService s : listMedicalServices) {
+            rs.add(covertServiceETRequest(s));
+        }
+        return rs;
+    }
+
     public MedicalServiceDTO convertMedicalServiceETD(MedicalService medicalService) {
         MedicalServiceDTO medicalServiceDTO = modelMapper.map(medicalService, MedicalServiceDTO.class);
         return medicalServiceDTO;
     }
+
     public MedicalService convertMedicalServiceDTE(MedicalServiceDTO medicalServiceDTO) {
         MedicalService medicalService = modelMapper.map(medicalServiceDTO, MedicalService.class);
         return medicalService;

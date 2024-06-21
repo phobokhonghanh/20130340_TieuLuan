@@ -5,8 +5,9 @@ import java.time.LocalDateTime;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "appointment_result")
-public class AppointmentResult {
+public class AppointmentResult extends BaseEntity{
 
     @Id
     @Column(name = "id", length = 36)
@@ -21,23 +22,14 @@ public class AppointmentResult {
     @Column(name = "result_note", columnDefinition = "TEXT")
     private String resultNote;
 
-    @Column(name = "create_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
+//    @Column(name = "create_at")
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "update_at")
+//    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;
 
-    public AppointmentResult(String id, String resultSymptom, String resultDiagnostic, String resultNote, LocalDateTime createdAt, LocalDateTime updatedAt, Appointment appointment) {
-        this.id = id;
-        this.resultSymptom = resultSymptom;
-        this.resultDiagnostic = resultDiagnostic;
-        this.resultNote = resultNote;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.appointment = appointment;
-    }
 }

@@ -77,9 +77,9 @@ public class AccountController {
     }
 
 
-    @GetMapping("/account/refresh-token/{accountId}")
-    public ResponseEntity<LoginResponse> refreshToken(@PathVariable String accountId) {
-        Account account = accountService.findById(accountId);
+    @PostMapping("/account/refresh-token")
+    public ResponseEntity<LoginResponse> refreshToken(@RequestBody LoginResponse userRequest) {
+        Account account = accountService.findById(userRequest.getId());
         if (account == null) {
             return ResponseEntity.badRequest().body(
                     LoginResponse.builder()
@@ -87,21 +87,30 @@ public class AccountController {
                             .build()
             );
         }
-        String token = accountService.generateToken(account);
-        if (token.equals("LOCK")) {
-            return ResponseEntity.badRequest().body(
-                    LoginResponse.builder()
-                            .message(MessageUtils.MESSAGE_ACCOUNT_LOCKED)
-                            .build()
-            );
+
+        boolean isRoleMatched = account.getAuthorities().stream()
+                .anyMatch(authority -> userRequest.getRoles().stream()
+                        .anyMatch(role -> authority.getAuthority().equalsIgnoreCase(role.toString())));
+
+        if (!isRoleMatched) {
+            String token = accountService.generateToken(account);
+            if (token.equals("LOCK")) {
+                return ResponseEntity.badRequest().body(
+                        LoginResponse.builder()
+                                .message(MessageUtils.MESSAGE_ACCOUNT_LOCKED)
+                                .build()
+                );
+            }
+            return ResponseEntity.ok(LoginResponse.builder()
+                    .message(MessageUtils.MESSAGE_REFRESH_TOKEN)
+                    .token(token)
+                    .username(account.getAccountName())
+                    .roles(account.getAuthorities().stream().map(item -> item.getAuthority()).toList())
+                    .id(account.getId())
+                    .build());
+        } else {
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(LoginResponse.builder()
-                .message(MessageUtils.MESSAGE_LOGIN_SUCCESS)
-                .token(token)
-                .username(account.getAccountName())
-                .roles(account.getAuthorities().stream().map(item -> item.getAuthority()).toList())
-                .id(account.getId())
-                .build());
     }
 
 

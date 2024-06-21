@@ -1,5 +1,4 @@
 import { Alert } from "react-bootstrap";
-import Header from "./Header";
 import { useEffect, useState } from "react";
 interface NotificationProps {
   message: string;
@@ -27,9 +26,40 @@ export const Notifi: React.FC<NotificationProps> = ({
         dismissible
         style={{ zIndex: "1900" }}
       >
-        {notifications
-          ? notifications.map((notify, index) => <p key={index}>{notify}</p>)
-          : message}
+        <div
+          style={{
+            display: "flex",
+          }}
+        >
+          <div style={{ alignContent: "center", width: "20%" }}>
+            <img
+              src={
+                variant == "success"
+                  ? "/src/assets/img/success.png"
+                  : "/src/assets/img/cancel.png"
+              }
+              style={{ width: "30px" }}
+              alt=""
+            />
+          </div>
+          <div style={{ width: "80%" }}>
+            {notifications
+              ? notifications.map((notify) => (
+                  <div key={notify}>
+                    <span
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: "larger",
+                      }}
+                    >
+                      {notify}
+                    </span>
+                    <br />
+                  </div>
+                ))
+              : message}
+          </div>
+        </div>
       </Alert>
     </>
   );
@@ -55,13 +85,12 @@ export const ErrorNotifi: React.FC<ErrorProps> = ({ error }) => {
         <div
           style={{
             textAlign: "center",
-            color: "rgb(116, 136, 151)",
             fontWeight: "bold",
             fontSize: "larger",
           }}
         >
           <Alert variant="danger" dismissible style={{ zIndex: "1900" }}>
-            Đang gặp sự cố kỹ thuật, xin vui lòng đợi trong giây lát !
+            Đang gặp sự cố kỹ thuật, xin vui lòng thử lại!
           </Alert>
         </div>
       )}
@@ -93,7 +122,7 @@ export const SuccessPage = () => {
   };
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <div style={containerStyle}>
         <div style={cardStyle}>
           <h1 style={headingStyle}>Thanh toán thành công!</h1>
@@ -133,7 +162,7 @@ export const ErrorPaymentPage = () => {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <div style={containerStyle}>
         <div style={cardStyle}>
           <h1 style={headingStyle}>Thanh toán không thành công!</h1>

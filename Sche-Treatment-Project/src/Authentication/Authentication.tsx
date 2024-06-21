@@ -1,7 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { LoginResponse } from "../Models/Model";
-import { API_ENDPOINTS } from "../apiConfig";
+import { API_ENDPOINTS, refreshToken } from "../apiConfig";
 
-const localStorageKey = "benhviendakhoathuduc";
+const localStorageKey = "essaymedical";
 
 const ROLE_ADMIN = "ROLE_ADMIN";
 const ROLE_DOCTOR = "ROLE_DOCTOR";
@@ -68,6 +69,22 @@ export const checkRoleDoctor = (): boolean => {
   }
   return false;
 };
+export const checkRoleOnlyDoctor = (): boolean => {
+  const token = getToken();
+  if (token) {
+    try {
+      return token.roles
+        ? token.roles[0] === ROLE_DOCTOR
+          ? true
+          : false
+        : false;
+    } catch (error) {
+      console.error("Error parsing stored response", error);
+      return false;
+    }
+  }
+  return false;
+};
 export const headerAuth = (): any => {
   const token = getToken();
   const requestOptions = {
@@ -78,38 +95,50 @@ export const headerAuth = (): any => {
   };
   return requestOptions;
 };
-export const handleLogout = (navigate: (path: string) => void) => {
-  removeToken("benhviendakhoathuduc");
-  navigate("/");
+export const headerAuthImage = (): any => {
+  const token = getToken();
+  const requestOptions = {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `${token ? `Bearer ${token.token}` : ""}`,
+    },
+  };
+  return requestOptions;
+};
+export const checkTokenRealtime = (token: LoginResponse): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    refreshToken(token)
+      .then((response: any) => {
+        if (response.status === 200) {
+          const responseData: LoginResponse = response.data;
+          setToken(JSON.stringify(responseData));
+          resolve(true);
+        }
+        if (response.status === 204) {
+          resolve(true);
+        }
+      })
+      .catch((error: any) => {
+        if (error.response.status === 403) {
+          resolve(false);
+        } else {
+          reject(error);
+        }
+      });
+  });
+};
+const useLogout = () => {
+  const navigate = useNavigate();
+
+  const logout = () => {
+    removeToken("essaymedical");
+    const timer = setTimeout(() => {
+      navigate("/");
+    }, 500);
+    return () => clearTimeout(timer);
+  };
+
+  return logout;
 };
 
-export const checkTokenRealtime = async (navigate: (path: string) => void) => {
-  try {
-    const token = getToken(); // Use await here
-    if (!token) {
-      return;
-    }
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token.token}`,
-      },
-    };
-    const response = await fetch(
-      API_ENDPOINTS.GET_REFRESH_TOKEN(getIdAccount()),
-      requestOptions
-    );
-    if (!response.ok) {
-      console.error("Response token not OK", response.status);
-      if (response.status == 403) {
-        handleLogout(navigate);
-      }
-      return;
-    }
-    const data: LoginResponse = await response.json();
-    setToken(JSON.stringify(data));
-  } catch (e: any) {
-    console.error("checkToken", e);
-  }
-};
+export default useLogout;

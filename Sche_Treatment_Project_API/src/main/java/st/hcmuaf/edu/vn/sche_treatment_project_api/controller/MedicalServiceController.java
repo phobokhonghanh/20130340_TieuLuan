@@ -6,10 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.ClinicDTO;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.DoctorDTO;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.MedicalPackageDTO;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.MedicalServiceDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.*;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalPackage;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.MedicalPackageService;
@@ -23,30 +20,24 @@ public class MedicalServiceController {
     @Autowired
     MedicalServicesService medicalServicesService;
 
-    @ExceptionHandler(DataAccessException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleDataAccessException() {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
     @PostMapping("/admin/service")
     public ResponseEntity<MedicalServiceDTO> createService(@RequestBody MedicalServiceDTO medicalServiceDTO) {
         MedicalServiceDTO saveService = medicalServicesService.createService(medicalServiceDTO);
         if (saveService != null) {
             return new ResponseEntity<>(saveService, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/service/all")
+    @GetMapping("/admin/service/all")
     public ResponseEntity<Page<MedicalServiceDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
         Page<MedicalServiceDTO> medicalServiceDTOs = medicalServicesService.getAll(keyword, pageNo);
         return ResponseEntity.ok(medicalServiceDTOs);
     }
 
-    @PostMapping("/service/all/select")
-    public List<MedicalService> getAllServices(@RequestBody List<MedicalService> medicalServices) {
-        return medicalServicesService.getServicesNotSelected(medicalServices);
+    @PostMapping("/admin/service/all/select")
+    public List<ServiceRequest> getAllServices(@RequestBody List<ServiceRequest> medicalServices) {
+        return medicalServicesService.getServicesNotSelected("", "S1", medicalServices);
     }
 
     @GetMapping("/service/area/{medicalAreaId}")

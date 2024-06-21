@@ -1,29 +1,58 @@
-// import "../assets/Admin/css/bootstrap.min.css";
-// import "../assets/Admin/css/metisMenu.min.css";
-// import "../assets/Admin/css/timeline.css";
-// import "../assets/Admin/css/startmin.css";
 import "../assets/Admin/css/font-awesome.min.css";
-// import "../assets/Admin/js/aos-animation/aos.css";
 import "../assets/Admin/css/styleAdmin.css";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
-import { checkTokenRealtime, getNameAccount, removeToken } from "../Authentication/Authentication";
-import { useEffect } from "react";
+import useLogout, {
+  checkRoleAdmin,
+  checkTokenRealtime,
+  getNameAccount,
+  getToken,
+} from "../Authentication/Authentication";
+import { useEffect, useState } from "react";
+import { Notifi } from "./Notification";
+import { isActive } from "../Utils/Header";
 
 export const AdminSidebar = () => {
-  const navigate = useNavigate();
+  const logout = useLogout();
+  const [message, setMessage] = useState("");
+  const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
+    "danger"
+  );
+  const [showMess, setShowMess] = useState(false);
 
   const handleLogout = () => {
-    removeToken("benhviendakhoathuduc");
-    navigate("/");
+    setMessage("Bạn đã đăng xuất");
+    setLevelMessage("success");
+    setShowMess(true);
+    logout();
   };
-  
+
   useEffect(() => {
-    checkTokenRealtime(navigate);
+    const checkToken = async () => {
+      const token = getToken();
+      if (token) {
+        const isTokenValid = await checkTokenRealtime(token);
+        if (!isTokenValid) {
+          setMessage("Tài khoản đã bị khóa");
+          setLevelMessage("danger");
+          setShowMess(true);
+          logout();
+        }
+      }
+    };
+
+    checkToken();
   }, []);
   return (
     <>
+      {showMess && (
+        <Notifi
+          message={message}
+          variant={levelMessage}
+          onClose={() => setShowMess(false)}
+        />
+      )}
       <Navbar
         collapseOnSelect
         expand="lg"
@@ -66,38 +95,91 @@ export const AdminSidebar = () => {
                   </Link>
                 </div>
               </li>
-              <li className="sidebar-search">
-                <Link to="/admin/home" className="active">
-                  <i className="fa  fa-dashboard fa-fw"></i> Thống kê
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin/clinic">
-                  <i className="fa fa-home fa-fw"></i> Phòng khám
-                </Link>
-              </li>
-
-              <li>
-                <Link to="/admin/packages">
-                  <i className="fa fa-pencil-square-o fa-fw"></i>Gói khám bệnh
-                </Link>
-              </li>
-              <li className="sidebar-search">
-                <Link to="/admin/account">
-                  <i className="fa  fa-user fa-fw"></i>Quản lý tài khoản
-                </Link>
-              </li>
-              <li className="sidebar-search">
-                <Link to="/admin/bill">
-                  <i className="fa fa-shopping-cart fa-fw"></i> Quản lý hóa đơn
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin/services">
-                  <i className="fa fa-calendar fa-fw"></i>Dịch vụ khám bệnh
-                </Link>
-              </li>
-              <li>
+              {checkRoleAdmin() && (
+                <>
+                  <li
+                    className={
+                      isActive("/admin/home") ? "sidebar-search active" : ""
+                    }
+                  >
+                    <Link to="/admin/home" className="">
+                      <i className="fa  fa-dashboard fa-fw"></i> Thống kê
+                    </Link>
+                  </li>
+                  <li
+                    className={
+                      isActive("/admin/clinic") ? "sidebar-search active" : ""
+                    }
+                  >
+                    <Link to="/admin/clinic">
+                      <i className="fa fa-home fa-fw"></i> Phòng khám
+                    </Link>
+                  </li>
+                  <li
+                    className={
+                      isActive("/admin/packages") ? "sidebar-search active" : ""
+                    }
+                  >
+                    <Link to="/admin/packages">
+                      <i className="fa fa-pencil-square-o fa-fw"></i>Gói khám
+                      bệnh
+                    </Link>
+                  </li>
+                  <li
+                    className={
+                      isActive("/admin/services") ? "sidebar-search active" : ""
+                    }
+                  >
+                    <Link to="/admin/services">
+                      <i className="fa fa-calendar fa-fw"></i>Dịch vụ khám bệnh
+                    </Link>
+                  </li>
+                  <li
+                    className={
+                      isActive("/admin/account") ? "sidebar-search active" : ""
+                    }
+                  >
+                    <Link to="/admin/account">
+                      <i className="fa  fa-user fa-fw"></i>Quản lý tài khoản
+                    </Link>
+                  </li>
+                  <li
+                    className={
+                      isActive("/admin/bill") ? "sidebar-search active" : ""
+                    }
+                  >
+                    <Link to="/admin/bill">
+                      <i className="fa fa-shopping-cart fa-fw"></i> Quản lý hóa
+                      đơn
+                    </Link>
+                  </li>
+                  <li
+                    className={
+                      isActive("/admin/evaluate") ? "sidebar-search active" : ""
+                    }
+                  >
+                    <Link to="/admin/evaluate">
+                      <i className="fa fa-commenting-o"></i> Quản lý nhận xét
+                    </Link>
+                  </li>
+                  <li
+                    className={
+                      isActive("/admin/log") ? "sidebar-search active" : ""
+                    }
+                  >
+                    <Link to="/admin/log">
+                      <i className="fa fa-bell-o"></i> Nhật ký hoạt động
+                    </Link>
+                  </li>
+                </>
+              )}
+              <li
+                className={
+                  isActive("/admin/appointments") || !checkRoleAdmin()
+                    ? "sidebar-search active"
+                    : ""
+                }
+              >
                 <Link to="/admin/appointments">
                   <i className="fa fa-newspaper-o fa-fw"></i> Lịch hẹn bệnh nhân
                 </Link>
@@ -108,7 +190,7 @@ export const AdminSidebar = () => {
       </Navbar>
       <div className="page-footer">
         <div className="page-footer-inner">
-          ADMIN - Website Đăng Ký Khám Bệnh Trực Tuyến
+          EssayMedical - Website Đặt lịch hẹn khám bệnh
         </div>
       </div>
     </>

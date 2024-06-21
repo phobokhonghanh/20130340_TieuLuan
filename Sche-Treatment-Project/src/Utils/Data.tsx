@@ -1,5 +1,3 @@
-import { StatisticalResponse } from "../Models/Model";
-
 export const labels = [
   "January",
   "February",

@@ -28,9 +28,9 @@ public class MedicalPackageImpl implements MedicalPackageService {
     private EntityManager entityManager;
 
     @Override
-    public Page<MedicalPackageDTO> getAll(String keyword,Integer pageNo) {
+    public Page<MedicalPackageDTO> getAll(String keyword, Integer pageNo) {
         Pageable pageable = PageRequest.of(pageNo - 1, 10);
-        Page<MedicalPackage> medicalPackages =  medicalPackageRepository.findAllByPackageNameIsContaining(keyword,pageable);
+        Page<MedicalPackage> medicalPackages = medicalPackageRepository.findAllByPackageNameIsContainingIgnoreCase(keyword, pageable);
         List<MedicalPackageDTO> medicalPackageDTOs = medicalPackageMapper.convertListMedicalPackageETD(medicalPackages.stream().toList());
         return new PageImpl<>(medicalPackageDTOs, pageable, medicalPackages.getTotalElements());
     }
@@ -51,17 +51,14 @@ public class MedicalPackageImpl implements MedicalPackageService {
     public Page<MedicalPackageDTO> getListPackageCalendar(Integer pageNo, String sortBy, String filter, String search) {
         // Validate the filter to ensure it's a valid column
         Set<String> validFilters = Set.of("id", "package_name", "package_price"); // replace with actual column names
-
         // Determine the sort direction
         String sortDirection = sortBy.equalsIgnoreCase("asc") ? "ASC" : "DESC";
+
         String orderByClause = "";
         if (validFilters.contains(filter)) {
-            orderByClause  = " ORDER BY " + filter + " " + sortDirection;
+            orderByClause = " ORDER BY " + filter + " " + sortDirection;
         }
-        // Construct the ORDER BY clause
-
         Pageable pageable = PageRequest.of(pageNo - 1, 5);
-
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         int offset = pageSize * pageNumber;
@@ -70,6 +67,7 @@ public class MedicalPackageImpl implements MedicalPackageService {
         String searchCondition = "";
         if (search != null && !search.trim().isEmpty()) {
             searchCondition = " AND (package_name LIKE :search)";
+            offset = 0;
         }
 
         // Create the native query string with the ORDER BY clause and search condition
@@ -123,10 +121,8 @@ public class MedicalPackageImpl implements MedicalPackageService {
 
     @Override
     public MedicalPackageDTO createPackage(MedicalPackageDTO medicalPackageDTO) {
-        if(!medicalPackageRepository.existsById(medicalPackageDTO.getId())){
-            if (medicalPackageRepository.existsByPackageName(medicalPackageDTO.getClinicId().getId(), medicalPackageDTO.getPackageName()) == 1) {
-                return null;
-            }
+        if (medicalPackageRepository.existsByPackageName(medicalPackageDTO.getClinicId().getId(), medicalPackageDTO.getPackageName(), medicalPackageDTO.getId()) == 1) {
+            return null;
         }
         MedicalPackage medicalPackage = medicalPackageRepository.save(medicalPackageMapper.convertMedicalPackageDTE(medicalPackageDTO));
         MedicalPackageDTO savePackage = medicalPackageMapper.convertMedicalPackageETD(medicalPackage);

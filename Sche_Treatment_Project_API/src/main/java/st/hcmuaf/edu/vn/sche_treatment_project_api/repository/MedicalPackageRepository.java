@@ -29,9 +29,9 @@ public interface MedicalPackageRepository extends JpaRepository<MedicalPackage, 
     @Query(value = "SELECT * FROM medical_package where id = (SELECT support_value FROM support where support_info = 'PACKAGE_DEFAULT')", nativeQuery = true)
     MedicalPackage getPackageDefault();
 
-    @Query(value = "SELECT EXISTS (SELECT 1 FROM medical_package WHERE clinic_id = :clinicId and package_name LIKE :packageName)", nativeQuery = true)
-    Integer existsByPackageName(@Param("clinicId") String clinicId, @Param("packageName") String packageName);
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM medical_package WHERE clinic_id = :clinicId and package_name LIKE :packageName AND id != :packageId)", nativeQuery = true)
+    Integer existsByPackageName(@Param("clinicId") String clinicId, @Param("packageName") String packageName, @Param("packageId") String packageId);
 
-    Page<MedicalPackage> findAllByPackageNameIsContaining(String searchTerm, Pageable pageable);
+    Page<MedicalPackage> findAllByPackageNameIsContainingIgnoreCase(String searchTerm, Pageable pageable);
 
 }

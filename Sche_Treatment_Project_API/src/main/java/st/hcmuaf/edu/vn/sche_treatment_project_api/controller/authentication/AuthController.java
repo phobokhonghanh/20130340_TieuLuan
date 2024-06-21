@@ -1,5 +1,6 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.controller.authentication;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,10 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.SupportDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.LoginResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AccountService;
 
+
 @RestController
 @RequestMapping("${api}")
+@Log4j2
 public class AuthController {
     @Autowired
     AccountService accountService;
@@ -24,6 +27,12 @@ public class AuthController {
             return new ResponseEntity(patientDTO.getId(), HttpStatus.OK);
         }
         return new ResponseEntity(MessageUtils.MESSAGE_EMAIL_OR_PHONE_EXISTS, HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/admin/auth/register")
+    public ResponseEntity createAdmin(@RequestBody PatientDTO patientDTO) {
+        log.info("register admin");
+        return create(patientDTO);
     }
 
     @PostMapping("/auth/login")
@@ -69,6 +78,7 @@ public class AuthController {
                     .id(accountLogin.getId())
                     .build());
         } catch (Exception e) {
+            log.warn("login");
             return ResponseEntity.badRequest().body(
                     LoginResponse.builder()
                             .message(MessageUtils.MESSAGE_LOGIN_FAILED)
@@ -91,13 +101,22 @@ public class AuthController {
         if (accountService.resetPassword(loginDTO)) {
             return new ResponseEntity(HttpStatus.OK);
         }
+        return new ResponseEntity(MessageUtils.MESSAGE_OVER_TIME, HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("/auth/reset-OTP/{accountId}")
+    public ResponseEntity resetOTP(@PathVariable String accountId, @RequestParam(name = "reset", defaultValue = "true") boolean reset) {
+        if (accountService.resetOTP(accountId, reset)) {
+            return new ResponseEntity(HttpStatus.OK);
+        }
         return new ResponseEntity(MessageUtils.MESSAGE_ACCOUNT_NOT_EXISTS, HttpStatus.BAD_REQUEST);
     }
 
     @PatchMapping("/auth/confirm-OTP/{accountId}")
-    public ResponseEntity confirmOTP(@PathVariable String accountId, @RequestParam(name = "otp", defaultValue = "000000") String otp) {
-        if (accountService.checkOTP(accountId, otp)) {
-            return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<String> confirmOTP(@PathVariable String accountId, @RequestParam(name = "otp", defaultValue = "000000") String otp, @RequestParam(name = "reset", defaultValue = "true") boolean reset) {
+        String token = accountService.checkOTP(accountId, otp, reset);
+        if (token != null) {
+            return new ResponseEntity(token, HttpStatus.OK);
         }
         return new ResponseEntity(MessageUtils.MESSAGE_ACCOUNT_NOT_EXISTS, HttpStatus.BAD_REQUEST);
     }

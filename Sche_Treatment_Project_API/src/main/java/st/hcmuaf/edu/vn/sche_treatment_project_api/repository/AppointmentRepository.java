@@ -21,7 +21,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
             "        ELSE 'FALSE' " +
             "    END AS result; ", nativeQuery = true)
     boolean checkTimeAppointment(@Param("calendarId")String calendarId, @Param("supportTimeId")String supportTimeId);
-    Page<Appointment> findAllByAppointmentPhoneIsContainingIgnoreCase(String keyword, Pageable pageable);
+    Page<Appointment> findAllByIdContainingIgnoreCase(String keyword, Pageable pageable);
     @Transactional
     @Modifying
     @Query(value ="UPDATE appointment SET support_status_id = :supportStatusId WHERE id = :appointmentId",nativeQuery = true)

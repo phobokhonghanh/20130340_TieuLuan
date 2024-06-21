@@ -16,12 +16,14 @@ import {
   updateAccount,
   updateBHYT_Patient,
   updateDoctor,
+  uploadImageSingle,
 } from "../apiConfig";
 import { ErrorNotifi, Notifi } from "./Notification";
 import { convertDate, convertDateTime } from "../Utils/Utils";
 import Pagination from "./Pagination";
 import {
   checkRoleDoctor,
+  checkRoleOnlyDoctor,
   getIdAccount,
   headerAuth,
   removeToken,
@@ -58,6 +60,7 @@ export const Profile = () => {
       setPhone(account.accountPhone || "");
       setEmail(account.accountEmail || "");
       setGender(account.accountGender + "" || "");
+      console.log(gender);
     }
     if (patient) {
       setBHYT(patient.patientBhyt || "");
@@ -66,7 +69,6 @@ export const Profile = () => {
 
   const fetchAccount = async () => {
     setLoading(true);
-
     try {
       if (idAccount !== "") {
         const response = await fetch(
@@ -84,10 +86,13 @@ export const Profile = () => {
         }
         setAccount(data);
       }
-    } catch (e: any) {
+    } catch (e) {
       setError(true);
     } finally {
-      setLoading(false);
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   };
   useEffect(() => {
@@ -129,7 +134,7 @@ export const Profile = () => {
     sendOTPRestPassword(idAccount)
       .then((response: any) => {
         if (response.status === 200) {
-          removeToken("benhviendakhoathuduc");
+          removeToken("essaymedical");
           navigate(`/otp/${idAccount}?reset-password=true`);
         }
       })
@@ -162,15 +167,13 @@ export const Profile = () => {
     updateAccount(form)
       .then((response: any) => {
         if (response.status === 200) {
-          setMessage("Cập nhật tài khoản thành công\n");
+          setMessage("Cập nhật thành công");
           setLevelMessage("success");
           if (!checkRoleDoctor() && isChangeBHYT) {
             updateBHYT_Patient(idAccount, bhyt)
               .then((response: any) => {
                 if (response.status === 200) {
                   const timer = setTimeout(() => {
-                    setMessage("Cập nhật tài khoản thành công\n");
-                    setLevelMessage("success");
                     setLoading(false);
                   }, 1000);
                   return () => clearTimeout(timer);
@@ -228,7 +231,7 @@ export const Profile = () => {
                     <i className="bx bx-user me-1"></i> Tài khoản
                   </a>
                 </li>
-                {checkRoleDoctor() && (
+                {checkRoleOnlyDoctor() && (
                   <li className="nav-item">
                     <Link className="nav-link" to="/account-doctor">
                       <i className="bx bx-bell me-1"></i> Thông tin bác sĩ
@@ -285,8 +288,8 @@ export const Profile = () => {
                             type="text"
                             id="email"
                             name="email"
-                            onChange={handleEmailChange}
                             className="form-control"
+                            disabled
                             value={email}
                           />
                         </div>
@@ -315,8 +318,8 @@ export const Profile = () => {
                           value={gender}
                           onChange={handleGenderChange}
                         >
-                          <option value="0">Nam</option>
-                          <option value="1">Nữ</option>
+                          <option value="false">Nam</option>
+                          <option value="true">Nữ</option>
                         </select>
                       </div>
                     </div>
@@ -335,7 +338,7 @@ export const Profile = () => {
                         className="btn btn-primary me-2"
                         disabled={!checkChange}
                       >
-                        Save changes
+                        Cập nhật
                       </Button>
                       <button
                         type="reset"
@@ -343,7 +346,7 @@ export const Profile = () => {
                         onClick={() => window.location.reload()}
                         disabled={!checkChange}
                       >
-                        Cancel
+                        Thoát
                       </button>
                     </div>
                   </form>
@@ -358,8 +361,8 @@ export const Profile = () => {
   );
 };
 export const ProfileDoctorDetails = () => {
-  const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [showMess, setShowMess] = useState(false);
   const [message, setMessage] = useState("");
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
@@ -377,6 +380,23 @@ export const ProfileDoctorDetails = () => {
   let idAccount = getIdAccount();
 
   const [doctor, setDoctor] = useState<DoctorDTO>();
+
+  const fetchAccount = async () => {
+    try {
+      if (checkRoleDoctor()) {
+        const response = await fetch(API_ENDPOINTS.GET_DOCTOR(idAccount));
+        const data = (await response.json()) as DoctorDTO;
+        setDoctor(data);
+      }
+    } catch (e: any) {
+      setError(true);
+    }
+  };
+
+  useEffect(() => {
+    fetchAccount();
+  }, [idAccount]);
+
   useEffect(() => {
     if (doctor) {
       setDoctorDegree(doctor.doctorDegree || "");
@@ -384,7 +404,7 @@ export const ProfileDoctorDetails = () => {
       setDoctorSpecialty(doctor.doctorSpecialty || "");
       setDoctorIntroduce(doctor.doctorIntroduce + "" || "");
       setDoctorExp(doctor.doctorExp + "" || "");
-      setDoctorImage(doctor.doctorImage + "" || "");
+      setDoctorImage(doctor.doctorImage);
     }
   }, [doctor]);
 
@@ -424,29 +444,31 @@ export const ProfileDoctorDetails = () => {
       value: React.SetStateAction<string>;
     };
   }) => {
-    setDoctorImage(event.target.files[0]);
-    setIsChange(true);
-  };
-  const fetchAccount = async () => {
     setLoading(true);
-    try {
-      if (checkRoleDoctor()) {
-        const response = await fetch(API_ENDPOINTS.GET_DOCTOR(idAccount));
-        const data = (await response.json()) as DoctorDTO;
-        setDoctor(data);
-      }
-    } catch (e: any) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+    setDoctorImage(event.target.files[0]);
+    const formData = new FormData();
+    formData.append("image", event.target.files[0]);
+    uploadImageSingle(formData)
+      .then((response: any) => {
+        console.log(response);
+        if (response.status === 200) {
+          setDoctorImage(response.data);
+          setIsChange(true);
+        }
+      })
+      .catch((error: any) => {
+        console.log("error:", error);
+        setMessage("Vui lòng chọn hình ảnh khác");
+        setLevelMessage("danger");
+        setShowMess(true);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
-  useEffect(() => {
-    fetchAccount();
-  }, [idAccount]);
+
   const handSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    setLoading(true);
     const form: DoctorDTO = {
       id: getIdAccount(),
       doctorDegree: doctorDegree,
@@ -459,33 +481,27 @@ export const ProfileDoctorDetails = () => {
     updateDoctor(form)
       .then((response: any) => {
         if (response.status === 200) {
-          const timer = setTimeout(() => {
-            setMessage("Cập nhật tài khoản thành công");
-            setLevelMessage("success");
-            setLoading(false);
-          }, 1000);
-          return () => clearTimeout(timer);
+          setMessage("Cập nhật thành công");
+          setLevelMessage("success");
+          setShowMess(true);
         }
       })
       .catch((error: any) => {
         if (error.response.status === 400) {
           setMessage(error.data);
           setLevelMessage("danger");
+          setShowMess(true);
         } else {
           console.log("error:", error);
           setMessage("Update Failed");
           setLevelMessage("danger");
+          setShowMess(true);
         }
-      })
-      .finally(() => {
-        setShowMess(true);
-        setLoading(false);
       });
     setIsChange(false);
   };
   return (
     <>
-      {isLoading && <Preloader />}
       {showMess && (
         <Notifi
           message={message}
@@ -493,6 +509,7 @@ export const ProfileDoctorDetails = () => {
           onClose={() => setShowMess(false)}
         />
       )}
+      {isLoading && <Preloader />}
       {error && <ErrorNotifi error={false} />}
       <div className="content-wrapper">
         <div className="container-xxl flex-grow-1 container-p-y">
@@ -523,14 +540,12 @@ export const ProfileDoctorDetails = () => {
                 <h5 className="card-header">Thông tin bác sĩ</h5>
                 <div className="card-body">
                   <div
+                    style={{ justifyContent: "start" }}
                     className="d-flex align-items-start align-items-sm-center gap-4"
-                    style={{ justifyContent: "none" }}
                   >
                     <img
                       src={
-                        doctorImage === null
-                          ? doctorImage
-                          : "/src/assets/img/doctor.jpg"
+                        doctorImage ? doctorImage : "/src/assets/img/doctor.jpg"
                       }
                       alt="user-avatar"
                       className="d-block rounded"
@@ -538,6 +553,7 @@ export const ProfileDoctorDetails = () => {
                       width="100"
                       id="uploadedAvatar"
                     />
+
                     <div className="button-wrapper">
                       <label
                         htmlFor="upload"
@@ -549,6 +565,7 @@ export const ProfileDoctorDetails = () => {
                         <input
                           type="file"
                           id="upload"
+                          multiple
                           className="account-file-input"
                           hidden
                           accept="image/png, image/jpeg"
@@ -583,7 +600,7 @@ export const ProfileDoctorDetails = () => {
                           <option value="GS.">GS</option>
                         </select>
                       </div>
-                      <div className="mb-3 col-md-1">
+                      <div className="mb-3 col-md-2">
                         <label htmlFor="language" className="form-label">
                           Học hàm
                         </label>
@@ -593,11 +610,12 @@ export const ProfileDoctorDetails = () => {
                           value={doctorRank}
                           onChange={handleRank}
                         >
-                          <option value="TS">BS</option>
+                          <option value="">Vui lòng chọn</option>
+                          <option value="BS">BS</option>
                           <option value="ThS">ThS</option>
                           <option value="TS">TS</option>
-                          <option value="TS">BSCK I</option>
-                          <option value="TS">BSCK II</option>
+                          <option value="BSCK I">BSCK I</option>
+                          <option value="BSCK II">BSCK II</option>
                         </select>
                       </div>
                       <div className="mb-3 col-md-4">
@@ -614,7 +632,7 @@ export const ProfileDoctorDetails = () => {
                           onChange={handleSpecialty}
                         />
                       </div>
-                      <div className="mb-3 col-md-4">
+                      <div className="mb-3 col-md-3">
                         <label htmlFor="organization" className="form-label">
                           Kinh nghiệm
                         </label>
@@ -647,7 +665,7 @@ export const ProfileDoctorDetails = () => {
                         disabled={!isChange}
                         className="btn btn-primary me-2"
                       >
-                        Save changes
+                        Cập nhật
                       </button>
                       <button
                         type="reset"
@@ -655,7 +673,7 @@ export const ProfileDoctorDetails = () => {
                         onClick={() => window.location.reload()}
                         disabled={!isChange}
                       >
-                        Cancel
+                        Thoát
                       </button>
                     </div>
                   </form>
@@ -732,7 +750,7 @@ export const DoctorDetails: React.FC<DoctorInfProps> = ({ doctor }) => {
                         backgroundRepeat: "no-repeat",
                       }}
                       src={`${
-                        doctor.doctorImage
+                        doctor.doctorImage === null
                           ? doctor.doctorImage
                           : "/src/assets/img/doctor.jpg"
                       }`}

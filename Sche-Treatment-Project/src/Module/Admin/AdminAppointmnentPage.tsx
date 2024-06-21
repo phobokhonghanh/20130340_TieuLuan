@@ -1,19 +1,16 @@
-import { AdminSidebar } from "../../Component/AdminSidebar";
 import { useEffect, useState } from "react";
-import { AppointmentDTO, Area, Clinic } from "../../Models/Model";
-import { Col, Form, Row } from "react-bootstrap";
+import { AppointmentDTO, Area } from "../../Models/Model";
+import { Col, Row } from "react-bootstrap";
 import { API_ENDPOINTS } from "../../apiConfig";
 import { Appointment, AppointmentDetail } from "../../Component/Appointment";
 import Pagination from "../../Component/Pagination";
 import {
   checkRoleAdmin,
   getIdAccount,
-  getRole,
   headerAuth,
 } from "../../Authentication/Authentication";
 import { useNavigate } from "react-router-dom";
 import { ErrorNotifi } from "../../Component/Notification";
-import Preloader from "../../Component/Preloader";
 
 export function AdminAppointmnetPage() {
   const [filterText, setFilterText] = useState(""); // input search
@@ -53,8 +50,6 @@ export function AdminAppointmnetPage() {
       const fetchAppointment = async (page: number) => {
         try {
           let response;
-          console.log(account);
-          console.log(checkRoleAdmin());
           if (!checkRoleAdmin()) {
             response = await fetch(
               `${API_ENDPOINTS.GET_APPOINTMENT_DOCTOR(
@@ -95,9 +90,8 @@ export function AdminAppointmnetPage() {
   };
   return (
     <>
-      <AdminSidebar />
       <ErrorNotifi error={error} />
-      <div id="page-wrapper">
+      <div id="page-wrapper" style={{ overflow: "hidden" }}>
         <div className="container-fluid">
           <div className="row">
             <div className="col-lg-12">
@@ -130,7 +124,7 @@ export function AdminAppointmnetPage() {
                       <Col xs={4}>
                         <input
                           type="text"
-                          placeholder="Tìm kiếm số điện thoại..."
+                          placeholder="Nhập mã lịch hẹn..."
                           value={filterText}
                           onChange={handleFilterChange}
                           className="custom-select-input"
@@ -148,7 +142,14 @@ export function AdminAppointmnetPage() {
                           listAppointment.map((appointment) => (
                             <div
                               key={appointment.id}
-                              style={{ cursor: "pointer" }}
+                              style={
+                                appointment.id === selectAppointment?.id
+                                  ? {
+                                      cursor: "pointer",
+                                      backgroundColor: "#d5d5d5",
+                                    }
+                                  : { cursor: "pointer" }
+                              }
                               onClick={() => setSelectAppointment(appointment)}
                             >
                               <Appointment

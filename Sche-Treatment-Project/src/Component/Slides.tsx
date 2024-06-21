@@ -2,8 +2,7 @@ import "../assets/css/Slides.css";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import React, { useState } from "react";
-import { Option, SelectWithSearch } from "./SelectWithSearch";
+import React from "react";
 import { Link } from "react-router-dom";
 
 interface SlideProps {
@@ -37,25 +36,19 @@ export const Slide: React.FC<SlideProps> = ({
 );
 
 const Slides = () => {
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [dataDepartments] = useState<Option[]>([
-    { value: "dermatology", label: "Da liễu" },
-    { value: "internal", label: "Nội khoa" },
-    { value: "surgery", label: "Ngoại khoa" },
-  ]);
   const settings = {
+    nav: true,
     dots: true,
-    infinite: true,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    loop: true,
-    autoplay: true,
-    smartSpeed: 500,
-    autoplayTimeout: 3500,
+    infinite: false,
+    autoplay: false,
     singleItem: true,
+    waitForAnimate: true,
     autoplayHoverPause: true,
     items: 1,
-    nav: true,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    speed: 1000,
+    autoplayTimeout: 20000,
   };
 
   return (

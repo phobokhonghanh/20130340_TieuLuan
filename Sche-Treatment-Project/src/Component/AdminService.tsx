@@ -7,12 +7,10 @@ import { ModalService } from "./Service";
 import { ErrorNotifi } from "./Notification";
 import { API_ENDPOINTS } from "../apiConfig";
 import { ServiceEntity } from "../Models/Model";
-import Preloader from "./Preloader";
 import { headerAuth } from "../Authentication/Authentication";
 
 // quản lý dịch vụ
 export const ServiceManager = () => {
-  const [isLoading, setLoading] = useState(false);
   const [filterText, setFilterText] = useState(""); // input search
   const [error, setError] = useState<boolean>(false);
   const [response, setResponse] = useState<number>(0); // get/set value response create
@@ -29,7 +27,6 @@ export const ServiceManager = () => {
   // call api
   useEffect(() => {
     const fetchListPackage = async () => {
-      setLoading(true);
       try {
         const response = await fetch(
           `${API_ENDPOINTS.GET_SERVICE_ALL}?page=${currentPage}&keyword=${filterText}`,
@@ -41,8 +38,6 @@ export const ServiceManager = () => {
         setTotalPages(data.totalPages);
       } catch (e: any) {
         setError(true);
-      } finally {
-        setLoading(false);
       }
     };
     setResponse(0);
@@ -50,7 +45,6 @@ export const ServiceManager = () => {
   }, [response, currentPage, filterText]);
   return (
     <>
-      {isLoading && <Preloader />}
       <ErrorNotifi error={error} />
       <div id="page-wrapper">
         <div className="container-fluid">
@@ -146,7 +140,6 @@ export const DataTableService: React.FC<DataTableServiceProps> = ({
         <thead>
           <tr className="text-small">
             <th># </th>
-            <th>ID</th>
             <th>Tên dịch vụ</th>
             <th>Giá tiền</th>
             <th>Trạng thái</th>
@@ -160,7 +153,6 @@ export const DataTableService: React.FC<DataTableServiceProps> = ({
           {data.map((row, rowIndex) => (
             <tr key={row.id}>
               <td>{++rowIndex}</td>
-              <td style={{ width: "200px" }}>{row.id}</td>
               <td>{row.serviceName}</td>
               <td>{formatPrice(row.servicePrice)}</td>
               <td>{row.supportStatusId.supportValue}</td>

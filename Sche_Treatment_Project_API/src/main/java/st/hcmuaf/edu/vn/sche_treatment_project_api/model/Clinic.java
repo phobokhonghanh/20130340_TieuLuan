@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Clinic {
+public class Clinic extends BaseEntity{
     @Id
     @Column(name = "id", length = 36)
     private String id;
@@ -22,11 +22,11 @@ public class Clinic {
     @Column(name = "clinic_name", length = 255, nullable = false)
     private String clinicName;
 
-    @Column(name = "create_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
+//    @Column(name = "create_at", updatable = false, nullable = false)
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "update_at")
+//    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore

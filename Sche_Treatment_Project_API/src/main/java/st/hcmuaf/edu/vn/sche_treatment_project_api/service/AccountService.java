@@ -23,7 +23,7 @@ public interface AccountService {
 
     AccountDTO getAccount(String id);
 
-    boolean checkEmailOrPhone(String email, String phone);
+    boolean checkEmailOrPhoneExists(String email, String phone);
 
     boolean checkEmailAndPhone(String email, String phone);
 
@@ -31,14 +31,16 @@ public interface AccountService {
 
     boolean resetPassword(LoginDTO loginDTO);
 
+    boolean resetOTP(String accountId, boolean reset);
+
     boolean sendOTPResetPassword(String accountId);
 
-    boolean checkOTP(String accountId, String otp);
+    String checkOTP(String accountId, String otp, boolean reset);
 
-    Account findByAccountEmailAndAccountPhoneAndSupportStatus(String email, String phone, String status); // test
+    Account findByAccountEmailAndAccountPhoneAndSupportStatus(String email, String phone, String status);
 
     Account findByAccountPhone(String phone);
-
+    List<Account> findAllByRoleAndStatus(String role,String status);
     Account findById(String id);
 
     boolean register(PatientDTO patientDTO);

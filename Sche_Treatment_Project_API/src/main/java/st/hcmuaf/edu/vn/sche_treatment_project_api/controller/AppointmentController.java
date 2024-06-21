@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.Utils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Appointment;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Bill;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AppointmentDTO;
@@ -24,8 +25,6 @@ import java.util.List;
 public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
-    @Autowired
-    private BillService billService;
 
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -44,13 +43,13 @@ public class AppointmentController {
     }
 
     @GetMapping("/admin/appointment")
-    public ResponseEntity<Page<AppointmentDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "0") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
+    public ResponseEntity<Page<AppointmentDTO>> getAll(@RequestParam(name = "keyword", defaultValue = "") String keyword, @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
         Page<AppointmentDTO> appointmentDTOs = appointmentService.getAll(keyword, pageNo);
         return ResponseEntity.ok(appointmentDTOs);
     }
 
     @GetMapping("/doctor-side/appointment/{accountId}")
-    public ResponseEntity<Page<AppointmentDTO>> getListAppointmentDoctor(@PathVariable("accountId") String accountId, @RequestParam(name = "keyword", defaultValue = "0") String keyword,
+    public ResponseEntity<Page<AppointmentDTO>> getListAppointmentDoctor(@PathVariable("accountId") String accountId, @RequestParam(name = "keyword", defaultValue = "") String keyword,
                                                                          @RequestParam(name = "page", defaultValue = "1") Integer pageNo) {
         Page<AppointmentDTO> appointmentDTOs = appointmentService.getListAppointmentDoctor(accountId, keyword, pageNo);
         return ResponseEntity.ok(appointmentDTOs);
@@ -58,12 +57,10 @@ public class AppointmentController {
 
     @PostMapping("/appointment")
     public ResponseEntity<Bill> createAppointment(@RequestBody AppointmentDTO appointmentDTO) {
+        appointmentDTO.setId(Utils.generateId());
         boolean createAppointment = appointmentService.createAppointment(appointmentDTO);
         if (createAppointment) {
-            Bill createBill = billService.createBill(appointmentDTO);
-            if (createBill != null) {
-                return new ResponseEntity<>(createBill, HttpStatus.CREATED);
-            }
+            return new ResponseEntity<>(null, HttpStatus.CREATED);
         }
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }

@@ -18,6 +18,9 @@ public class SupportDTO {
     public static final String STATUS_ROLE_ADMIN = "R1";
     public static final String STATUS_ROLE_DOCTOR = "R2";
     public static final String STATUS_ROLE_PATIENT = "R4";
+    public static final String LEVEL_INFO = "L1";
+    public static final String LEVEL_WARNING = "L2";
+    public static final String LEVEL_DANGER = "L3";
     private String id;
     private String supportValue;
     private String supportInfo;

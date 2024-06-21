@@ -1,35 +1,57 @@
-import { Navbar, Nav, Container, Row, Col, Alert } from "react-bootstrap";
+import { Navbar, Nav, Container, Row, Col } from "react-bootstrap";
 import "../assets/css/HeaderNav.css";
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { API_ENDPOINTS } from "../apiConfig";
-import { LoginResponse, PackageEntity } from "../Models/Model";
-import {
+import { PackageEntity } from "../Models/Model";
+import useLogout, {
   checkRoleAdmin,
   checkRoleDoctor,
   checkTokenRealtime,
   getIdAccount,
   getNameAccount,
-  removeToken,
+  getToken,
 } from "../Authentication/Authentication";
+import { Notifi } from "./Notification";
+import { isActive } from "../Utils/Header";
 
 function HeaderNav() {
+  const [message, setMessage] = useState("");
+  const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
+    "danger"
+  );
+  const [showMess, setShowMess] = useState(false);
   const [sliderMobile, setSliderMobile] = useState(false);
   const handleNavbarToggle = () => {
     setSliderMobile(!sliderMobile);
   };
   const [packageEntity, setPackage] = useState<PackageEntity>();
-  const navigate = useNavigate();
+  const logout = useLogout();
 
   const handleLogout = () => {
-    removeToken("benhviendakhoathuduc");
-    navigate("/");
+    setMessage("Bạn đã đăng xuất");
+    setLevelMessage("success");
+    setShowMess(true);
+    logout();
   };
 
   useEffect(() => {
-  checkTokenRealtime(navigate);
-  })
-  
+    const checkToken = async () => {
+      const token = getToken();
+      if (token) {
+        const isTokenValid = await checkTokenRealtime(token);
+        if (!isTokenValid) {
+          setMessage("Tài khoản đã bị khóa");
+          setLevelMessage("danger");
+          setShowMess(true);
+          logout();
+        }
+      }
+    };
+
+    checkToken();
+  }, []);
+
   useEffect(() => {
     const fetchPackage = async () => {
       try {
@@ -44,6 +66,13 @@ function HeaderNav() {
   }, []);
   return (
     <>
+      {showMess && (
+        <Notifi
+          message={message}
+          variant={levelMessage}
+          onClose={() => setShowMess(false)}
+        />
+      )}
       {/* Header Area */}
       <header className="header">
         {/* Topbar */}
@@ -57,12 +86,8 @@ function HeaderNav() {
                 <Col lg={3} style={{ width: "25%" }}>
                   {/* Start Logo */}
                   <div className="logo">
-                    <Link to="/">
-                      <img
-                        src="http://myhealthdemo.benhvienkhuvucthuduc.vn/admin/assets/img/logo.png"
-                        alt="logo"
-                        className="logo-image"
-                      />
+                    <Link to="/" className="logo-image logo-text">
+                      ESSAY
                     </Link>
                   </div>
                   {/* End Logo */}
@@ -77,19 +102,44 @@ function HeaderNav() {
                       />
                       <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="font-nav">
-                          <Link to="/" className="nav-link p-right-15">
+                          <Link
+                            to="/"
+                            className={`nav-link p-right-15 ${
+                              isActive("/") && "active"
+                            }`}
+                          >
                             Trang chủ
                           </Link>
-                          <Link to="/doctors" className="nav-link p-right-15">
+                          <Link
+                            to="/doctors"
+                            className={`nav-link p-right-15 ${
+                              isActive("/doctors") && "active"
+                            }`}
+                          >
                             Bác sĩ
                           </Link>
-                          <Link to="/packages" className="nav-link p-right-15">
+                          <Link
+                            to="/packages"
+                            className={`nav-link p-right-15 ${
+                              isActive("/packages") && "active"
+                            }`}
+                          >
                             Gói khám
                           </Link>
-                          <Link to="/services" className="nav-link p-right-15">
+                          <Link
+                            to="/services"
+                            className={`nav-link p-right-15 ${
+                              isActive("/services") && "active"
+                            }`}
+                          >
                             Dịch vụ
                           </Link>
-                          <Link to="/about-us" className="nav-link p-right-15">
+                          <Link
+                            to="/about-us"
+                            className={`nav-link p-right-15 ${
+                              isActive("/about-us") && "active"
+                            }`}
+                          >
                             Về chúng tôi
                           </Link>
                         </Nav>
@@ -144,7 +194,7 @@ function HeaderNav() {
                               paddingRight: "10px",
                             }}
                           >
-                            Tài khoản
+                            Đăng nhập
                           </span>
                         ) : (
                           <>

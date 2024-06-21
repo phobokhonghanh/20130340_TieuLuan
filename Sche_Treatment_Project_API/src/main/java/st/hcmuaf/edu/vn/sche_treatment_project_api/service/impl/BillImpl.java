@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,6 +18,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.BillMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Bill;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AppointmentDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.BillDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.SupportDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalPackage;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.BillRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.MedicalPackageRepository;
@@ -26,6 +28,8 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.PaymentLandi
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.PaypalRequest;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.PaypalResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.BillService;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.service.LogService;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.service.Specification.BillSpecs;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,14 +39,15 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class BillImpl implements BillService {
     private BillRepository billRepository;
+    private LogService logService;
     private MedicalPackageRepository medicalPackageRepository;
     private BillMapper billMapper;
     @PersistenceContext
     private EntityManager entityManager;
     private final PayPalHttpClient payPalHttpClient;
-
     private static final int USD_VND_RATE = 23_000;
 
     @Override
@@ -59,13 +64,13 @@ public class BillImpl implements BillService {
             bill = billRepository.save(bill);
             return bill;
         } catch (DataAccessException ex) {
-            System.out.println(ex);
+            log.warn("Cannot create bill " + ex.getMessage());
             return null;
         }
     }
 
     @Override
-    public Page<BillDTO>  getAll(Integer pageNo, String keyword) {
+    public Page<BillDTO> getAll(Integer pageNo, String keyword) {
         Pageable pageable = PageRequest.of(pageNo - 1, 10);
         Specification<Bill> spec = Specification
                 .where(BillSpecs.idLike(keyword));
@@ -109,12 +114,12 @@ public class BillImpl implements BillService {
                 return null;
             }
             Bill bill = optional.get();
-            // (3.2.1) Tính tổng tiền theo USD
+            // Tính tổng tiền theo USD
 
             BigDecimal billSum = BigDecimal.valueOf(Double.parseDouble(bill.getBillSum()));
             BigDecimal totalPayUSD = billSum.divide(BigDecimal.valueOf(USD_VND_RATE), 0, BigDecimal.ROUND_HALF_UP);
 
-            // (3.2.2) Tạo một yêu cầu giao dịch PayPal
+            // Tạo một yêu cầu giao dịch PayPal
             PaypalRequest paypalRequest = new PaypalRequest();
 
             paypalRequest.setIntent(OrderIntent.CAPTURE);
@@ -125,21 +130,22 @@ public class BillImpl implements BillService {
             ));
 
             paypalRequest.setApplicationContext(new PaypalRequest.PayPalAppContext()
-                    .setBrandName("Benh vien da khoa Thu Duc")
+                    .setBrandName("Essay Medical")
                     .setLandingPage(PaymentLandingPage.BILLING)
-                    .setReturnUrl(MessageUtils.BACKEND_HOST + "/api/payment/paypal/success")
-                    .setCancelUrl(MessageUtils.BACKEND_HOST + "/api/payment/paypal/cancel"));
-
+                    .setReturnUrl(MessageUtils.BACKEND_API + "/payment/paypal/success")
+                    .setCancelUrl(MessageUtils.BACKEND_API + "/payment/paypal/cancel"));
+            // tạo giao dịch
             PaypalResponse paypalResponse = payPalHttpClient.createPaypalTransaction(paypalRequest);
             bill.setPaymentId(paypalResponse.getId());
             billRepository.save(bill);
-            // (3.2.4) Trả về đường dẫn checkout cho user
+            // Trả về đường dẫn checkout cho user
             for (PaypalResponse.Link link : paypalResponse.getLinks()) {
                 if ("approve".equals(link.getRel())) {
                     return link.getHref();
                 }
             }
         } catch (Exception e) {
+            log.warn("Cannot create PayPal transaction request!");
             throw new RuntimeException("Cannot create PayPal transaction request!" + e.getMessage());
         }
         return null;
@@ -154,7 +160,7 @@ public class BillImpl implements BillService {
                 payPalHttpClient.capturePaypalTransaction(paypalOrderId, payerId);
                 bill.setPaid(true); // (2) Đã thanh toán
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                log.warn("Cannot create PayPal capture transaction request!" + e.getMessage());
                 return false;
             }
             billRepository.save(bill);
@@ -165,6 +171,15 @@ public class BillImpl implements BillService {
 
     @Override
     public void updateBillByPaid(String id, boolean is_pay) {
-         billRepository.updateIsPaid(id,is_pay);
+        billRepository.updateIsPaid(id, is_pay);
+        createBillLog(id);
+    }
+
+    public void createBillLog(String id) {
+        Optional<Bill> bill = billRepository.findById(id);
+        if (bill.isPresent()) {
+            String content = "Thanh toán - Lịch hẹn có mã: " + bill.get().getAppointment().getId() + " đã được thanh toán";
+            logService.info(content);
+        }
     }
 }

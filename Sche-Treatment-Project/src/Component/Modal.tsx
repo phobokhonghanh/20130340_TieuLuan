@@ -27,7 +27,6 @@ export const ModalResult: React.FC<ResultProps> = ({
 }) => {
   const [modalShow, setModalShow] = useState(false);
   const [error, setError] = useState(false);
-  const [isLoading, setLoading] = useState(false);
   const [showMess, setShowMess] = useState(false);
   const [message, setMessage] = useState("");
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
@@ -53,7 +52,6 @@ export const ModalResult: React.FC<ResultProps> = ({
   }, [result]);
 
   const fetchResult = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         `${API_ENDPOINTS.GET_RESULT_APPOINTMENT(appointmentId)}`,
@@ -66,8 +64,6 @@ export const ModalResult: React.FC<ResultProps> = ({
       setResult(data);
     } catch (e: any) {
       setError(true);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -94,14 +90,6 @@ export const ModalResult: React.FC<ResultProps> = ({
         break;
     }
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowMess(false);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [showMess]);
 
   const handleResultSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -134,7 +122,6 @@ export const ModalResult: React.FC<ResultProps> = ({
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">Kết quả</Modal.Title>
-          {isLoading && <div> Loading...</div>}
           {showMess && (
             <Notifi
               message={message}
@@ -197,7 +184,14 @@ export const ModalResult: React.FC<ResultProps> = ({
                   </Col>
                 ) : (
                   <Col>
-                    <Button onClick={() => setModalShow(true)}>Đánh giá</Button>
+                    <Button
+                      onClick={() => {
+                        onHide;
+                        setModalShow(true);
+                      }}
+                    >
+                      Đánh giá
+                    </Button>
                   </Col>
                 )}
               </Row>
@@ -210,7 +204,9 @@ export const ModalResult: React.FC<ResultProps> = ({
           doctorId={doctorId}
           appointmentId={appointmentId}
           show={modalShow}
-          onHide={() => setModalShow(false)}
+          onHide={() => {
+            setModalShow(false);
+          }}
         />
       )}
     </>
@@ -359,7 +355,7 @@ export const ModalThankYou: React.FC<ThankYouProps> = ({ show, onHide }) => {
               fontWeight: "bold",
             }}
           >
-            Mẹo nhỏ
+            Chân thành cảm ơn bạn đã hoàn tất thanh toán!
           </Modal.Title>
         </Modal.Header>
         <Modal.Body
@@ -367,12 +363,11 @@ export const ModalThankYou: React.FC<ThankYouProps> = ({ show, onHide }) => {
           style={{ fontFamily: "Arial, sans-serif", fontSize: "16px" }}
         >
           <Modal.Title id="contained-modal-title-vcenter">
-            Bạn sẽ được khám sớm hơn nếu như người khác hủy lịch. Vậy nên hãy
-            đến sớm hơn 15 phút nhé!
+            Để có cơ hội được khám sớm hơn nếu có người hủy lịch, bạn hãy đến
+            sớm 15 phút nhé!
           </Modal.Title>
         </Modal.Body>
       </Modal>
     </>
   );
 };
-

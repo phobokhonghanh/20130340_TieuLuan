@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 import { Col, Form, Modal, Row } from "react-bootstrap";
 
-import { Notifi } from "./Notification";
+import { ErrorNotifi, Notifi } from "./Notification";
 import { API_ENDPOINTS, createService } from "../apiConfig";
 import { ClinicSelected } from "./Department";
 import { Clinic, ServiceDTO, ServiceEntity } from "../Models/Model";
@@ -96,9 +96,8 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [showMess, setShowMess] = useState(false);
-  const [isLoading, setLoading] = useState(false);
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
-    "danger"
+    "success"
   );
 
   const serviceID = service ? service.id : uuidv4(); // id
@@ -114,8 +113,16 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
 
   const [dataClinic, setDataClinic] = useState<Clinic[]>([]); // list clinic all
 
+  useEffect(() => {
+    if (service) {
+      setName(service.serviceName);
+      setPrice(service.servicePrice);
+      setClinic(service.clinic);
+      setDescription(service.serviceDescription);
+      setSupportStatus(service.supportStatusId.id);
+    }
+  }, [service]);
   const fetchClinic = async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         `${API_ENDPOINTS.GET_CLINIC_ALL}`,
@@ -124,9 +131,7 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
       const data = (await response.json()) as Clinic[];
       setDataClinic(data);
     } catch (e: any) {
-      setError(e);
-    } finally {
-      setLoading(false);
+      setError(true);
     }
   };
 
@@ -158,9 +163,7 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
   };
   const handleFormSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    setLoading(true);
     if (!clinic) {
-      setLoading(false);
       return;
     }
     const formData: ServiceDTO = {
@@ -186,16 +189,19 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
           }
         })
         .catch((error: any) => {
-          if (error.status === 400) {
+          console.error("Error:", error.response.status);
+          if (error.response.status == 400) {
             setMessage("Dịch vụ đã tồn tại");
             setLevelMessage("danger");
             setShowMess(true);
+          } else {
+            console.error("Error:", error);
+            setError(true);
           }
-          console.error("Error:", error);
-          setError(true);
+          responseStatus(error.response.status);
         })
         .finally(() => {
-          setLoading(false);
+          window.scrollTo({ top: 30, behavior: "smooth" });
         });
     }
   };
@@ -208,6 +214,7 @@ export const ModalService: React.FC<ModalServiceeProps> = ({
           onClose={() => setShowMess(false)}
         />
       )}
+      {<ErrorNotifi error={error} />}
       <Modal
         show={show}
         onHide={onHide}

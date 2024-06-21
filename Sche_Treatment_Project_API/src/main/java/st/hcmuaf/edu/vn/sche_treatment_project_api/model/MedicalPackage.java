@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "medical_package")
 @AllArgsConstructor
-public class MedicalPackage {
+public class MedicalPackage extends BaseEntity {
     @Id
     @Column(name = "id", length = 36)
     private String id;
@@ -21,11 +21,11 @@ public class MedicalPackage {
     @Column(name = "package_price", length = 255, nullable = false)
     private String packagePrice;
 
-    @Column(name = "create_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
+//    @Column(name = "create_at")
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "update_at")
+//    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "clinic_id")

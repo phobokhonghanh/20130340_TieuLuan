@@ -7,33 +7,29 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { API_ENDPOINTS } from "../apiConfig";
-import { formatDate } from "../Module/AppointmentPage";
 import { CalendarDTO, DoctorEntity } from "../Models/Model";
 import { headerAuth } from "../Authentication/Authentication";
+import { formatDate } from "../Utils/Utils";
 
-const settings = {
-  infinite: true,
-  slidesToShow: 2,
-  slidesToScroll: 1,
-  loop: true,
-  autoplay: true,
-  smartSpeed: 50000,
-  autoplayTimeout: 50000,
-  singleItem: true,
-  autoplayHoverPause: true,
-  items: 1,
-  nav: true,
-  responsive: [
-    {
-      breakpoint: 992,
-      settings: {
-        slidesToShow: 1,
-      },
-    },
-  ],
-};
 export const DoctorSlider = () => {
   const [listDoctor, setListDoctor] = useState<DoctorEntity[]>([]);
+
+  const settings = {
+    infinite: listDoctor.length < 2 ? false : true,
+    slidesToShow: 2,
+    slidesToScroll: 1,
+    loop: true,
+    autoplayTimeout: 50000,
+    nav: true,
+    responsive: [
+      {
+        breakpoint: 992,
+        settings: {
+          slidesToShow: 1,
+        },
+      },
+    ],
+  };
   const [error, setError] = useState();
   const [isLoading, setLoading] = useState(false);
   useEffect(() => {
@@ -148,7 +144,8 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
     const fetchListDoctor = async () => {
       try {
         const response = await fetch(
-          API_ENDPOINTS.GET_CALENDAR_DOCTOR(doctorEntity.id),headerAuth()
+          API_ENDPOINTS.GET_CALENDAR_DOCTOR(doctorEntity.id),
+          headerAuth()
         );
         const data = (await response.json()) as CalendarDTO[];
         setCalendar(data);
@@ -159,7 +156,7 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
     fetchListDoctor();
   }, [doctorEntity]);
   return (
-    <div className="col-md-12 col-12 custom-slider">
+    <div className="col-md-12 col-12 custom-slider" key={doctorEntity.id}>
       <div className="single-table">
         {/* <!-- Table Head --> */}
         <div className="table-head">
@@ -182,16 +179,16 @@ export const DoctorInfo: React.FC<DoctorProps> = ({ doctorEntity }) => {
           <div className="price">
             <p style={{ color: "black" }}>
               {" "}
-              Khoa: {doctorEntity.doctorSpecialty}
+              Chuyên khoa: {doctorEntity.doctorSpecialty}
             </p>
           </div>
           <div
-            className="price"
+            className="price time-container"
             style={{ overflowY: "auto", height: " 150px" }}
           >
             {calendars ? (
               calendars.map((calendar) => (
-                <div key={calendar.id}>
+                <div key={calendar.id} style={{borderBottom:"1px solid"}}>
                   <i className="far fa-calendar-check calendar"></i>
                   <span className="calendar">
                     {formatDate(calendar.calendarDate)}

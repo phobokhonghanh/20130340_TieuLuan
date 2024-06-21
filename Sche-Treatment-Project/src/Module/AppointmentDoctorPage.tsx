@@ -1,6 +1,5 @@
 import "../assets/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "react-calendar/dist/Calendar.css";
 
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -17,15 +16,14 @@ import {
   PackageEntity,
   Support,
 } from "../Models/Model";
-import Header from "../Component/Header";
 import { ErrorNotifi, Notifi } from "../Component/Notification";
 import { convertTime } from "../Component/AdminCalendar";
 
 import { API_ENDPOINTS, createAppointment } from "../apiConfig";
-import { formatDate } from "./AppointmentPage";
 import { ClinicSelected } from "../Component/Department";
 import { getIdAccount, headerAuth } from "../Authentication/Authentication";
 import Preloader from "../Component/Preloader";
+import { formatDate } from "../Utils/Utils";
 
 const AppointmentDoctor = () => {
   const { state } = useLocation();
@@ -148,7 +146,6 @@ const AppointmentDoctor = () => {
         })
         .finally(() => {
           window.scrollTo({ top: 0, behavior: "smooth" });
-
           const timer = setTimeout(() => {
             setLoading(false);
           }, 1000);
@@ -269,7 +266,7 @@ const AppointmentDoctor = () => {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       {isLoading && <Preloader />}
       <Container>
         <Row className="justify-content-center m-25">

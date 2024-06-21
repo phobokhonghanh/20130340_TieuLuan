@@ -18,11 +18,12 @@ public interface MedicalServicesRepository extends JpaRepository<MedicalService,
     @Query(value = "SELECT * FROM medical_service WHERE clinic_id IN " +
             "(SELECT clinic_id FROM calendar WHERE calendar_date >= CURDATE() and  clinic_id IN " +
             "(SELECT id FROM clinic WHERE medical_area_id = :medicalAreaId))", nativeQuery = true)
-    public List<MedicalService> getListServicesArea(@Param("medicalAreaId") String medicalAreaId);
+    List<MedicalService> getListServicesArea(@Param("medicalAreaId") String medicalAreaId);
 
-    @Query(value = "SELECT EXISTS (SELECT 1 FROM medical_service WHERE clinic_id = :clinicId and service_name LIKE :serviceName)", nativeQuery = true)
-    Integer existsByServiceName(@Param("clinicId") String clinicId, @Param("serviceName") String serviceName);
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM medical_service WHERE clinic_id = :clinicId and service_name LIKE :serviceName AND id != :serviceId)", nativeQuery = true)
+    Integer existsByServiceName(@Param("clinicId") String clinicId, @Param("serviceName") String serviceName, @Param("serviceId") String serviceId);
 
     Page<MedicalService> findAllByServiceNameIsContaining(String keyword, Pageable pageable);
 
+    List<MedicalService> findAllByServiceNameIsContainingAndSupportStatusId(String keyword, String status);
 }

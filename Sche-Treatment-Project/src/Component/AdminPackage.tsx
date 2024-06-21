@@ -11,6 +11,7 @@ import {
   PackageEntity,
   PackageService,
   PackageServiceDTO,
+  ServiceDTO,
   ServiceEntity,
 } from "../Models/Model";
 import {
@@ -25,12 +26,10 @@ import {
   getServicesRemoved,
   getServicesSelected,
 } from "../Utils/Utils";
-import Preloader from "./Preloader";
 import { headerAuth } from "../Authentication/Authentication";
 
 //Quản lý gói khám
 export const PackageManager = () => {
-  const [isLoading, setLoading] = useState(false);
   const [filterText, setFilterText] = useState(""); // input search
   const [error, setError] = useState<boolean>(false);
   const [response, setResponse] = useState<number>(0); // get/set value response
@@ -45,7 +44,6 @@ export const PackageManager = () => {
   };
   useEffect(() => {
     const fetchListPackage = async () => {
-      setLoading(true);
       try {
         const response = await fetch(
           `${API_ENDPOINTS.GET_PACKAGE_ALL}?page=${currentPage}&keyword=${filterText}`,
@@ -58,7 +56,6 @@ export const PackageManager = () => {
       } catch (e: any) {
         setError(true);
       } finally {
-        setLoading(false);
       }
     };
     setResponse(0);
@@ -66,7 +63,6 @@ export const PackageManager = () => {
   }, [response, currentPage, filterText]);
   return (
     <>
-      {isLoading && <Preloader />}
       <ErrorNotifi error={error} />
       <div id="page-wrapper">
         <div className="container-fluid">
@@ -165,30 +161,33 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
   const [error, setError] = useState(false);
   const [message, setMessage] = useState("");
   const [showMess, setShowMess] = useState(false);
-  const [isLoading, setLoading] = useState(false);
   const [levelMessage, setLevelMessage] = useState<"danger" | "success">(
     "danger"
   );
   const packageId = packageEntity ? packageEntity.id : uuidv4();
-  const [packageName, setPackageName] = useState(
-    packageEntity ? packageEntity.packageName : ""
-  );
-  const [packagePrice, setPackagePrice] = useState(
-    packageEntity ? packageEntity.packagePrice : ""
-  );
+  const [packageName, setPackageName] = useState("");
+  const [packagePrice, setPackagePrice] = useState("");
   const [clinic, setClinic] = useState<Clinic | undefined>(
     packageEntity?.clinicId
   );
-  const [supportStatus, setSupportStatus] = useState(
-    packageEntity ? packageEntity.supportStatusId.id : "S1"
-  );
+  const [supportStatus, setSupportStatus] = useState("S1");
   const [listPackageService, setListPackageService] = useState<
     PackageService[]
-  >(packageEntity ? packageEntity.packageServices : []);
+  >([]);
 
-  const [servicesSelected, setServicesSelected] = useState<ServiceEntity[]>([]); // list services selected callback
-  const [dataServices, setDataServices] = useState<ServiceEntity[]>([]); // list services all
+  const [servicesSelected, setServicesSelected] = useState<ServiceDTO[]>([]); // list services selected callback
+  const [dataServices, setDataServices] = useState<ServiceDTO[]>([]); // list services all
   const [dataClinic, setDataClinic] = useState<Clinic[]>([]);
+
+  useEffect(() => {
+    if (packageEntity) {
+      setPackageName(packageEntity.packageName);
+      setPackagePrice(packageEntity.packagePrice);
+      setClinic(packageEntity.clinicId);
+      setSupportStatus(packageEntity.supportStatusId.id);
+      setListPackageService(packageEntity.packageServices);
+    }
+  }, [packageEntity]);
 
   const fetchClinic = async () => {
     try {
@@ -235,7 +234,7 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
   const handleClinicSelected = (selectedClinic: Clinic) => {
     setClinic(selectedClinic);
   };
-  const handleServicesSelected = (list: ServiceEntity[]) => {
+  const handleServicesSelected = (list: ServiceDTO[]) => {
     setServicesSelected(list);
   };
   const handleSupportChange = (e: { target: { name: any; value: any } }) => {
@@ -254,7 +253,6 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
   };
   const handleFormSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    setLoading(true);
     const listPackageServices = packageEntity
       ? packageEntity.packageServices
       : []; // ds dich vu da chon (api)
@@ -300,19 +298,20 @@ export const ModalPackage: React.FC<ModalPackageProps> = ({
           }
         })
         .catch((error: any) => {
-          if (error.response.status === 400) {
+          if (error.response.status == 400) {
             setMessage("Gói khám đã tồn tại");
             setLevelMessage("danger");
             setShowMess(true);
+          } else {
+            console.error("Error:", error);
+            setError(true);
           }
-          console.error("Error:", error);
-          setError(true);
+          responseStatus(error.response.status);
         })
         .finally(() => {
-          setLoading(false);
+          window.scrollTo({ top: 30, behavior: "smooth" });
         });
     }
-    setLoading(true);
   };
   return (
     <>
@@ -499,7 +498,6 @@ export const DataTablePackage: React.FC<DataTablePackageProps> = ({
         <thead>
           <tr className="text-small">
             <th># </th>
-            <th>ID</th>
             <th>Tên gói</th>
             <th>Giá tiền</th>
             <th>Trạng thái</th>
@@ -514,7 +512,6 @@ export const DataTablePackage: React.FC<DataTablePackageProps> = ({
           {data.map((row, rowIndex) => (
             <tr key={row.id}>
               <td>{++rowIndex}</td>
-              <td style={{ width: "200px" }}>{row.id}</td>
               <td>{row.packageName}</td>
               <td>{formatPrice(row.packagePrice)}</td>
               <td>{row.supportStatusId.supportValue}</td>

@@ -2,7 +2,6 @@ import "../assets/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { v4 as uuidv4 } from "uuid";
-import { format } from "date-fns";
 import { useLocation } from "react-router-dom";
 import Calendar, { TileArgs } from "react-calendar";
 import { useEffect, useRef, useState } from "react";
@@ -15,17 +14,15 @@ import {
   PackageEntity,
   Support,
 } from "../Models/Model";
-import Header from "../Component/Header";
 import { ErrorNotifi, Notifi } from "../Component/Notification";
 import { convertTime } from "../Component/AdminCalendar";
 import { API_ENDPOINTS, createAppointment } from "../apiConfig";
 import { ClinicSelected } from "../Component/Department";
 import { getIdAccount, headerAuth } from "../Authentication/Authentication";
 import Preloader from "../Component/Preloader";
+import { formatDate } from "../Utils/Utils";
+import { format } from "date-fns";
 
-export function formatDate(date: string) {
-  return format(new Date(date), "dd/MM/yyyy");
-}
 interface Calendar {
   calendarDate: string;
 }
@@ -178,7 +175,6 @@ const AppointmentForm = () => {
   const infoTime = ({ date, view }: TileArgs) => {
     const now = new Date();
     const nowDateString = format(now, "yyyy-MM-dd");
-
     const dateCalendar = format(date, "yyyy-MM-dd");
     const convertedData = convertTime(clinic ? clinic.calendars : []);
     if (dateCalendar >= nowDateString) {
@@ -233,7 +229,7 @@ const AppointmentForm = () => {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       {isLoading && <Preloader />}
       <Container>
         <Row className="justify-content-center m-25">
@@ -435,10 +431,7 @@ const AppointmentForm = () => {
                       </span>
                     </Col>
                   </Form.Label>
-                  <Calendar
-                    tileContent={infoTime}
-                    // onChange={handleDateChange}
-                  />
+                  <Calendar tileContent={infoTime} />
                   <TimeTable
                     calendar={calendarModel}
                     title={

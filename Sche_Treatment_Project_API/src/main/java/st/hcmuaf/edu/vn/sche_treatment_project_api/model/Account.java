@@ -1,7 +1,10 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +22,7 @@ import java.util.Map;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "account")
-public class Account implements UserDetails, OAuth2User {
+public class Account extends BaseEntity implements UserDetails, OAuth2User {
     @Id
     @Column(name = "id", length = 36, nullable = false)
     private String id;
@@ -39,12 +42,13 @@ public class Account implements UserDetails, OAuth2User {
 
     @Column(name = "account_gender", nullable = false)
     private boolean accountGender;
-
-    @Column(name = "create_at")
-    private LocalDateTime createAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updateAt;
+//    @CreatedDate
+//    @Column(name = "create_at")
+//    private LocalDateTime createAt;
+//
+//    @LastModifiedDate
+//    @Column(name = "update_at")
+//    private LocalDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "support_role_id", referencedColumnName = "id", nullable = false)
@@ -71,9 +75,10 @@ public class Account implements UserDetails, OAuth2User {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        authorityList.add(new SimpleGrantedAuthority("ROLE_"+getSupportRole().getSupportValue().toUpperCase()));
+        authorityList.add(new SimpleGrantedAuthority("ROLE_" + getSupportRole().getSupportValue().toUpperCase()));
         return authorityList;
     }
+
     @Override
     public String getPassword() {
         return null;

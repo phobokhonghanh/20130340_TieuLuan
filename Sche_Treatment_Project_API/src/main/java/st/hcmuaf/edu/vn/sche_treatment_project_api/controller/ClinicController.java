@@ -60,7 +60,7 @@ public class ClinicController {
         if (saveClinicDTO != null) {
             return new ResponseEntity<>(saveClinicDTO, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/admin/clinic")

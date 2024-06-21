@@ -1,4 +1,3 @@
-import Header from "../Component/Header";
 
 export default function ErrorPage() {
   const containerStyle: React.CSSProperties = {
@@ -25,7 +24,7 @@ export default function ErrorPage() {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <div style={containerStyle}>
         <div style={cardStyle}>
           <h1 style={headingStyle}>404!</h1>

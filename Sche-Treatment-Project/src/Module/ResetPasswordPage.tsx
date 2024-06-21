@@ -1,11 +1,10 @@
 import { useState } from "react";
-import Header from "../Component/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/style.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Notifi } from "../Component/Notification";
-import { forgotPassword, login, resetPassword } from "../apiConfig";
+import { forgotPassword, resetPassword } from "../apiConfig";
 import Preloader from "../Component/Preloader";
 import { Signin } from "../Models/Model";
 function ForgotPassword() {
@@ -73,7 +72,7 @@ function ForgotPassword() {
   return (
     <>
       {isLoading && <Preloader />}
-      <Header />
+      {/* <Header /> */}
       {showMess && (
         <Notifi
           message={message}
@@ -165,6 +164,7 @@ export function ResetPassword() {
     const { value } = event.currentTarget;
     setPassword(value);
     if (value.length < 8) {
+      setIsError(true);
       setValidationPassword("Mật khẩu quá ngắn, vui lòng nhập hơn 8 kí tự");
     } else {
       setIsError(false);
@@ -200,14 +200,17 @@ export function ResetPassword() {
     resetPassword(form)
       .then((response: any) => {
         if (response.status === 200) {
-          setIsLoading(false);
-          navigate("/login");
+          const timer = setTimeout(() => {
+            setIsLoading(false);
+            navigate("/login");
+          }, 500);
+          return () => clearTimeout(timer);
         }
       })
       .catch((error: any) => {
         setIsLoading(false);
         if (error.response && error.response.status === 400) {
-          setMessage(error.response.data.message);
+          setMessage(error.response.data);
         } else {
           console.log("error:", error);
           setMessage("Vui lòng thử lại sau");
@@ -219,7 +222,7 @@ export function ResetPassword() {
   return (
     <>
       {isLoading && <Preloader />}
-      <Header />
+      {/* <Header /> */}
       {showMess && (
         <Notifi
           message={message}
@@ -245,6 +248,9 @@ export function ResetPassword() {
             </Link>
             <h1 style={{ paddingLeft: "5px" }}>Đổi mật khẩu</h1>
           </div>
+          <p style={{ font: "caption" }}>
+            Lưu ý: Bạn chỉ có 5 phút để thay đổi mật khẩu.
+          </p>
           <form className={` form-style row g-3`} onSubmit={handleSubmit}>
             <div className="col-md-4">
               <div className="has-validation">
@@ -279,7 +285,11 @@ export function ResetPassword() {
               </div>
             </div>
             <div className="col-13">
-              <button className="btn btn-primary" type="submit">
+              <button
+                className="btn btn-primary"
+                type="submit"
+                disabled={isError}
+              >
                 Xong
               </button>
             </div>

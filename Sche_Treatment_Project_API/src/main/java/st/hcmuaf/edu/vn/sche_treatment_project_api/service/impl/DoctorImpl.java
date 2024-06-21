@@ -45,6 +45,7 @@ public class DoctorImpl implements DoctorService {
             doctor.setDoctorExp(doctorDTO.getDoctorExp());
             doctor.setDoctorDegree(doctorDTO.getDoctorDegree());
             doctor.setDoctorImage(doctorDTO.getDoctorImage());
+
             doctor.setDoctorRank(doctorDTO.getDoctorRank());
             doctor.setDoctorSpecialty(doctorDTO.getDoctorSpecialty());
             doctor.setDoctorIntroduce(doctorDTO.getDoctorIntroduce());
@@ -83,6 +84,7 @@ public class DoctorImpl implements DoctorService {
         String searchCondition = "";
         if (search != null && !search.trim().isEmpty()) {
             searchCondition = " AND (account.account_name LIKE :search)";
+            offset = 0;
         }
 
         // Create the native query string with the ORDER BY clause and search condition

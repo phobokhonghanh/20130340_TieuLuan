@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import Header from "../Component/Header";
 import "../assets/style.css";
 import { v4 as uuidv4 } from "uuid";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Signup } from "../Models/Model";
-import { register } from "../apiConfig";
+import { register, registerAdmin } from "../apiConfig";
 import { Notifi } from "../Component/Notification";
 import { Form } from "react-bootstrap";
 import Preloader from "../Component/Preloader";
+import { checkRoleAdmin } from "../Authentication/Authentication";
 function Register() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,6 @@ function Register() {
     "danger"
   );
   const [showMess, setShowMess] = useState(false);
-  let location = useLocation();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -87,35 +86,57 @@ function Register() {
       accountName: name,
       accountPassword: password,
       accountGender: 0,
-      supportRoleId: location.pathname === "/admin/register" ? "R1" : "R4",
+      supportRoleId: checkRoleAdmin() ? "R1" : "R4",
       supportStatusId: "S5",
     };
     setIsLoading(true);
-    register(formData)
-      .then((response: any) => {
-        if (response.status === 200) {
+    if (!checkRoleAdmin()) {
+      register(formData)
+        .then((response: any) => {
+          if (response.status === 200) {
+            setIsLoading(false);
+            navigate(`/otp/${response.data}`);
+          }
+        })
+        .catch((error: any) => {
           setIsLoading(false);
-          navigate(`/otp/${response.data}`);
-        }
-      })
-      .catch((error: any) => {
-        setIsLoading(false);
-        if (error.response.status === 400) {
-          setMessage(error.response.data);
-          setLevelMessage("danger");
-          setShowMess(true);
-        } else {
-          console.error("Error:", error);
-          setMessage("Tạo tài khoản không thành công");
-          setLevelMessage("danger");
-          setShowMess(true);
-        }
-      });
+          if (error.response.status === 400) {
+            setMessage(error.response.data);
+            setLevelMessage("danger");
+            setShowMess(true);
+          } else {
+            console.error("Error:", error);
+            setMessage("Tạo tài khoản không thành công");
+            setLevelMessage("danger");
+            setShowMess(true);
+          }
+        });
+    } else {
+      registerAdmin(formData)
+        .then((response: any) => {
+          if (response.status === 200) {
+            setIsLoading(false);
+            navigate("/admin/account");
+          }
+        })
+        .catch((error: any) => {
+          setIsLoading(false);
+          if (error.response.status === 400) {
+            setMessage(error.response.data);
+            setLevelMessage("danger");
+            setShowMess(true);
+          } else {
+            console.error("Error:", error);
+            setMessage("Tạo tài khoản không thành công");
+            setLevelMessage("danger");
+            setShowMess(true);
+          }
+        });
+    }
   };
   return (
     <>
       {isLoading && <Preloader />}
-      <Header />
       {showMess && (
         <Notifi
           message={message}

@@ -14,18 +14,18 @@ import java.util.List;
 @Table(name = "calendar")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Calendar {
+public class Calendar extends BaseEntity{
 
     @Id
     @Column(name = "id", length = 36)
     private String id;
     @Column(name = "calendar_date")
     private LocalDate calendarDate;
-    @Column(name = "create_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
+//    @Column(name = "create_at", updatable = false, nullable = false)
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "update_at")
+//    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JsonIgnore
@@ -43,5 +43,4 @@ public class Calendar {
     @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Appointment> appointments;
-
 }

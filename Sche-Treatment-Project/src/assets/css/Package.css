@@ -1,7 +1,19 @@
 /*=============================
 	Start Pricing Table CSS
 ===============================*/
+.time-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 cột bằng nhau */
+    grid-gap: 10px;
+    /* Khoảng cách giữa các ô */
+}
 
+.time-item {
+    background-color: #f0f0f0;
+    padding: 20px;
+    text-align: center;
+}
 .package .container-package {
     display: flex;
 }

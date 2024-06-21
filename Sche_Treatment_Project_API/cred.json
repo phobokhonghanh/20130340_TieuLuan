@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "bold-bastion-426017-t9",
+  "private_key_id": "857a278df5b61bf8aec892c73e17273e089cf469",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC8+kSml/S2X6vO\n5pVBdSOIkBr6YpMJeEebOdIwGHzMf6OWvA/wWN9vYWzCvl04p76sw1+mvNHo3UOH\nZ6aGfGIhWEm95rrv4FcZZ0Mziyl4JoWmlTFjy+qW08SPaH4JMzPl7yq+3k5UAbd0\n/vbb7yRjyVB0WElUC+EtvE0orRN66qJv5DRoBAJqjNGQrNchcV9gDjW5BIX5soeS\nN+NmN6GnpdrkYj7qkV5lRVFB1lJT2EHynDB8vKG3L/PlfsdzHhgt2bLGEiC6a5BH\n2XAvSsjBh9S1LRVbgXBsDSPWXD4/CE3Y0IG2VY9a0+u0SakCGVsxeLlew2raz0oz\n2GsmkaoVAgMBAAECggEACoYugg+W2Xw4+3gEamWNYcrSscyBD0czR63/6l1Gv/XA\nxMF66sHsSY3lqm/DDcdruz/TKRw9XWhLHTSUxcsSBPTfgHOjx/2YpCnHyIxQtigB\nC+6llj7yNM2c1fa2BCmlk4HPAdusBYol7x5O3Z8zCdqZgC01gjh6JRumOWRwIAlu\nGs0NIDWq1OObeg/25a2JLZzJbNnpPeP7MjJnsrvk22XxwU5qIHNpFymbDeCiAEi5\nGwhW0Pmb5kzbSAiS5xudNlCkyFK/JSG54tqYrxCYZkIYqeTZHsHvsmMzafXzstr7\n+a7zt2bSJSYJQUWH3xWvftGn5JKUwNxA+gEQFHP1+QKBgQDg0+KUop8iriscacjg\njD6QgG3CA7kdpKS7kJRiLUNraatKUfTu8NZ/ByHX0eCC3w9m9PZI2uPbJfvlIV54\njkTb3xbzemrW5ie7X1XhdVfkgPycnbfGPkx8fbabAFbCHDU++5KV7fhuEooAmvCl\nuy465CFnlaERXHQgZpxMglg+vQKBgQDXLehpy9OXAy0yyBAaT2CD/J2FW1Bqib/z\nctukomNc2inUXS1veoZ0yDtXqk4Xo07VgHdk1K/xw2yoCJy+gwjf3aHTjSD4FmH0\n0TFmu/ack9ZmKG6Flt0jduTLxmggzrGutKKHZwoYrLOX/pYLLWr9MiIMqZb49w1V\nujlBacaaOQKBgC9VrPCqRGLi1ITI6NgN7uYxg+pDKmhJT72FtRfue7FTsBKXqr/b\nyO05rTBpKaGkIPQGQwwXub1cA+q72c379hdsosJkVbYlAtx6N/Sd5gFf/s9ijVyZ\npTTYqud7bMi1c6htAvG6BoH2OUPjWyMpg5Q2j6nlYOHs2y4vLF0XXEjpAoGAfeiy\n8hT+foKxU+GU6pA/3XtXgMzpxS1NUFqJA1Cx64cMquLKz0xWmMcBUk6o21QHsQ42\nzp1VRpYfYkOH1EJAUx4QrwUJoaEXOHWf/olFyGEJN0W5Rhn809+iCUrTaz8G4T95\nStmUItQLUoj5qxisXfOT0Oz7FjsZZmxNTGVkfKECgYBmRVWzdbNk8hWKoCKnQ7KK\npEYJ1n6mQOI1eSUo3lk3TRiQEIWK2oypzNpDB9CYLpzLTcdgDlzClP4Ln9Q4y5is\n6nw0nOk7NHUSQTtOB6aDnHNz0u8gm1PMZ7Q9UNN0REijJ81APTf2Xkfv+rwuTcCg\nVtqMq+S7zlwN4yH3hZmcaA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "googledriveuploads@bold-bastion-426017-t9.iam.gserviceaccount.com",
+  "client_id": "108664524833557131915",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/googledriveuploads%40bold-bastion-426017-t9.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -233,9 +233,11 @@ z-index: 2 !important;
 }
 
 .p-right-15{
-    padding-right: 25px !important;
+    margin-right: 25px !important;
 }
-
+.p-right-15:hover {
+    color: #1A76D1;
+}
 .mr-auto:hover a:hover {
     opacity: 1;
     visibility: visible;
@@ -412,6 +414,9 @@ z-index: 2 !important;
 .header .search-top.active .search i:before {
     content: "\eee1";
     font-size: 15px;
+}
+.active{
+    border-bottom: 5px solid #1092be;
 }
 
 /* Search */

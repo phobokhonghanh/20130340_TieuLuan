@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import Preloader from "../Component/Preloader";
-import HeaderNav from "../Component/HeaderNav";
 import CardInfo from "../Component/CardInfo";
 import Footer from "../Component/Footer";
 import { Slide } from "../Component/Slides";
@@ -29,6 +27,7 @@ function ListDoctors() {
 
   useEffect(() => {
     const fetchListDoctor = async (page: number) => {
+      window.scrollTo({ top: 900, behavior: "smooth" });
       try {
         const response = await fetch(
           `${API_ENDPOINTS.GET_DOCTOR_CALENDAR}?page=${page}&search=${search}&sort=${sort}&filter=account_name`
@@ -51,7 +50,7 @@ function ListDoctors() {
   }, [currentPage, search, sort]);
   return (
     <>
-      <HeaderNav />
+      {/* <HeaderNav /> */}
       <section className="slider">
         <div className="hero-slider">
           <Slide

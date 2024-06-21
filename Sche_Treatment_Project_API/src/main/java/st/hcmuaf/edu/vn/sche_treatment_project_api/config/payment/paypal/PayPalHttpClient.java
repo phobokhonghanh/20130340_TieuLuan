@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.response.ClientTokenResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.AccessTokenResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.PaypalRequest;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.response.payment.PaypalResponse;
@@ -37,21 +36,6 @@ public class PayPalHttpClient {
         var content = response.body();
 
         return objectMapper.readValue(content, AccessTokenResponse.class);
-    }
-    public ClientTokenResponse getClientToken() throws Exception {
-        var accessTokenResponse = getPaypalAccessToken();
-
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(PayPalEndpoints.createUrl(paypalConfig.getBaseUrl(), PayPalEndpoints.GET_CLIENT_TOKEN)))
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenResponse.getAccessToken())
-                .header(HttpHeaders.ACCEPT_LANGUAGE, "en_US")
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .build();
-        var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        var content = response.body();
-
-        return objectMapper.readValue(content, ClientTokenResponse.class);
     }
     public PaypalResponse createPaypalTransaction(PaypalRequest paypalRequest) throws Exception {
         var accessTokenResponse = getPaypalAccessToken();

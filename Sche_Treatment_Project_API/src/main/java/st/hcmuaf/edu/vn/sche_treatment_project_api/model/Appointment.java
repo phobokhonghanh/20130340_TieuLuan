@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "appointment")
-public class Appointment {
+public class Appointment extends BaseEntity{
 
     @Id
     @Column(name = "id", length = 36)
@@ -32,15 +32,15 @@ public class Appointment {
     @Column(name = "appointment_symptom", columnDefinition = "TEXT")
     private String appointmentSymptom;
 
-    @Column(name = "create_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
+//    @Column(name = "create_at", updatable = false, nullable = false)
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "update_at")
+//    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "account_id")
-    private Patient patient;
+    private Account account;
 
     @ManyToOne
     @JoinColumn(name = "package_id")
@@ -57,6 +57,4 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "support_time_id")
     private Support supportTime;
-
-
 }

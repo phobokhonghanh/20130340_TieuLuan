@@ -1,5 +1,3 @@
-import Preloader from "../Component/Preloader";
-import HeaderNav from "../Component/HeaderNav";
 import CardInfo from "../Component/CardInfo";
 import Footer from "../Component/Footer";
 import Slides from "../Component/Slides";
@@ -27,6 +25,7 @@ function ListPackage() {
   useEffect(() => {
     const fetchListPackage = async (page: number) => {
       try {
+      window.scrollTo({ top: 900, behavior: "smooth" });
         const response = await fetch(
           `${API_ENDPOINTS.GET_PACKAGE_CALENDAR}?page=${page}&search=${search}&sort=${sort}&filter=package_price`
         );
@@ -48,7 +47,7 @@ function ListPackage() {
   }, [currentPage, search, sort]);
   return (
     <>
-      <HeaderNav />
+      {/* <HeaderNav /> */}
       <Slides />
       <CardInfo />
       <ErrorNotifi error={error} />

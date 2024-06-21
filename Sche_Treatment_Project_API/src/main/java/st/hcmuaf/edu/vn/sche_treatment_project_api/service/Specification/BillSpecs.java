@@ -1,4 +1,4 @@
-package st.hcmuaf.edu.vn.sche_treatment_project_api.service.impl;
+package st.hcmuaf.edu.vn.sche_treatment_project_api.service.Specification;
 
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;

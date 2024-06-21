@@ -1,5 +1,3 @@
-import Preloader from "../Component/Preloader";
-import HeaderNav from "../Component/HeaderNav";
 import CardInfo from "../Component/CardInfo";
 import Footer from "../Component/Footer";
 import Slides from "../Component/Slides";
@@ -25,6 +23,7 @@ function ListService() {
 
   useEffect(() => {
     const fetchListService = async (page: number) => {
+      window.scrollTo({ top: 900, behavior: "smooth" });
       try {
         const response = await fetch(
           `${API_ENDPOINTS.GET_SERVICE_CALENDAR}?page=${page}&search=${search}&sort=${sort}&filter=service_price`
@@ -47,7 +46,6 @@ function ListService() {
   }, [currentPage, search, sort]);
   return (
     <>
-      <HeaderNav />
       <Slides />
       <CardInfo />
       <ErrorNotifi error={error} />

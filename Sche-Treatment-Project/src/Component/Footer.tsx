@@ -11,12 +11,15 @@ function Footer() {
               <div className="custom-footer col-md-6 col-12 ">
                 <div className="single-footer">
                   <h2>
-                    Bệnh viện đa khoa <br />
-                    Khu vực Thủ Đức
+                    Cơ sơ y tế
+                    <br />
+                    Essay Medical
                   </h2>
-                  <p> Địa chỉ: Lê Văn Chí, Thủ Đức, Tp Hồ Chí Minh</p>
+                  <p>
+                    Địa chỉ: Khu Phố 6, Thủ Đức, Thành phố Hồ Chí Minh, Việt Nam
+                  </p>
                   <p> HotLine: 19008080</p>
-                  <p>Email: benhviendakhoa@gmail.com</p>
+                  <p>Email: essaymedicalnlu2024@gmail.com</p>
                 </div>
               </div>
               <div className="col-md-6 col-12 custom-footer">
@@ -26,7 +29,7 @@ function Footer() {
                     <div className="col-lg-6 col-md-6 col-12">
                       <ul className="pad-0">
                         <li>
-                          <a href="#">
+                          <a href="/">
                             <i
                               className="fa fa-caret-right"
                               aria-hidden="true"
@@ -35,7 +38,7 @@ function Footer() {
                           </a>
                         </li>
                         <li>
-                          <a href="#">
+                          <a href="/doctors">
                             <i
                               className="fa fa-caret-right"
                               aria-hidden="true"
@@ -44,7 +47,7 @@ function Footer() {
                           </a>
                         </li>
                         <li>
-                          <a href="#">
+                          <a href="/packages">
                             <i
                               className="fa fa-caret-right"
                               aria-hidden="true"
@@ -53,7 +56,7 @@ function Footer() {
                           </a>
                         </li>
                         <li>
-                          <a href="#">
+                          <a href="/services">
                             <i
                               className="fa fa-caret-right"
                               aria-hidden="true"

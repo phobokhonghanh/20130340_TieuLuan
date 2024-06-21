@@ -13,6 +13,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.MedicalServiceMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.DoctorDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.MedicalPackageDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.MedicalServiceDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.ServiceRequest;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Doctor;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalPackage;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalService;
@@ -32,14 +33,23 @@ public class MedicalServicesImpl implements MedicalServicesService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Override
-    public List<MedicalService> getServicesNotSelected(List<MedicalService> serviceList) {
-        List<MedicalService> getAll = medicalServicesRepository.findAll();
+        @Override
+    public List<ServiceRequest> getServicesNotSelected(String keyword, String status, List<ServiceRequest> serviceList) {
+        List<MedicalService> getAll = medicalServicesRepository.findAllByServiceNameIsContainingAndSupportStatusId(keyword, status);
         List<MedicalService> result = getAll.stream()
-                .filter(item -> !serviceList.stream().map(MedicalService::getId).collect(Collectors.toList()).contains(item.getId()))
+                .filter(item -> !serviceList.stream().map(ServiceRequest::getId).collect(Collectors.toList()).contains(item.getId()))
                 .collect(Collectors.toList());
-        return result;
+        return medicalServiceMapper.covertListServiceETRequest(result);
     }
+
+//    @Override
+//    public List<ServiceRequest> getServicesNotSelected(String keyword, String status, List<MedicalService> medicalServices) {
+//        List<MedicalService> getAll = medicalServicesRepository.findAllByServiceNameIsContainingAndSupportStatusId(keyword, status);
+//        List<MedicalService> result = getAll.stream()
+//                .filter(item -> !medicalServices.stream().map(MedicalService::getId).collect(Collectors.toList()).contains(item.getId()))
+//                .collect(Collectors.toList());
+//        return medicalServiceMapper.covertListServiceETRequest(result);
+//    }
 
     @Override
     public List<MedicalService> getListServicesArea(String medical_area_id) {
@@ -56,7 +66,7 @@ public class MedicalServicesImpl implements MedicalServicesService {
 
         String orderByClause = "";
         if (validFilters.contains(filter)) {
-            orderByClause  = " ORDER BY " + filter + " " + sortDirection;
+            orderByClause = " ORDER BY " + filter + " " + sortDirection;
         }
 
         Pageable pageable = PageRequest.of(pageNo - 1, 5);
@@ -69,6 +79,7 @@ public class MedicalServicesImpl implements MedicalServicesService {
         String searchCondition = "";
         if (search != null && !search.trim().isEmpty()) {
             searchCondition = " AND (service_name LIKE :search)";
+            offset = 0;
         }
 
         // Create the native query string with the ORDER BY clause and search condition
@@ -109,10 +120,8 @@ public class MedicalServicesImpl implements MedicalServicesService {
 
     @Override
     public MedicalServiceDTO createService(MedicalServiceDTO medicalServiceDTO) {
-        if (!medicalServicesRepository.existsById(medicalServiceDTO.getId())) {
-            if (medicalServicesRepository.existsByServiceName(medicalServiceDTO.getClinic().getId(), medicalServiceDTO.getServiceName()) == 1) {
-                return null;
-            }
+        if (medicalServicesRepository.existsByServiceName(medicalServiceDTO.getClinic().getId(), medicalServiceDTO.getServiceName(), medicalServiceDTO.getId()) == 1) {
+            return null;
         }
         MedicalService medicalService = medicalServicesRepository.save(medicalServiceMapper.convertMedicalServiceDTE(medicalServiceDTO));
         MedicalServiceDTO saveService = medicalServiceMapper.convertMedicalServiceETD(medicalService);

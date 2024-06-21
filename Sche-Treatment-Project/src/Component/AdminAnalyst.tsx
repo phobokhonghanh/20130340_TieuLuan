@@ -26,7 +26,10 @@ export function Analyst() {
         console.log(e);
         setError(true);
       } finally {
-        setLoading(false);
+        const timer = setTimeout(() => {
+          setLoading(false);
+        }, 500);
+        return () => clearTimeout(timer);
       }
     };
     useEffect(() => {
@@ -40,13 +43,11 @@ export function Analyst() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(api);
+        const response = await fetch(api, headerAuth());
         const data = (await response.json()) as number;
         setBillWeek(data);
       } catch (e: any) {
         console.log(e);
-      } finally {
-        setLoading(false);
       }
     };
     useEffect(() => {

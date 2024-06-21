@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "bill")
-public class Bill {
+public class Bill extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -28,11 +28,11 @@ public class Bill {
     @Column(name = "bill_ispay", nullable = false)
     private boolean isPaid;
 
-    @Column(name = "create_at", updatable = false, nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
+//    @Column(name = "create_at", updatable = false, nullable = false)
+//    private LocalDateTime createdAt;
+//
+//    @Column(name = "update_at")
+//    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "appointment_id")
@@ -40,6 +40,5 @@ public class Bill {
 
     @Column(name = "payment_id")
     private String paymentId;
-
 
 }

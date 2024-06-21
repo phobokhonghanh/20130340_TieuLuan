@@ -1,5 +1,6 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class GroupTime {
     @Column(name = "group_time_description")
     private String groupTimeDescription;
 
-    @OneToMany(mappedBy = "idGroupTime", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "groupTime", cascade = CascadeType.ALL)
     private List<Support> supports;
+
 }

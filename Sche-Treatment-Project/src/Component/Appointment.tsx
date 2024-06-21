@@ -19,15 +19,16 @@ import {
   payment_paypal,
   updateStatus,
 } from "../apiConfig";
-import { formatDate } from "../Module/AppointmentPage";
 import { Button } from "react-bootstrap";
 import { ErrorNotifi, Notifi } from "./Notification";
 import {
   checkRoleDoctor,
+  checkRoleOnlyDoctor,
   getIdAccount,
   headerAuth,
 } from "../Authentication/Authentication";
 import Preloader from "./Preloader";
+import { formatDate } from "../Utils/Utils";
 interface appointmentDetailsProps {
   refesh: boolean;
   appointmentId: AppointmentDTO;
@@ -46,8 +47,8 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
     "danger"
   );
   const [bill, setBill] = useState<Bill>();
-  const [clinic, setClinic] = useState<ClinicDTO>();
   const [area, setArea] = useState<Area>();
+  const [clinic, setClinic] = useState<ClinicDTO>();
   const [modalThankYou, showModalThankYou] = useState<boolean>(false);
 
   // gọi api - lấy danh sách khu vực khám
@@ -98,6 +99,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
     fetchArea();
     setRefesh(false);
   }, [appointmentId, refesh]);
+
   const handleCancel = (appointmentid: string) => {
     if (appointmentid) {
       updateStatus(appointmentid)
@@ -122,6 +124,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
   const height = 800;
   const left = window.innerWidth / 2 - width / 2;
   const top = window.innerHeight / 2 - height / 2;
+
   const handPayment = (id: string) => {
     if (id !== "") {
       payment_paypal(id)
@@ -184,15 +187,19 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
       )}
       <ModalThankYou show={modalThankYou} onHide={handleCloseModal} />
       <div className="card col-md-4" style={{ height: "max-content" }}>
-        <h5 className="card-header fw-bold">Chi tiết cuộc hẹn</h5>
+        <h5 className="card-header fw-bold">Chi tiết lịch hẹn</h5>
         <div className="card-body">
           <div className="align-items-start align-items-sm-center gap-4">
             <div className="button-wrapper w90">
               {/* <!-- Table Head --> */}
               <div className="table-head">
-                <p className="title-package fw-bold">{area?.areaName}</p>
                 <p className="title-package fw-bold">
-                  Khoa khám: {clinic?.clinicName}
+                  Mã lịch hẹn:{" "}
+                  {bill?.appointment.calendar ? bill?.appointment.id : ""}
+                </p>
+                <p className="title-package fw-bold"></p>
+                <p className="title-package fw-bold">
+                  Khoa khám: {clinic?.clinicName} - {area?.areaName}
                 </p>
                 <p className="title-package fw-bold">
                   Bác sĩ:{" "}
@@ -255,7 +262,7 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
                   <p className="">
                     Trạng thái lịch hẹn:{" "}
                     <span className="fw-bold">
-                      <span style={{ color: "green" }}>
+                      <span>
                         {bill?.appointment.supportStatus.id === "S1" ? (
                           <Button
                             onClick={() => handleCancel(appointmentId?.id)}
@@ -263,7 +270,17 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
                             Hủy lịch hẹn
                           </Button>
                         ) : bill?.appointment.supportStatus ? (
-                          bill?.appointment.supportStatus.supportValue
+                          <span
+                            style={{
+                              color: `${
+                                bill?.appointment.supportStatus.id === "S3"
+                                  ? "green"
+                                  : "red"
+                              }`,
+                            }}
+                          >
+                            {bill?.appointment.supportStatus.supportValue}
+                          </span>
                         ) : (
                           ""
                         )}
@@ -287,14 +304,14 @@ export const AppointmentDetail: React.FC<appointmentDetailsProps> = ({
                       )}
                     </span>
                   </p>
-                  <p className="">
+                  <b className="">
                     {" "}
                     Tổng tiền:{" "}
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     }).format(parseFloat(bill?.billSum ? bill?.billSum : "0"))}
-                  </p>
+                  </b>
                   {!bill?.paid && !checkRoleDoctor() && (
                     <div style={{ float: "right" }}>
                       <button
@@ -393,6 +410,7 @@ export const Appointment: React.FC<AppointmentProps> = ({
       navigator("/error");
     }
   }, [appointmentDTO]);
+
   return (
     <>
       <ErrorNotifi error={error} />
@@ -400,7 +418,7 @@ export const Appointment: React.FC<AppointmentProps> = ({
         <div className="d-flex align-items-start align-items-sm-center gap-4">
           <img
             src="/src/assets/img/schedule.png"
-            alt="user-avatar"
+            alt=""
             className="d-block rounded"
             height="100"
             width="100"
@@ -520,7 +538,7 @@ export const HistoryAppointment = () => {
                   <i className="bx bx-user me-1"></i> Tài khoản
                 </Link>
               </li>
-              {checkRoleDoctor() && (
+              {checkRoleOnlyDoctor() && (
                 <li className="nav-item">
                   <Link className="nav-link" to="/account-doctor">
                     <i className="bx bx-bell me-1"></i> Thông tin bác sĩ
