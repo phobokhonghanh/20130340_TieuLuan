@@ -1,0 +1,55 @@
+HELP.md
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+target/
+workspace.xml
+
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+### VS Code ###
+.vscode/
+
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### Eclipse ###
+.metadata
+bin/
+tmp/
+
+### Node ###
+node_modules/
+npm-debug.log
+yarn-error.log
+
+
+### python ###
+__pycache__/
+*.py[cod]
+
+### aws ###
+azure/
+
+### cred.json ###
+cred.json
