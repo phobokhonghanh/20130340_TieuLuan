@@ -87,12 +87,11 @@ public class AccountController {
                             .build()
             );
         }
-
+        boolean isUserNameMatched = account.getAccountName().equalsIgnoreCase(userRequest.getUsername());
         boolean isRoleMatched = account.getAuthorities().stream()
                 .anyMatch(authority -> userRequest.getRoles().stream()
                         .anyMatch(role -> authority.getAuthority().equalsIgnoreCase(role.toString())));
-
-        if (!isRoleMatched) {
+        if (!isRoleMatched || !isUserNameMatched) {
             String token = accountService.generateToken(account);
             if (token.equals("LOCK")) {
                 return ResponseEntity.badRequest().body(

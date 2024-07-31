@@ -24,6 +24,7 @@ public class ImageImpl {
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String SERVICE_ACOUNT_KEY_PATH = getPathToGoodleCredentials();
+    private static final String APPLICATION_NAME = "googleDriveUploads";
 
     private static String getPathToGoodleCredentials() {
         String currentDirectory = System.getProperty("user.dir");
@@ -46,10 +47,10 @@ public class ImageImpl {
             file.delete();
             return imageUrl;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             log.warn("Upload image to drive failed");
         }
         return null;
-
     }
 
     private Drive createDriveService() throws GeneralSecurityException, IOException {
@@ -60,6 +61,7 @@ public class ImageImpl {
                 GoogleNetHttpTransport.newTrustedTransport(),
                 JSON_FACTORY,
                 credential)
+                .setApplicationName(APPLICATION_NAME)
                 .build();
 
     }

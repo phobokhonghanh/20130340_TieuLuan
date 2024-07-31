@@ -22,13 +22,11 @@ public class EvaluateMapper {
         if (evaluate == null) {
             return null;
         }
-        EvaluateDTO evaluateDTO = modelMapper.map(evaluate, EvaluateDTO.class);
-        return evaluateDTO;
+        return modelMapper.map(evaluate, EvaluateDTO.class);
     }
 
     public Evaluate convertEvaluateDTE(EvaluateDTO evaluateDTO) {
-        Evaluate evaluate = modelMapper.map(evaluateDTO, Evaluate.class);
-        return evaluate;
+        return modelMapper.map(evaluateDTO, Evaluate.class);
     }
 
     public List<EvaluateDTO> convertListEvaluateETD(List<Evaluate> evaluates) {

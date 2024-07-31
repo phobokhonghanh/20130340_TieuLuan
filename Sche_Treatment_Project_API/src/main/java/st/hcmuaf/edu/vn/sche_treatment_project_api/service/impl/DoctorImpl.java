@@ -7,14 +7,17 @@ import jakarta.persistence.Query;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.AccountMapper;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.generic.GenericMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.DoctorDTO;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.PatientDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Doctor;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Patient;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.DoctorRepository;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.doctor.DoctorResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.DoctorService;
 
 import java.util.List;
@@ -32,10 +35,12 @@ public class DoctorImpl implements DoctorService {
     private AccountMapper accountMapper;
     @PersistenceContext
     private EntityManager entityManager;
-
+    @Autowired
+    GenericMapper genericMapper;
     @Override
-    public List<Doctor> getAll() {
-        return doctorRepository.findAll();
+    public List<DoctorResponse> getAllByStatusAndRole(String status, String role) {
+        List<Doctor> doctors = doctorRepository.findAllBySupportStatusIdAndSupportRoleId(status,role);
+        return genericMapper.toListConvert(doctors, DoctorResponse.class);
     }
     @Override
     public boolean updateDoctor(DoctorDTO doctorDTO) {
@@ -57,7 +62,7 @@ public class DoctorImpl implements DoctorService {
     @Override
     public List<DoctorDTO> getListDoctorLimit() {
         List<Doctor> doctors = doctorRepository.getListDoctorLimit();
-        List<DoctorDTO> listDoctorDTO = accountMapper.convertListDoctorETD(doctors);
+        List<DoctorDTO> listDoctorDTO = genericMapper.toListConvert(doctors,DoctorDTO.class);
         return listDoctorDTO;
     }
     @Override
@@ -106,7 +111,7 @@ public class DoctorImpl implements DoctorService {
         List<Doctor> doctors = query.getResultList();
 
         // Convert the list of Doctor entities to DoctorDTO
-        List<DoctorDTO> listDoctorDTO = accountMapper.convertListDoctorETD(doctors);
+        List<DoctorDTO> listDoctorDTO = genericMapper.toListConvert(doctors,DoctorDTO.class);
 
         // Create a query to count the total number of matching records with the search condition
         String countQueryString = "SELECT COUNT(*) FROM doctor " +
@@ -126,14 +131,15 @@ public class DoctorImpl implements DoctorService {
 
     @Override
     public DoctorDTO getDoctorByIdCalendar(String idCalendar) {
-        return accountMapper.convertDoctorETD(doctorRepository.getDoctorbyIdCalendar(idCalendar));
+        return genericMapper.convert(doctorRepository.getDoctorbyIdCalendar(idCalendar),DoctorDTO.class);
+
     }
     @Override
     public DoctorDTO getDoctor(String id) {
         if(!doctorRepository.findById(id).isPresent()){
             return null;
         }
-        return accountMapper.convertDoctorETD(doctorRepository.findById(id).get());
+        return genericMapper.convert(doctorRepository.findById(id).get(),DoctorDTO.class);
     }
 
 }

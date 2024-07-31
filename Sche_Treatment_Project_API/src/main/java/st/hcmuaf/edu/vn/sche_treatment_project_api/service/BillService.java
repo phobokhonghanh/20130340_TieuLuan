@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Bill;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AppointmentDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.BillDTO;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.response.StatisticalResponse;
 
 import java.util.List;
 
@@ -15,9 +14,9 @@ public interface BillService {
 
     Bill getBillByAppointmentId(String appointmentId);
 
-    List<Double> sumBillMonths(boolean is_pay);
+    List<Double> sumBillMonths(String year);
 
-    Double sumBillWeek();
+    String sumBillWeek();
 
     String billPayByPaypal(String id);
 

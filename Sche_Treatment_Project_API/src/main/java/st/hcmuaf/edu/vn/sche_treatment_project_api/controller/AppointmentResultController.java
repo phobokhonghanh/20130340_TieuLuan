@@ -20,12 +20,6 @@ public class AppointmentResultController {
     @Autowired
     AppointmentResultService appointmentResultService;
 
-    @ExceptionHandler(DataAccessException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleDataAccessException() {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
     @GetMapping("/result/appointment/{appointmentId}")
     public ResponseEntity<AppointmentResultDTO> getResultByAppointmentId(@PathVariable String appointmentId) {
         AppointmentResultDTO appointmentResultDTO = appointmentResultService.getAppointmentResultByAppointment(appointmentId);

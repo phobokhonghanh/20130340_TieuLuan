@@ -18,6 +18,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.JwtTokenUtils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.MessageUtils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.Utils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.AccountMapper;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.generic.GenericMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Account;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AccountDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.LoginDTO;
@@ -63,10 +64,12 @@ public class AccountImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
     @Autowired
     PatientService patientService;
+    @Autowired
+    GenericMapper genericMapper;
 
     @Override
     public boolean createAccount(AccountDTO accountDTO) {
-        Account acc = accountRepository.save(accountMapper.convertAccountDTE(accountDTO));
+        Account acc = accountRepository.save(genericMapper.convert(accountDTO, Account.class));
         return acc != null ? true : false;
     }
 
@@ -80,7 +83,7 @@ public class AccountImpl implements AccountService {
             accountRepository.save(account);
             return true;
         }
-        Account acc = accountRepository.save(accountMapper.convertAccountDTE(accountDTO));
+        Account acc = accountRepository.save(genericMapper.convert(accountDTO, Account.class));
         return acc != null ? true : false;
     }
 
@@ -166,7 +169,7 @@ public class AccountImpl implements AccountService {
     public AccountDTO getAccount(String id) {
         Optional<Account> account = accountRepository.findById(id);
         if (account.isPresent()) {
-            return accountMapper.convertAccountETD(account.get());
+            return genericMapper.convert(account.get(), AccountDTO.class);
         }
         return null;
     }

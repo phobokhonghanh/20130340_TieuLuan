@@ -17,6 +17,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.response.StatisticalResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AppointmentService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.BillService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -32,8 +33,11 @@ public class BillController {
     }
 
     @GetMapping("/admin/bill/sum/months")
-    public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "is_pay", defaultValue = "true") boolean is_pay) {
-        return ResponseEntity.ok(billService.sumBillMonths(is_pay));
+    public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "year", required = false) String year) {
+        if (year == null) {
+            year = String.valueOf(LocalDate.now().getYear()); // Nếu năm không được cung cấp, sử dụng năm hiện tại
+        }
+        return ResponseEntity.ok(billService.sumBillMonths(year));
     }
     @GetMapping("/admin/bill/all")
     public ResponseEntity<Page<BillDTO>> getAll(@RequestParam(name = "page", defaultValue = "1") Integer pageNo, @RequestParam(name = "keyword", defaultValue = "") String keyword) {
@@ -41,7 +45,7 @@ public class BillController {
     }
 
     @GetMapping("/admin/bill/sum/week")
-    public ResponseEntity<Double> getSumBillWeek() {
+    public ResponseEntity<String> getSumBillWeek() {
         return ResponseEntity.ok(billService.sumBillWeek());
     }
     @PatchMapping("/doctor-side/payment/cash/{id}")

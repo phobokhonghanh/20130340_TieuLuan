@@ -17,7 +17,7 @@ public class MedicalPackageDTO {
     private String packagePrice;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-//    private String supportStatusId;
+    private boolean def;
     private SupportDTO supportStatusId;
     private ClinicDTO clinicId;
     private List<MedicalPackageServiceDTO> packageServices;

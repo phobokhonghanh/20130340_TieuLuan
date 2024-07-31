@@ -42,13 +42,6 @@ public class Account extends BaseEntity implements UserDetails, OAuth2User {
 
     @Column(name = "account_gender", nullable = false)
     private boolean accountGender;
-//    @CreatedDate
-//    @Column(name = "create_at")
-//    private LocalDateTime createAt;
-//
-//    @LastModifiedDate
-//    @Column(name = "update_at")
-//    private LocalDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "support_role_id", referencedColumnName = "id", nullable = false)

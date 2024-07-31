@@ -13,4 +13,11 @@ public interface CalendarRepository extends JpaRepository<Calendar, String > {
     List<Calendar> getCalendarDoctor(@Param("doctorId") String doctorId);
     @Query(value = "SELECT * FROM calendar WHERE clinic_id = :clinicId and calendar_date >= CURRENT_DATE", nativeQuery = true)
     List<Calendar> getCalendarClinic(@Param("clinicId") String clinicId);
+
+    List<Calendar> findAllByClinicId(String clinicId);
+    @Query(value = "SELECT CASE WHEN EXISTS (" +
+            "SELECT 1 FROM appointment WHERE calendar_id = :id)" +
+            "THEN true ELSE false END", nativeQuery = true)
+    Integer existsByIdAndAppointmentsExist(@Param("id") String id);
+
 }

@@ -18,57 +18,9 @@ public class AccountMapper {
     @Autowired
     private ModelMapper modelMapper;
 
-    // covert doctor
-    public DoctorDTO convertDoctorETD(Doctor doctor) {
-        DoctorDTO doctorDTO = modelMapper.map(doctor, DoctorDTO.class);
-        return doctorDTO;
-    }
-
-    public List<DoctorDTO> convertListDoctorETD(List<Doctor> listDoctor) {
-        List<DoctorDTO> listDoctorDTO = new ArrayList<>();
-        for (Doctor d : listDoctor) {
-            listDoctorDTO.add(convertDoctorETD(d));
-        }
-        return listDoctorDTO;
-    }
-
-    public Doctor convertDoctorDTE(DoctorDTO doctorDTO) {
-        Doctor doctor = modelMapper.map(doctorDTO, Doctor.class);
-        return doctor;
-    }
-
-    public List<Doctor> convertListDoctorDTE(List<DoctorDTO> listDoctorDTO) {
-        List<Doctor> listDoctor = new ArrayList<>();
-        for (DoctorDTO dto : listDoctorDTO) {
-            listDoctor.add(convertDoctorDTE(dto));
-        }
-        return listDoctor;
-    }
-
-    // covert patient
-    public PatientDTO convertPatientETD(Patient patient) {
-        PatientDTO patientDTO = modelMapper.map(patient, PatientDTO.class);
-        return patientDTO;
-    }
-
-    public List<PatientDTO> convertListPatientETD(List<Patient> patients) {
-        List<PatientDTO> listPatientDTO = new ArrayList<>();
-        for (Patient p : patients) {
-            listPatientDTO.add(convertPatientETD(p));
-        }
-        return listPatientDTO;
-    }
-
-    public Patient convertPatientDTE(PatientDTO patientDTO) {
-        Patient patient = modelMapper.map(patientDTO, Patient.class);
-        return patient;
-    }
-
-
     // covert account
     public AccountDTO convertAccountETD(Account account) {
-        AccountDTO accountDTO = modelMapper.map(account, AccountDTO.class);
-        return accountDTO;
+        return modelMapper.map(account, AccountDTO.class);
     }
 
     public List<AccountDTO> convertListAccountETD(List<Account> accounts) {
@@ -82,11 +34,5 @@ public class AccountMapper {
         }
         return listDTO;
     }
-
-    public Account convertAccountDTE(AccountDTO accountDTO) {
-        Account account = modelMapper.map(accountDTO, Account.class);
-        return account;
-    }
-
 
 }

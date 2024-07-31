@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class EvaluateDTO {
     private String id;
     private String evaluateContent;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String doctorId;
     private String appointmentId;
  }

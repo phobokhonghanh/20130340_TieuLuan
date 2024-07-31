@@ -40,7 +40,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(SecurityConstants.CLIENT_API_PATHS)
                         .permitAll()
-                        .requestMatchers(SecurityConstants.ADMIN_API_PATHS).hasAnyAuthority(SecurityConstants.Role.ADMIN)
+                        .requestMatchers(SecurityConstants.ADMIN_API_PATHS).hasAuthority(SecurityConstants.Role.ADMIN)
                         .requestMatchers(SecurityConstants.DOCTOR_API_PATHS).hasAnyAuthority(SecurityConstants.Role.DOCTOR,SecurityConstants.Role.ADMIN)
                         .requestMatchers(SecurityConstants.PATIENT_API_PATHS).hasAnyAuthority(SecurityConstants.Role.PATIENT,SecurityConstants.Role.DOCTOR,SecurityConstants.Role.ADMIN)
                         .anyRequest().authenticated()

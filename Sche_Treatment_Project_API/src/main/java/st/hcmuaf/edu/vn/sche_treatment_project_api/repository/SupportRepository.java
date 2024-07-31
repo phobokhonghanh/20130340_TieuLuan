@@ -13,4 +13,5 @@ public interface SupportRepository extends JpaRepository<Support, String> {
     @Query(value = "SELECT * FROM support WHERE id_group_time = (SELECT id_group_time FROM calendar WHERE id= :calendarId) AND id NOT IN (SELECT support_time_id FROM appointment WHERE calendar_id =:calendarId AND support_status_id = 'S1')", nativeQuery = true)
     List<Support> getAllTimeAppointment(String calendarId);
 
+    Support findBySupportInfo(String value);
 }

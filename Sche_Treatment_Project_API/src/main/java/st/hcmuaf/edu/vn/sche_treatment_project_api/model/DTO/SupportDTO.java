@@ -21,6 +21,7 @@ public class SupportDTO {
     public static final String LEVEL_INFO = "L1";
     public static final String LEVEL_WARNING = "L2";
     public static final String LEVEL_DANGER = "L3";
+    public static final String PACKAGE_DEFAULT = "PACKAGE_DEFAULT";
     private String id;
     private String supportValue;
     private String supportInfo;

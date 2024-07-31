@@ -21,11 +21,6 @@ public class Calendar extends BaseEntity{
     private String id;
     @Column(name = "calendar_date")
     private LocalDate calendarDate;
-//    @Column(name = "create_at", updatable = false, nullable = false)
-//    private LocalDateTime createdAt;
-//
-//    @Column(name = "update_at")
-//    private LocalDateTime updatedAt;
 
     @ManyToOne
     @JsonIgnore

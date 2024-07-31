@@ -39,7 +39,7 @@ public interface BillRepository extends JpaRepository<Bill, String> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE Bill SET bill_ispay = :isPaid WHERE id = :id", nativeQuery = true)
+    @Query(value = "UPDATE bill SET bill_ispay = :isPaid WHERE id = :id", nativeQuery = true)
     void updateIsPaid(@Param("id") String id, @Param("isPaid") boolean isPaid);
 
     Page<Bill> findAll(Specification<Bill> spec, Pageable pageable);

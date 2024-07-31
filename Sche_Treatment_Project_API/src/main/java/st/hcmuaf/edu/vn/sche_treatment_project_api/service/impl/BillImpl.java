@@ -13,12 +13,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.MessageUtils;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.Utils.Utils;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.config.payment.paypal.PayPalHttpClient;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.BillMapper;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.generic.GenericMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Bill;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.AppointmentDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.BillDTO;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.SupportDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalPackage;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.BillRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.MedicalPackageRepository;
@@ -33,7 +33,6 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.Specification.BillSpe
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +43,7 @@ public class BillImpl implements BillService {
     private BillRepository billRepository;
     private LogService logService;
     private MedicalPackageRepository medicalPackageRepository;
-    private BillMapper billMapper;
+    private GenericMapper genericMapper;
     @PersistenceContext
     private EntityManager entityManager;
     private final PayPalHttpClient payPalHttpClient;
@@ -60,7 +59,7 @@ public class BillImpl implements BillService {
             billDTO.setPaid(false);
             billDTO.setCreatedAt(LocalDateTime.now());
             billDTO.setAppointmentId(appointmentDTO.getId());
-            Bill bill = billMapper.convertBillDTE(billDTO);
+            Bill bill = genericMapper.convert(billDTO, Bill.class);
             bill = billRepository.save(bill);
             return bill;
         } catch (DataAccessException ex) {
@@ -75,7 +74,7 @@ public class BillImpl implements BillService {
         Specification<Bill> spec = Specification
                 .where(BillSpecs.idLike(keyword));
         Page pageBill = billRepository.findAll(spec, pageable);
-        List<BillDTO> billDTOList = billMapper.convertListBillETD(pageBill.getContent());
+        List<BillDTO> billDTOList = genericMapper.toListConvert(pageBill.getContent(), BillDTO.class);
         return new PageImpl<>(billDTOList, pageable, pageBill.getTotalElements());
     }
 
@@ -87,14 +86,11 @@ public class BillImpl implements BillService {
     }
 
     @Override
-    public List<Double> sumBillMonths(boolean is_pay) {
-        Query query = entityManager.createNativeQuery("SELECT EXTRACT(MONTH FROM create_at) AS month, SUM(bill_sum) AS sum FROM bill WHERE bill_ispay = :is_pay GROUP BY month ORDER BY month", StatisticalResponse.class);
-        query.setParameter("is_pay", is_pay);
+    public List<Double> sumBillMonths(String year) {
+        Query query = entityManager.createNativeQuery("SELECT EXTRACT(MONTH FROM create_at) AS month, SUM(bill_sum) AS sum FROM bill WHERE bill_ispay = true AND EXTRACT(YEAR FROM create_at) = :year GROUP BY month ORDER BY month", StatisticalResponse.class);
+        query.setParameter("year", Integer.parseInt(year));
         List<StatisticalResponse> list = query.getResultList();
-        List<Double> listResult = new ArrayList<>();
-        for (int i = 1; i < 13; i++) {
-            listResult.add(0.0);
-        }
+        List<Double> listResult = Utils.initializeMonthlySumList();
         for (StatisticalResponse s : list) {
             listResult.set(s.getMonth() - 1, s.getSum());
         }
@@ -102,8 +98,9 @@ public class BillImpl implements BillService {
     }
 
     @Override
-    public Double sumBillWeek() {
-        return billRepository.sumBillWeek();
+    public String sumBillWeek() {
+        Double sum = billRepository.sumBillWeek();
+        return String.format("%.0f", sum);
     }
 
     @Override

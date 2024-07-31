@@ -10,4 +10,5 @@ public interface SupportService {
     List<Support> getAllTime();
     List<Support> getAllTimeAppointment(String calendarId);
     Support getSupportById(String supportId);
+    Support setPackageDefault(String id);
 }

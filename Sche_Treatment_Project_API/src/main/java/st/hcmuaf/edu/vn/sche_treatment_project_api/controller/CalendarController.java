@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Calendar;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.CalendarDTO;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.calendar.CalendarResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.CalendarService;
 
 import java.util.List;
@@ -16,12 +17,6 @@ import java.util.List;
 public class CalendarController {
     @Autowired
     private CalendarService calendarService;
-
-    @ExceptionHandler(DataAccessException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleDataAccessException() {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
 
     @PostMapping("/admin/calendar")
     public ResponseEntity<CalendarDTO> createCalendar(@RequestBody CalendarDTO calendarDTO) {
@@ -42,9 +37,22 @@ public class CalendarController {
     }
 
     @GetMapping("/calendar/clinic/{clinicId}")
-    public List<Calendar> getCalendarClinic(@PathVariable("clinicId") String clinicId) {
-        List<Calendar> calendars = calendarService.getCalendarClinic(clinicId);
+    public List<CalendarResponse> getCalendarClinic(@PathVariable("clinicId") String clinicId) {
+        List<CalendarResponse> calendars = calendarService.getCalendarClinic(clinicId);
         return calendars;
     }
-
+    @GetMapping("/admin/calendar/all/{clinicId}")
+    public List<CalendarResponse> getAllByClinic(@PathVariable("clinicId") String clinicId) {
+        List<CalendarResponse> calendars = calendarService.getAllByClinic(clinicId);
+        return calendars;
+    }
+    @DeleteMapping("/admin/calendar/{id}")
+    public ResponseEntity delete(@PathVariable("id") String id) {
+        boolean deleted = calendarService.delete(id);
+        if (deleted) {
+            return ResponseEntity.ok().build(); // Xóa thành công
+        } else {
+            return ResponseEntity.badRequest().build(); // Xóa không thành công
+        }
+    }
 }

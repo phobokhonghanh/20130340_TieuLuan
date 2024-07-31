@@ -13,6 +13,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.DoctorDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.PatientDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.SupportDTO;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Doctor;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.response.doctor.DoctorResponse;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AccountService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.DoctorService;
 
@@ -28,6 +29,10 @@ public class DoctorController {
     @GetMapping("/doctor/all")
     public List<Account> getAllDoctor() {
         return accountService.findAllByRoleAndStatus(SupportDTO.STATUS_ROLE_DOCTOR, SupportDTO.STATUS_UNLOCK);
+    }
+    @GetMapping("/doctor/active")
+    public List<DoctorResponse> getAllDoctorActive() {
+        return doctorService.getAllByStatusAndRole(SupportDTO.STATUS_UNLOCK, SupportDTO.STATUS_ROLE_DOCTOR);
     }
 
     @GetMapping("/doctor/slides")

@@ -42,15 +42,6 @@ public class MedicalServicesImpl implements MedicalServicesService {
         return medicalServiceMapper.covertListServiceETRequest(result);
     }
 
-//    @Override
-//    public List<ServiceRequest> getServicesNotSelected(String keyword, String status, List<MedicalService> medicalServices) {
-//        List<MedicalService> getAll = medicalServicesRepository.findAllByServiceNameIsContainingAndSupportStatusId(keyword, status);
-//        List<MedicalService> result = getAll.stream()
-//                .filter(item -> !medicalServices.stream().map(MedicalService::getId).collect(Collectors.toList()).contains(item.getId()))
-//                .collect(Collectors.toList());
-//        return medicalServiceMapper.covertListServiceETRequest(result);
-//    }
-
     @Override
     public List<MedicalService> getListServicesArea(String medical_area_id) {
         return medicalServicesRepository.getListServicesArea(medical_area_id);
@@ -84,8 +75,7 @@ public class MedicalServicesImpl implements MedicalServicesService {
 
         // Create the native query string with the ORDER BY clause and search condition
         String queryString = "SELECT * FROM medical_service " +
-                "WHERE clinic_id IN (SELECT clinic_id FROM calendar) " +
-                "AND support_status_id = 'S1'" +
+                "WHERE support_status_id = 'S1'" +
                 searchCondition +
                 orderByClause + " LIMIT :limit OFFSET :offset";
 
@@ -105,8 +95,7 @@ public class MedicalServicesImpl implements MedicalServicesService {
 
         // Create a query to count the total number of matching records with the search condition
         String countQueryString = "SELECT COUNT(*) FROM medical_service " +
-                "WHERE clinic_id IN (SELECT clinic_id FROM calendar) " +
-                "AND support_status_id = 'S1'" +
+                "WHERE support_status_id = 'S1'" +
                 searchCondition;
         Query countQuery = entityManager.createNativeQuery(countQueryString);
         if (!searchCondition.isEmpty()) {

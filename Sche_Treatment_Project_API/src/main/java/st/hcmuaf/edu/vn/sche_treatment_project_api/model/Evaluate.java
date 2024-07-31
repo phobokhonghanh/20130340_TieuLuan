@@ -16,12 +16,6 @@ public class Evaluate extends BaseEntity{
     @Column(name = "evaluate_content", columnDefinition = "TEXT")
     private String evaluateContent;
 
-//    @Column(name = "create_at")
-//    private LocalDateTime createAt;
-//
-//    @Column(name = "update_at")
-//    private LocalDateTime updateAt;
-
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;

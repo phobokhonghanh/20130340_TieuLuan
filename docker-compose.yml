@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+    essay-client:
+      container_name: essay-client
+      image: essay-client
+      restart: always
+      depends_on:
+        - essay-server
+      build:
+        context: Sche_Treatment_Project
+        dockerfile: Dockerfile
+      ports:
+        - 5173:80
+      networks:
+        - network
+
+    essay-server:
+      container_name: essay-server
+      image: essay-server
+      restart: on-failure
+      depends_on:
+        essay-database:
+          condition: service_healthy
+      build:
+        context: Sche_Treatment_Project_API
+        dockerfile: Dockerfile
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://essay_database:3306/sche_treatment_db
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: 123456
+      ports:
+        - 8080:8080
+      networks:
+        - network
+
+    essay-database:
+      container_name: essay_database
+      image: mysql:8.0
+      restart: unless-stopped
+      cap_add:
+        - SYS_NICE
+      environment:
+        MYSQL_ROOT_PASSWORD: 123456
+        MYSQL_DATABASE: sche_treatment_db
+        LANG: C.UTF-8
+      ports:
+        - 3308:3306
+      networks:
+        - network    
+      command: --sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION" --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --general-log=1 --general-log-file=/tmp/mysql-general-log.log
+      healthcheck:
+        # Reference: https://stackoverflow.com/a/74905088
+        test: 'cat /tmp/mysql-general-log.log | grep "Tcp port: 3306"'
+        interval: 5s
+        timeout: 30s
+        retries: 20
+volumes:
+  storage:
+    driver: local
+
+networks:
+  network:
+    driver: bridge

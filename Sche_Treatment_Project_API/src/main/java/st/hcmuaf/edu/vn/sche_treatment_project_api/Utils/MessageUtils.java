@@ -13,8 +13,10 @@ public class MessageUtils {
     public static final String MESSAGE_LOGIN_SUCCESS = "LOGIN SUCCESS";
     public static final String MESSAGE_LOGIN_FAILED = "LOGIN FAILED";
     public static final String HOSPITAL = "[Essay Medical]";
-    public static final String CLIENT_HOST = "http://localhost:5173";
-    public static final String BACKEND_HOST = "http://localhost:8080";
+    public static final String CLIENT_HOST = "http://172.16.3.200:5173";
+//    public static final String CLIENT_HOST = "http://localhost:5173";
+    public static final String BACKEND_HOST = "http://172.16.3.200:8080";
+//    public static final String BACKEND_HOST = "http://localhost:8080";
     public static final String BACKEND_API = BACKEND_HOST + "/api/v1";
     public static final String EMAIL_SUBJECT_REGISTER_APPOINTMENT = HOSPITAL + " - Đặt lịch hẹn";
     public static final String EMAIL_SUBJECT_REGISTER = HOSPITAL + " - Đăng ký tài khoản";

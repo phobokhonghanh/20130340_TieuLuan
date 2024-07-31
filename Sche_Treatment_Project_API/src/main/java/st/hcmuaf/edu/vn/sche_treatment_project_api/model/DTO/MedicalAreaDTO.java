@@ -14,5 +14,5 @@ public class MedicalAreaDTO {
     private String areaName;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
-    private String supportStatusId;
+    private SupportDTO supportStatusId;
  }

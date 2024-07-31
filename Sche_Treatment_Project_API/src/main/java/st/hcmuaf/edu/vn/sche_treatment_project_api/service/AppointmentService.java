@@ -15,7 +15,7 @@ public interface AppointmentService {
     Page<AppointmentDTO> getListAppointmentDoctor(String accountId,String keyword,Integer pageNo);
     Page<AppointmentDTO> getAll(String keyword,Integer pageNo);
     void updateStatus(String appointmentId, String supportStatusId);
-    List<Double> sumAppointmentMonths();
-    List<Double> sumAppointmentStatusMonths(String status);
+    List<Double> sumAppointmentMonths(String year);
+    List<Double> sumAppointmentStatusMonths(String status,String year);
 
 }

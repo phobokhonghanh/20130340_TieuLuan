@@ -1,12 +1,10 @@
 package st.hcmuaf.edu.vn.sche_treatment_project_api.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.repository.query.Param;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.BillMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.ClinicMapper;
+import st.hcmuaf.edu.vn.sche_treatment_project_api.mapper.generic.GenericMapper;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.Clinic;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.model.DTO.ClinicDTO;
-import st.hcmuaf.edu.vn.sche_treatment_project_api.model.MedicalArea;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.repository.ClinicRepository;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.ClinicService;
 
@@ -18,18 +16,18 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ClinicImpl implements ClinicService {
-    ClinicRepository clinicRepository;
-    ClinicMapper clinicMapper;
+    private ClinicRepository clinicRepository;
+    private ClinicMapper clinicMapper;
+    private GenericMapper genericMapper;
 
     @Override
     public ClinicDTO createClinic(ClinicDTO clinicDTO) {
         if (clinicRepository.existsByClinicName(clinicDTO.getMedicalAreaId().getId(), clinicDTO.getClinicName(), clinicDTO.getId()) == 1) {
             return null;
-
         }
-        Clinic clinic = clinicMapper.convertClinicDTE(clinicDTO);
+        Clinic clinic = genericMapper.convert(clinicDTO, Clinic.class);
         clinic.setCreatedAt(LocalDateTime.now());
-        return clinicMapper.convertClinicETD(clinicRepository.save(clinic));
+        return genericMapper.convert(clinicRepository.save(clinic), ClinicDTO.class);
     }
 
     @Override
@@ -52,14 +50,13 @@ public class ClinicImpl implements ClinicService {
 
     @Override
     public Clinic getClinic(String idClinic) {
-        return clinicRepository.findById(idClinic).get();
+        return clinicRepository.findById(idClinic).orElse(null);
     }
 
     @Override
     public List<ClinicDTO> getAll() {
         List<Clinic> getAll = clinicRepository.findAll();
-        List<ClinicDTO> getAllDTO = clinicMapper.convertListClinicETD(getAll);
-        return getAllDTO;
+        return clinicMapper.convertListClinicETD(getAll);
     }
 
     @Override
@@ -74,7 +71,7 @@ public class ClinicImpl implements ClinicService {
 
     @Override
     public ClinicDTO getClinicByCalendar(String calendarId) {
-        return clinicMapper.convertClinicETD(clinicRepository.getClinicByCalendar(calendarId));
+        return genericMapper.convert(clinicRepository.getClinicByCalendar(calendarId), ClinicDTO.class);
     }
 
 }

@@ -17,6 +17,7 @@ import st.hcmuaf.edu.vn.sche_treatment_project_api.service.AppointmentService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.BillService;
 import st.hcmuaf.edu.vn.sche_treatment_project_api.service.CalendarService;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -33,13 +34,19 @@ public class AppointmentController {
     }
 
     @GetMapping("/admin/appointment/sum/months")
-    public ResponseEntity<List<Double>> getSumAppointmentMonths() {
-        return ResponseEntity.ok(appointmentService.sumAppointmentMonths());
+    public ResponseEntity<List<Double>> getSumAppointmentMonths(@RequestParam(name = "year", required = false) String year) {
+        if (year == null) {
+            year = String.valueOf(LocalDate.now().getYear()); // Nếu năm không được cung cấp, sử dụng năm hiện tại
+        }
+        return ResponseEntity.ok(appointmentService.sumAppointmentMonths(year));
     }
 
     @GetMapping("/admin/appointment/sum/status/months")
-    public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "status", defaultValue = "S4") String status) {
-        return ResponseEntity.ok(appointmentService.sumAppointmentStatusMonths(status));
+    public ResponseEntity<List<Double>> getSumBillMonths(@RequestParam(name = "year", required = false) String year,@RequestParam(name = "status", defaultValue = "S4") String status) {
+        if (year == null) {
+            year = String.valueOf(LocalDate.now().getYear()); // Nếu năm không được cung cấp, sử dụng năm hiện tại
+        }
+        return ResponseEntity.ok(appointmentService.sumAppointmentStatusMonths(status,year));
     }
 
     @GetMapping("/admin/appointment")

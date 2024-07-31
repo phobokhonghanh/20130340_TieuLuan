@@ -35,7 +35,7 @@ public class EvaluateImpl implements EvaluateService {
         Pageable pageable = PageRequest.of(pageNo - 1, 5);
 
         Page<Evaluate> evaluate = evaluateRepository.findAllByDoctorIdOrderByCreatedAtDesc(doctorId, pageable);
-        List<EvaluateDTO> evaluateDTOs = evaluateMapper.convertListEvaluateETD(evaluate.stream().toList());
+        List<EvaluateDTO> evaluateDTOs = evaluateMapper.convertListEvaluateETD(evaluate.getContent());
 
         return new PageImpl<>(evaluateDTOs, pageable, evaluate.getTotalElements());
     }
@@ -44,7 +44,6 @@ public class EvaluateImpl implements EvaluateService {
     public Page<EvaluateDTO> getAll(String keyword, Integer pageNo) {
         Pageable pageable = PageRequest.of(pageNo - 1, 5);
         Page<Evaluate> evaluate = evaluateRepository.findAllByEvaluateContentContainingIgnoreCaseOrderByCreatedAtDesc(keyword, pageable);
-//        List<EvaluateDTO> evaluateDTOs = evaluateMapper.convertListEvaluateETD(evaluate.stream().toList());
         List<EvaluateDTO> evaluateDTOs = new ArrayList<>();
         for (Evaluate e : evaluate.getContent()) {
             evaluateDTOs.add(evaluateMapper.convertEvaluateETD(e));
